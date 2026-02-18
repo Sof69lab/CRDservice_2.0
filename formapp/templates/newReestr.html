@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание реестра</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+</head>
+<body class="container custom">
+    <div class="container" style="max-width:99%">
+        <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+            <h1 class="display-4">Создание реестра несоответствий </h1>
+        </div>
+        <div class="py-5">
+            <div class="row">
+                <div class="col-12">
+                    {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <div class="{{ message.tags }}">
+                              <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                              {{ message }}
+                            </div>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <form novalidate method="post" id="ReestForm" onsubmit="return false;" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% load verbose_names %}
+                        <p hidden>{{ form.status }}</p>
+                        <p>
+                            {% get_verbose_field_name2 "customer" %}<br />
+                            {{ form.customer }}
+                            {% if form.customer.errors %}
+                                {% for error in form.customer.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "project_dogovor" %}<br />
+<!--                            <select name="num_dogovor" class="form-textinput" required></select>-->
+                            {{ form.project_dogovor }}
+                            {% if form.project_dogovor.errors %}
+                                {% for error in form.project_dogovor.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "project_date_contract" %}<br />
+                            {{ form.project_date_contract }}
+                            {% if form.project_date_contract.errors %}
+                                {% for error in form.project_date_contract.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "project_name" %}<br />
+                            {{ form.project_name }}
+                            {% if form.project_name.errors %}
+                                {% for error in form.project_name.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "gip" %}<br />
+                            {{ form.gip }}
+                            {% if form.gip.errors %}
+                                {% for error in form.gip.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "project_reviewer" %}<br />
+                            {{ form.project_reviewer }}
+                            {% if form.project_reviewer.errors %}
+                                {% for error in form.project_reviewer.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "out_mail_num" %}<br />
+                            {{ form.out_mail_num }}
+                            {% if form.out_mail_num.errors %}
+                                {% for error in form.out_mail_num.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "out_mail_date" %}<br />
+                            {{ form.out_mail_date }}
+                            {% if form.out_mail_date.errors %}
+                                {% for error in form.out_mail_date.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "in_mail_num" %}<br />
+                            {{ form.in_mail_num }}
+                            {% if form.in_mail_num.errors %}
+                                {% for error in form.in_mail_num.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "in_mail_date" %}<br />
+                            {{ form.in_mail_date }}
+                            {% if form.in_mail_date.errors %}
+                                {% for error in form.in_mail_date.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name2 "num_reestr" %}<br />
+                            {{ form.num_reestr }}
+                            {% if form.num_reestr.errors %}
+                                {% for error in form.num_reestr.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            Дополнительные файлы (общий объём загружаемых файлов не должен превышать 30 МБ)<br/>
+                            {{ form.add_files }}
+                            {% if form.add_files.errors %}
+                                {% for error in form.add_files.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            Наименование документов<br/>
+                            {{ form.file_name }}
+                            {% if form.file_name.errors %}
+                                {% for error in form.file_name.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p>
+                            Комментарий к файлам<br/>
+                            {{ form.file_comment }}
+                            {% if form.file_comment.errors %}
+                                {% for error in form.file_comment.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                        <p hidden>
+                            {{ form.start_date }}
+                        </p>
+                        <p hidden>
+                            {{ form.end_date }}
+                        </p>
+                        <table hidden id="dogovors">
+                            {% for i in dogovors %}
+                                <tr>
+                                    <td>{{i.0}}</td>
+                                    <td>{{i.1}}</td>
+                                    <td>{{i.2}}</td>
+                                    <td>{{i.3}}</td>
+                                    <td>{{i.4}}</td>
+                                    <td>{{i.5}}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        <p hidden id="gip">{{ gip }}</p>
+                    </form>
+                    <button class="turquoise-button" onclick="document.forms['ReestForm'].submit();">Отправить форму</button>
+                    <button  class="blue-button"><a href="{% url 'home'%}" style="color:white">Вернуться в профиль</a></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('id_gip').value = document.getElementById('gip').innerHTML;
+        let dogovorsInfo = document.getElementById("dogovors").getElementsByTagName("TR");
+        let customers = [];
+        let numbers = [];
+        let dates = [];
+        let names = [];
+        let contracts = [];
+        let num_reestrs = [];
+        for (i=0; i<dogovorsInfo.length; i++) {
+            customers[i] = dogovorsInfo[i].getElementsByTagName("TD")[0].innerHTML;
+            numbers[i] = dogovorsInfo[i].getElementsByTagName("TD")[1].innerHTML;
+            dates[i] = dogovorsInfo[i].getElementsByTagName("TD")[2].innerHTML;
+            names[i] = dogovorsInfo[i].getElementsByTagName("TD")[3].innerHTML;
+            contracts[i] = parseInt(dogovorsInfo[i].getElementsByTagName("TD")[4].innerHTML);
+            num_reestrs[i] = parseInt(dogovorsInfo[i].getElementsByTagName("TD")[5].innerHTML)+1;
+        }
+
+        let contract_date = document.getElementById("id_project_date_contract");
+        let contract_name = document.getElementById("id_project_name");
+        if (contract_date.value != "") {
+            contract_date.style.borderColor="var(--green)";
+        }
+        if (contract_name.value != "") {
+            contract_name.style.borderColor="var(--green)";
+        }
+        document.getElementById("id_customer").addEventListener('change', numberSelect);
+        function numberSelect(e) {
+            let fragment = document.createDocumentFragment();
+            fragment.appendChild(new Option("-----", ""));
+            let defaultValue = 0;
+            for (i=0; i<dogovorsInfo.length; i++) {
+                if (customers[i] == this.value) {
+                    let option = new Option(numbers[i], contracts[i]);
+                    fragment.appendChild(option);
+                    defaultValue+=1;
+                }
+            }
+            let numDogovor = document.getElementById("id_project_dogovor");
+            while (numDogovor.lastChild) {
+                numDogovor.removeChild(numDogovor.lastChild);
+            }
+            numDogovor.appendChild(fragment);
+            if (defaultValue == 1) {
+                numDogovor.value = numDogovor.lastChild.value;
+            }
+            dateNameSelect(numDogovor);
+        }
+
+        document.getElementById("id_project_dogovor").addEventListener('change', dateNameSelect);
+        function dateNameSelect(e) {
+            let val = document.getElementById("id_project_dogovor").value;
+            let empty = true;
+            let contract_date = document.getElementById("id_project_date_contract");
+            let contract_name = document.getElementById("id_project_name");
+            let num_reestr = document.getElementById("id_num_reestr");
+            for (i=0; i<dogovorsInfo.length; i++) {
+                if (contracts[i] == val) {
+                    contract_date.value = dates[i];
+                    contract_name.value = names[i];
+                    num_reestr.value = num_reestrs[i];
+                    contract_date.style.borderColor="var(--green)";
+                    contract_name.style.borderColor="var(--green)";
+                    num_reestr.style.borderColor="var(--green)";
+                    empty = false;
+                    break;
+                }
+            }
+            if (empty) {
+                contract_date.value = "";
+                    contract_name.value = "";
+                    num_reestr.value = "";
+                    contract_date.style.borderColor="var(--red)";
+                    contract_name.style.borderColor="var(--red)";
+                    num_reestr.style.borderColor="var(--red)";
+            }
+        }
+    </script>
+</body>
+</html>

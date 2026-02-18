@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание замечания</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        td {
+            border-style: none;
+            background: var(--light_blue);
+        }
+        tbody td:nth-child(1) {
+            width: 60%;
+        }
+    </style>
+</head>
+<body class="container custom">
+    <div class="container" style="max-width:99%">
+        <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+			<h2 id="reest_num">-</h2>
+        </div>
+        <div class="py-5">
+            <div class="row">
+                <div class="col-12">
+                    {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <div class="{{ message.tags }}">
+                              <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                              {{ message }}
+                            </div>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <form novalidate method="post" id="GIPform" onsubmit="return false;" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% load verbose_names %}
+                        <p id="gipID" hidden>{{ user.id }}</p>
+                        <p id="role" hidden>{{ role }}</p>
+                        <p id="emptyUserID" hidden>{{ emptyUserID }}</p>
+                        <p id="end_date" hidden>{{ end_date }}</p>
+                        <p id="start_date" hidden>{{ start_date }}</p>
+                        <p hidden>
+                            {{ form.reestrID }}
+                        </p>
+                        {% for s in subcontracts %}
+                        <p class="subcontracts" hidden>{{ s }}</p>
+                        {% endfor %}
+                        <details>
+                            <summary>Информация о реестре</summary>
+                            <p>
+                                {% get_verbose_field_name "customer" %}<br />
+                                {{ form.customer }}
+                                <input type="text" class="form-readonly" readonly="readonly" value="{{ customer }}">
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "project_dogovor" %}<br />
+                                {{ form.project_dogovor }}
+                                <input id="reest_project" type="text" class="form-readonly" readonly="readonly" value="{{ contract_number }}">
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "project_date_contract" %}<br />
+                                {{ form.project_date_contract }}
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "project_name" %}<br />
+                                {{ form.project_name }}
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "gip" %}<br />
+                                {{ form.gip }}
+                                <input type="text" class="form-readonly" readonly="readonly" value="{{ gipcontext }}">
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "project_reviewer" %}<br />
+                                {{ form.project_reviewer }}
+                                <input type="text" class="form-readonly" readonly="readonly" value="{{ reviewer }}">
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "out_mail_num" %}<br />
+                                {{ form.out_mail_num }}
+                                {% if form.out_mail_num.errors %}
+                                    {% for error in form.out_mail_num.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "out_mail_date" %}<br />
+                                {{ form.out_mail_date }}
+                                {% if form.out_mail_date.errors %}
+                                    {% for error in form.out_mail_date.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "in_mail_num" %}<br />
+                                {{ form.in_mail_num }}
+                                {% if form.in_mail_num.errors %}
+                                    {% for error in form.in_mail_num.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "in_mail_date" %}<br />
+                                {{ form.in_mail_date }}
+                                {% if form.in_mail_date.errors %}
+                                    {% for error in form.in_mail_date.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+							<p>
+								{% get_verbose_field_name "num_reestr" %}<br />
+								{{ form.num_reestr }}
+								{% if form.num_reestr.errors %}
+									{% for error in form.num_reestr.errors %}
+										<li class="alert danger"> {{error}} </li>
+									{% endfor %}
+								{% endif %}
+							</p>
+                        </details>
+                        <br />
+                        <details id="remark_edit" open>
+                            {% get_verbose_field_name "num_remark" %}<br />
+                            {{ form.num_remark }}
+                            {% if form.num_remark.errors %}
+                                {% for error in form.num_remark.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <br />{% get_verbose_field_name "remark_v" %}<br />
+                            {{ form.remark_v }}
+                            {% if form.remark_v.errors %}
+                                {% for error in form.remark_v.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <br />{% get_verbose_field_name "remark_name" %}<br />
+                            {{ form.remark_name }}
+                            {% if form.remark_name.errors %}
+                                {% for error in form.remark_name.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <br />{% get_verbose_field_name "rational" %}<br />
+                            {{ form.rational }}
+                            {% if form.rational.errors %}
+                                {% for error in form.rational.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <br />{% get_verbose_field_name "designation_name" %}<br />
+                            {{ form.designation_name }}
+                            {% if form.designation_name.errors %}
+                                {% for error in form.designation_name.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <br />{% get_verbose_field_name "section_name" %}<br />
+                            {{ form.section_name }}
+                            {% if form.section_name.errors %}
+                                {% for error in form.section_name.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <p id="responsible">{% get_verbose_field_name "responsibleTrouble_name" %}
+                            {{ form.responsibleTrouble_name }}
+                            {% if form.responsibleTrouble_name.errors %}
+                                {% for error in form.responsibleTrouble_name.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            </br></br>
+                            <button id="newResponsible" class="green-button">Добавить ответственного</button>
+                            </p>
+                            <p id="comments">
+                                <b>{% get_verbose_field_name "comment" %}</b><br />
+                            </p>
+                            {{ form.comment }}
+                            <summary id="remark_summary">Информация о несоответствии</summary>
+                        </details>
+                        <br />
+                        <p hidden>
+                            {{ form.status }}
+                        </p>
+                        <details>
+                            <summary>Прикрепить файлы</summary>
+                            <p>
+                                Дополнительные файлы (общий объём загружаемых файлов не должен превышать 30 МБ)<br/>
+                                {{ form.add_files }}
+                                {% if form.add_files.errors %}
+                                    {% for error in form.add_files.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                Наименование документов<br/>
+                                {{ form.file_name }}
+                                {% if form.file_name.errors %}
+                                    {% for error in form.file_name.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                Комментарий к файлам<br/>
+                                {{ form.file_comment }}
+                                {% if form.file_comment.errors %}
+                                    {% for error in form.file_comment.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                        </details>
+                        <br/>
+                        <script>
+                            let er_mes = document.getElementsByClassName("alert-danger");
+                            let suc_mes = document.getElementsByClassName("alert-success");
+                            if (er_mes.length == 0 && suc_mes.length > 0) {
+                                document.getElementById("remark_edit").removeAttribute("open");
+                            }
+
+                            if (document.getElementById("role").innerHTML == "viewer") {
+                                document.getElementById("responsible").setAttribute("hidden", "");
+                                document.getElementById("id_responsibleTrouble_name").removeAttribute("required");
+                            } else {
+                                document.getElementById("id_responsibleTrouble_name").setAttribute("required", "");
+                            }
+                            let calendars = document.querySelectorAll('input[type="date"]');
+                            let end_date = document.getElementById("end_date").innerHTML;
+                            let start_date = document.getElementById("start_date").innerHTML;
+                            for (let i = 0; i < calendars.length; i++) {
+                                calendars[i].max = end_date;
+                                calendars[i].min = start_date;
+                            }
+                            document.getElementById("newResponsible").addEventListener('click', addResponsible)
+                            if (document.getElementById("id_responsibleTrouble_name").parentElement.nextSibling.innerHTML) {
+                                document.getElementById("id_responsibleTrouble_name").value = "";
+                            }
+                            let subcontracts = document.getElementsByClassName('subcontracts');
+                            let subcntr = []
+                            for (i = 0; i < subcontracts.length; i++) {
+                                subcntr[i] = subcontracts[i].innerHTML;
+                            }
+                            function addResponsible(e) {
+                                let myParent = this.parentElement;
+                                let elem = document.createElement('select');
+                                elem.addEventListener('change', responsibleSelect);
+                                elem.setAttribute("required", "");
+                                elem.setAttribute("autocomplete", "off");
+                                elem.setAttribute("class", "form-textinput");
+                                elem.setAttribute("name", "responsibleTrouble_name");
+                                elem.setAttribute("style", "width:80%");
+                                let delButton = document.createElement('button');
+                                delButton.addEventListener('click', delResponsible);
+                                delButton.setAttribute("class", "red-button");
+                                delButton.innerHTML = "Удалить ответственного";
+                                myParent.insertBefore(elem, this);
+                                myParent.insertBefore(document.createTextNode("\u00A0 \u00A0 \u00A0"), this);
+                                myParent.insertBefore(delButton, this);
+                                myParent.insertBefore(document.createElement('BR'), this);
+                                myParent.insertBefore(document.createElement('BR'), this);
+                                let selectElement = document.getElementById("id_responsibleTrouble_name");
+                                let optionValues = [...selectElement.options].map(o => o.value);
+                                let optionNames = [...selectElement.options].map(o => o.text);
+                                for (let i=0; i < optionValues.length; i++) {
+                                    let option = document.createElement("option");
+                                    option.value = optionValues[i];
+                                    option.text = optionNames[i];
+                                    elem.appendChild(option);
+                                }
+                            }
+                            function onlyUnique(value, index, array) {
+                                return array.indexOf(value) === index;
+                            }
+                            function valIndex(res) {
+                                let vals = [];
+                                let remark_summary = document.getElementById("remark_summary");
+                                for (let i=0; i < res.length; i++) {
+                                    vals[i] = res[i].value;
+                                }
+                                let unique = vals.filter(onlyUnique);
+                                if (unique.length < vals.length) {
+                                    let duplicate = [];
+                                    for (let i=0; i<unique.length; i++) {
+                                        duplicate.push([]);
+                                        if (unique[i] != "") {
+                                            for (let j=0; j < res.length; j++) {
+                                                if (unique[i] == res[j].value) {
+                                                    duplicate[i].push(j);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    for (let i=0; i<duplicate.length; i++) {
+                                        if (duplicate[i].length > 1) {
+                                            for (let j=0; j < duplicate[i].length; j++) {
+                                                if (res[duplicate[i][j]].id == "id_responsibleTrouble_name") {
+                                                    res[duplicate[i][j]].setAttribute("style", "border: outset #ff0000b2");
+                                                } else {
+                                                    res[duplicate[i][j]].setAttribute("style", "border: outset #ff0000b2; width:80%");
+                                                }
+                                            }
+                                            remark_summary.setAttribute("style", "background-color: #ff0000b2");
+                                        } else if (duplicate[i].length == 1) {
+                                            if (res[duplicate[i][0]].id == "id_responsibleTrouble_name") {
+                                                res[duplicate[i][0]].removeAttribute("style");
+                                            } else {
+                                                res[duplicate[i][0]].setAttribute("style", "width:80%");
+                                            }
+                                            remark_summary.removeAttribute("style");
+                                        }
+                                    }
+                                } else {
+                                    remark_summary.removeAttribute("style");
+                                    for (let i=0; i < res.length; i++) {
+                                        if (res[i].value != "") {
+                                            if (res[i].id == "id_responsibleTrouble_name") {
+                                                res[i].removeAttribute("style");
+                                            } else {
+                                                res[i].setAttribute("style", "width:80%");
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            function delResponsible(e) {
+                                this.previousSibling.previousSibling.remove();
+                                this.previousSibling.remove();
+                                this.nextSibling.remove();
+                                this.nextSibling.remove();
+                                this.remove();
+                                valIndex(document.getElementsByName("responsibleTrouble_name"));
+                            }
+
+                            let reestr = document.getElementById("id_num_reestr").value;
+                            let reest_num = document.getElementById("reest_project").value;
+							let reest_num2 = document.getElementById("id_num_reestr").value;
+							let s = "Реестр выявленных несоответствий № ";
+							s = s.concat(reest_num.substring(4,9));
+							s = s.concat(reest_num2);
+							document.getElementById("reest_num").innerHTML = s;
+                            document.getElementById("remark_v").value = 0;
+
+                            document.getElementById("id_responsibleTrouble_name").addEventListener('change', responsibleSelect);
+
+                            function responsibleSelect(e) {
+                                let res = document.getElementsByName("responsibleTrouble_name");
+                                valIndex(res);
+                            }
+                        </script>
+                    </form>
+                    <button class="blue-button" onclick="document.forms['GIPform'].submit();">Отправить форму</button>
+                    <button class="blue-button"><a href="{% url 'home'%}" style="color:white">Вернуться в профиль</a></button>
+                    <button class="blue-button"><a href="{% url 'homeGIP' id=reestrID %}" style="color:white">Вернуться в реестр</a></button>
+                    <button class="blue-button" onclick="window.location.href = window.location.href; return false;">Создать новое замечание</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

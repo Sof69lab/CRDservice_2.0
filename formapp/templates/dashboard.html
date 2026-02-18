@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Дашборд</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        form {
+            padding: 10px 20px;
+            border: none;
+            background: var(--white);
+            border-radius: 10px;
+        }
+        td {
+            border-style: none;
+            background: var(--white);
+            cursor: default;
+        }
+    </style>
+</head>
+<body class="container custom">
+    {% load verbose_names %}
+    {% if user.is_authenticated %}
+    <h4 hidden id="user">{{ user.id }}</h4>
+    <h4 hidden id="group">{{ group }}</h4>
+    <h4 hidden id="department">{{ depart }}</h4>
+    <form>
+        <table style="width:100%">
+            <tr>
+                <td style="width:23%">
+                    <table id="importance_table">
+                        <tr>
+                            <td style="width:50%">
+                                Год
+                                {{ form.years }}
+                            </td>
+                            <td>
+                                ГИП
+                                {{ form.gips }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                Рецензент
+                                {{ form.reviewers }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                Заказчик
+                                {{ form.customers }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:50%">
+                                Договор
+                                {{ form.contracts }}
+                            </td>
+                            <td>
+                                Реестр
+                                {{ form.reestrs }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                Подразделение
+                                {{ form.departments }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width:50%" valign="bottom">
+                                Значимость
+                                {{ form.importances }}
+                            </td>
+                            <td>
+                                Зона ответственности
+                                {{ form.respons }}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td style="width:77%">
+                    <table>
+                        <tr>
+                            <td colspan="3">
+                                <iframe id="header" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739164706799&to=1739186306799&panelId=20" width="630" height="100" frameborder="0"></iframe>
+                            </td>
+                            <td>
+                                <iframe id="customer" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739164828533&to=1739186428533&panelId=16" width="210" height="100" frameborder="0"></iframe>
+                            </td>
+                            <td>
+                                <iframe id="significant" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739164946424&to=1739186546424&panelId=17" width="210" height="100" frameborder="0"></iframe>
+                            </td>
+                            <td>
+                                <iframe id="unsignificant" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739164967176&to=1739186567176&panelId=18" width="210" height="100" frameborder="0"></iframe>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <iframe id="number_header" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739165102112&to=1739186702112&panelId=24" width="210" height="120" frameborder="0"></iframe>
+                            </td>
+                            <td>
+                                <iframe id="number" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739165136830&to=1739186736830&panelId=10" width="210" height="120" frameborder="0"></iframe>
+                            </td>
+                            <td>
+                                <iframe id="root_cause_header" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739165147590&to=1739186747590&panelId=25" width="210" height="120" frameborder="0"></iframe>
+                            </td>
+                            <td>
+                                <iframe id="root_cause_1" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739165167304&to=1739186767304&panelId=13" width="210" height="120" frameborder="0"></iframe>
+                            </td>
+                            <td>
+                                <iframe id="labor_coast_header" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739165181203&to=1739186781203&panelId=26" width="210" height="120" frameborder="0"></iframe>
+                            </td>
+                            <td>
+                                <iframe id="labor_coast" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=t&from=1739165198331&to=1739186798331&panelId=14" width="210" height="120" frameborder="0"></iframe>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <iframe id="importance_stat" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739165829314&to=1739187429314&panelId=2" width="420" height="250" frameborder="0"></iframe>
+                            </td>
+                            <td colspan="2" valign="top">
+                                <iframe id="root_cause_2" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739165848969&to=1739187448969&panelId=4" width="420" height="205" frameborder="0"></iframe>
+                            </td>
+                            <td colspan="2">
+                                <iframe id="labor_coast_stat" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739165869836&to=1739187469836&panelId=6" width="420" height="250" frameborder="0"></iframe>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <iframe id="dynamic" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1581342807642&to=1739195607642&panelId=22" width="420" height="250" frameborder="0"></iframe>
+                            </td>
+                            <td colspan="2">
+                                <iframe id="root_cause_3" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739166296277&to=1739187896280&panelId=8" width="420" height="250" frameborder="0"></iframe>
+                            </td>
+                            <td colspan="2">
+                                <iframe id="respons" src="http://localhost:3000/d-solo/wNTrA3dHk/crds?orgId=1&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1739166313794&to=1739187913795&panelId=15" width="420" height="250" frameborder="0"></iframe>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </form>
+    </br>
+    <button class="blue-button"><a style="color:white" href="{% url 'home'%}">К реестрам</a></button>
+    {% else %}
+    <p>Вы не авторизованы</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+    {% endif %}
+    <script>
+        var now = new Date();
+        let to = now.getTime();
+        let from = now.setFullYear(now.getFullYear() - 5);
+        let first_year = new Date(from);
+        if (first_year.getFullYear() > 2024) {
+            from = now.setFullYear(2024);
+        }
+        let role = document.getElementById("group").innerHTML;
+        let gip = document.getElementById("user").innerHTML;
+        let department = document.getElementById("department").innerHTML;
+
+        let vYear = document.getElementById("var-Year");
+        vYear.addEventListener('change', multipleSelect);
+        vYear.selectedIndex = "0";
+        let vGIP = document.getElementById("var-GIP");
+        vGIP.addEventListener('change', multipleSelect);
+        vGIP.selectedIndex = "0";
+        let vReviewer = document.getElementById("var-reviewer");
+        vReviewer.addEventListener('change', multipleSelect);
+        vReviewer.selectedIndex = "0";
+        let vCustomers = document.getElementById("var-customers");
+        vCustomers.addEventListener('change', multipleSelect);
+        vCustomers.selectedIndex = "0";
+        let vReestrs = document.getElementById("var-reestrs");
+        vReestrs.addEventListener('change', multipleSelect);
+        vReestrs.selectedIndex = "0";
+        let vDepartments = document.getElementById("var-departments");
+        vDepartments.addEventListener('change', multipleSelect);
+        vDepartments.selectedIndex = "0";
+        let vRespons = document.getElementById("var-respons");
+        vRespons.addEventListener('change', multipleSelect);
+        vRespons.selectedIndex = "0";
+        let vImportance = document.getElementById("var-importance");
+        vImportance.addEventListener('change', multipleSelect);
+        vImportance.selectedIndex = "0";
+        let vContracts = document.getElementById("var-contracts");
+        vContracts.addEventListener('change', multipleSelect);
+        vContracts.selectedIndex = "0";
+
+        if (role == "ГИП") {
+            vGIP.value = gip;
+        } else {
+            gip = 'All';
+            if (role == "Руководитель" || role == "Исполнитель") {
+                vDepartments.value = department;
+            }
+        }
+        let customer = document.getElementById("customer");
+        changeURL(customer, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+        let significant = document.getElementById("significant");
+        changeURL(significant, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+        let unsignificant = document.getElementById("unsignificant");
+        changeURL(unsignificant, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+        let number = document.getElementById("number");
+        changeURL(number, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+        let root_cause_1 = document.getElementById("root_cause_1");
+        changeURL(root_cause_1, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+        let labor_coast = document.getElementById("labor_coast");
+        changeURL(labor_coast, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+        let importance_stat = document.getElementById("importance_stat");
+        changeURL(importance_stat, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+        let root_cause_2 = document.getElementById("root_cause_2");
+        changeURL(root_cause_2, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+        let labor_coast_stat = document.getElementById("labor_coast_stat");
+        changeURL(labor_coast_stat, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+        let dynamic = document.getElementById("dynamic");
+        changeURL(dynamic, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+        let root_cause_3 = document.getElementById("root_cause_3");
+        changeURL(root_cause_3, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+        let respons = document.getElementById("respons");
+        changeURL(respons, ['from', 'to', 'var-GIP', 'var-departments'], [from, to, gip, department])
+
+        function changeURL(ID, param_names, param_values) {
+            let url_str = new URL(ID.src);
+            for (let i=0; i < param_names.length; i++) {
+                if (i < 2) {
+                    url_str.searchParams.set(param_names[i], param_values[i]);
+                } else {
+                    if (param_names[i-1] != param_names[i]) {
+                        url_str.searchParams.delete(param_names[i]);
+                    }
+                    url_str.searchParams.append(param_names[i], param_values[i]);
+                }
+            }
+            ID.src = url_str.href;
+        }
+
+        function multipleSelect(e) {
+            let opt = this.selectedOptions;
+            let ID = this.id;
+            let params = ['from', 'to'];
+            let values = [from, to];
+            if (opt[0].value == 'All' || opt[0].value == 'н') {
+                params.push(ID);
+                values.push(opt[0].value);
+                console.log(ID);
+            } else {
+                for (let i=0; i<opt.length; i++) {
+                    params.push(ID);
+                    values.push(opt[i].value);
+                }
+            }
+            changeURL(customer, params, values);
+            changeURL(significant, params, values);
+            changeURL(unsignificant, params, values);
+            changeURL(number, params, values);
+            changeURL(root_cause_1, params, values);
+            changeURL(labor_coast, params, values);
+            changeURL(importance_stat, params, values);
+            changeURL(root_cause_2, params, values);
+            changeURL(labor_coast_stat, params, values);
+            changeURL(dynamic, params, values);
+            changeURL(root_cause_3, params, values);
+            changeURL(respons, params, values);
+        }
+    </script>
+</body>
+</html>

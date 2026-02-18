@@ -1,0 +1,161 @@
+.custom {
+    background:#ddebf7;
+}
+.dark {
+    background:#09375c;
+}
+.site-footer {
+    background-color: #09375c;
+    position: absolute;
+    bottom: 0;
+    padding: 0px 5px;
+    font-size:15px;
+    height:7.5rem;
+    width: 100%;
+    color: white;
+}
+
+@font-face {
+    font-family: 'Rosatom';
+    src: url('../fonts/Rosatom-Regular.ttf') format("truetype");
+}
+body {
+    font-family: 'Rosatom';
+    background: #ddebf7;
+}
+.py-f {
+    padding-bottom: 7.5rem
+}
+.container {
+    position: relative;
+    min-height: 100vh;
+    max-width:99%
+}
+a.text:active, /* активная/посещенная ссылка */
+a.text:hover,  /* при наведении */
+a.text {
+  text-decoration: none;
+}
+a {
+    text-decoration: none;
+}
+
+.blue-button {
+    background: #1abff2;
+    border: none;
+    border-radius: 2px;
+    padding: 10px 15px;
+    color: white;
+    cursor: pointer;
+}
+.blue-button:disabled {
+    background: #9a9da0;
+    color: white;
+    cursor: default;
+}
+.red-button {
+    background: #eb5757;
+    border: none;
+    border-radius: 2px;
+    padding: 10px 15px;
+    color: white;
+    cursor: pointer;
+}
+.green-button {
+    background: #5dfc4eb2;
+    border: none;
+    border-radius: 2px;
+    padding: 10px 15px;
+    color: white;
+    cursor: pointer;
+}
+
+td {
+    background: white;
+    border: 1px solid #F2F2F2;
+    cursor: pointer;
+}
+summary {
+    background-color: #1abff2;
+    color: white;
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+}
+.form-textinput:valid ~ summary{
+    background-color: #5dfc4eb2;
+}
+.form-textinput:invalid ~ summary{
+    background-color: #eb5757;
+}
+
+.reestr:hover, .reestr:focus-within {
+    color: #1abff2;
+    border: 1px solid #F2F2F2;
+}
+
+.form-importance {
+    width:100%;
+    border: outset #ff0000b2;
+    border-radius: 5px
+}
+.form-readonly {
+    width:100%;
+    border: outset grey;
+    border-radius: 5px
+}
+.form-textinput {
+    width:100%;
+}
+.form-textinput:invalid {
+    width:100%;
+    border: outset #ff0000b2;
+    border-radius: 5px
+}
+.form-textinput:valid {
+    width:100%;
+    border: outset #5dfc4eb2;
+    border-radius: 5px
+}
+.form-dateinput:invalid {
+    border: outset #ff0000b2;
+    border-radius: 5px
+}
+.form-dateinput:valid {
+    border: outset #5dfc4eb2;
+    border-radius: 5px
+}
+.select[multiple] {
+    white-space: normal;
+    height: 18rem;
+}
+
+.alert-danger {
+    padding: 20px;
+    background-color: #eb5757;
+    color: white;
+    margin-bottom: 15px;
+}
+.danger {
+    color: red;
+}
+.alert-success {
+    padding: 20px;
+    background-color: #5dfc4eb2;
+    color: white;
+    margin-bottom: 15px;
+}
+.closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.closebtn:hover {
+    color: black;
+}
+

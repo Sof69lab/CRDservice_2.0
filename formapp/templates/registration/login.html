@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Авторизация</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        body {
+            position: relative;
+            height: 100vh;
+        }
+        form {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -70%);
+        }
+        td {
+            background: var(--navy);
+            color: white;
+            padding: 10px;
+            border: none;
+        }
+    </style>
+</head>
+<body class="dark">
+<div class="container">
+    <div class="py-f">
+    <h1 style="text-align:center; color:white; background: url('../../static/vnipi_logo-2.svg') no-repeat right 1px top 0.5%;">СЕРВИС ПО ФОРМИРОВАНИЮ<br/>РЕЕСТРОВ НЕСООТВЕТСТВИЙ</h1>
+    {% block content %}
+    {% if form.errors %}
+        <p style="color:white">Неверное имя пользователя и/или пароль. Пожалуйста, повторите попытку.</p>
+    {% endif %}
+
+   <!-- {% if next %}
+        {% if user.is_authenticated %}
+            <p>Ваш аккаунт не имеет доступа к данной странице. Для продолжения,
+                авторизируйтесь через аккаунт с соответствующим доступом.</p>
+        {% else %}
+             <p>Пожалуйста, авторизируйтесь, чтобы увидеть эту страницу.</p>
+        {% endif %}
+    {% endif %}-->
+
+    <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+
+    <h1 style="text-align:center; color:white">Авторизация</h1>
+    <table align="center">
+
+    <tr>
+        <td>{{ form.username.label_tag }}</td>
+        <td>{{ form.username }}</td>
+    </tr>
+
+    <tr>
+        <td>{{ form.password.label_tag }}</td>
+        <td>{{ form.password }}</td>
+    </tr>
+
+    <tr>
+        <td align="center" colspan="2"><input class="green-button" type="submit" value="Войти" /></td>
+    </tr>
+    </table>
+
+    <input type="hidden" name="next" value="{{ next }}" />
+    </form>
+    {% endblock %}
+    </div>
+    <footer class="site-footer">
+        <div style="display: flex; justify-content: space-between; width: 100%">
+            <div style="margin-left: 5px;">
+                <h4>Контакты разработчиков:</h4>
+                <ul>
+                    <li>crds@vnipipt.ru</li>
+                    <li>ilyina-s-a@vnipipt.ru</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

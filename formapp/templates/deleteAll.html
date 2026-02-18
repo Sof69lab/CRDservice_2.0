@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Удаление файлов</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+</head>
+<body class="container custom">
+    <form novalidate method="post" id="DeleteForm" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h2>Удаление файла</h2>
+        <p>Вы хотите удалить следующие файлы?</p>
+        {% for f in files %}
+            <p>{{ f.file }}</p>
+        {% endfor %}
+
+        <button class="red-button" onclick="document.forms['DeleteForm'].submit();">Да</button>
+        <button class="blue-button"><a href="{% url 'fileManage' id=reestr.id %}" style="color:white">Нет</a></button>
+    </form>
+</body>
+</html>

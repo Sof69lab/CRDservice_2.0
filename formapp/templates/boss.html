@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Заполнение замечания Руководителем</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        td {
+            border-style: none;
+            background: var(--light_blue);
+        }
+        tbody td:nth-child(1) {
+            width: 60%;
+        }
+    </style>
+</head>
+<body class="container custom">
+    <div class="container" style="max-width:99%">
+        <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+            <h1 class="display-4" id="reest_num">Реестр выявленных несоответствий № {{ form.project_dogovor.value }}-{{ form.num_reestr.value }}</h1>
+        </div>
+        <div class="py-5">
+            <div class="row">
+                <div class="col-12">
+                    {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <div class="{{ message.tags }}">
+                              <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                              {{ message }}
+                            </div>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <form novalidate method="POST" id="BossForm1" onsubmit="return false;">
+                        {% csrf_token %}
+                        {% load verbose_names %}
+                        <p hidden>{{ form.reestrID }}</p>
+                        <p id="bossID" hidden>{{ user.id }}</p>
+                        <p id="emptyUserID" hidden>{{ emptyUserID }}</p>
+                        <p id="end_date" hidden>{{ end_date }}</p>
+                        <p id="start_date" hidden>{{ start_date }}</p>
+                        {% for s in subcontracts %}
+                        <p class="subcontracts" hidden>{{ s }}</p>
+                        <p id="status" hidden>{{ reestrID.status }}</p>
+                        <p id="next_step_key" hidden>{{ next_step_key }}</p>
+                        {% endfor %}
+                        <details>
+                            <summary>Информация о реестре</summary>
+                            <p>
+                                {% get_verbose_field_name "customer" %}<br />
+                                <input type="text" class="form-readonly" readonly="readonly" value="{{ customer }}">
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "project_dogovor" %}<br />
+                                <input type="text" class="form-readonly" readonly="readonly" value="{{ contract_number }}" id="id_project_dogovor">
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "project_date_contract" %}<br />
+                                {{ form.project_date_contract }}
+                                {% if form.project_date_contract.errors %}
+                                    {% for error in form.project_date_contract.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "project_name" %}<br />
+                                {{ form.project_name }}
+                                {% if form.project_name.errors %}
+                                    {% for error in form.project_name.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "gip" %}<br />
+                                <input type="text" class="form-readonly" readonly="readonly" value="{{ gipcontext }}">
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "project_reviewer" %}<br />
+                                <input type="text" class="form-readonly" readonly="readonly" value="{{ reviewer }}">
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "out_mail_num" %}<br />
+                                {{ form.out_mail_num }}
+                                {% if form.out_mail_num.errors %}
+                                    {% for error in form.out_mail_num.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "out_mail_date" %}<br />
+                                {{ form.out_mail_date }}
+                                {% if form.out_mail_date.errors %}
+                                    {% for error in form.out_mail_date.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "in_mail_num" %}<br />
+                                {{ form.in_mail_num }}
+                                {% if form.in_mail_num.errors %}
+                                    {% for error in form.in_mail_num.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "in_mail_date" %}<br />
+                                {{ form.in_mail_date }}
+                                {% if form.in_mail_date.errors %}
+                                    {% for error in form.in_mail_date.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                            <p>
+                                {% get_verbose_field_name "num_reestr" %}<br />
+                                {{ form.num_reestr }}
+                                {% if form.num_reestr.errors %}
+                                    {% for error in form.num_reestr.errors %}
+                                        <li class="alert danger"> {{error}} </li>
+                                    {% endfor %}
+                                {% endif %}
+                            </p>
+                        </details>
+                        <br />
+                        <details id="remark_edit" open>
+                            <br />{% get_verbose_field_name "num_remark" %}<br />
+                            {{ form.num_remark }}
+                            {% if form.num_remark.errors %}
+                                {% for error in form.num_remark.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <br />{% get_verbose_field_name "remark_v" %}<br />
+                            {{ form.remark_v }}
+                            {% if form.remark_v.errors %}
+                                {% for error in form.remark_v.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <br />{% get_verbose_field_name "remark_name" %}<br />
+                            {{ form.remark_name }}
+                            {% if form.remark_name.errors %}
+                                {% for error in form.remark_name.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <br />{% get_verbose_field_name "rational" %}<br />
+                            {{ form.rational }}
+                            {% if form.rational.errors %}
+                                {% for error in form.rational.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <br />{% get_verbose_field_name "designation_name" %}<br />
+                            {{ form.designation_name }}
+                            {% if form.designation_name.errors %}
+                                {% for error in form.designation_name.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <br />{% get_verbose_field_name "section_name" %}<br />
+                            {{ form.section_name }}
+                            {% if form.section_name.errors %}
+                                {% for error in form.section_name.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <br />{% get_verbose_field_name "responsibleTrouble_name" %}<br />
+                            <input type="text" class="form-readonly" readonly="readonly" value="{{ rescontext }}">
+                            <p id="execFailName">
+                                {% get_verbose_field_name "executor_fail_name" %}<br />
+                            </p>
+                            {{ form.executor_fail_name }}
+                            {% if form.executor_fail_name.errors %}
+                                {% for error in form.executor_fail_name.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <p id="execFailText" hidden>
+                                {% get_verbose_field_name "executor_fail_text" %}<br/>
+                            </p>
+                            {{ form.executor_fail_text }}
+                            {% if form.executor_fail_text.errors %}
+                                {% for error in form.executor_fail_text.errors %}
+                                    <li class="alert danger">{{ error }}</li>
+                                {% endfor %}
+                            {% endif %}
+                            <p id="execName">
+                                {% get_verbose_field_name "executor_name" %}<br />
+                            </p>
+                            {{ form.executor_name }}
+                            {% if form.executor_name.errors %}
+                                {% for error in form.executor_name.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <p id="comments">
+                                <b>{% get_verbose_field_name "comment" %}</b><br />
+                            </p>
+                            {{ form.comment }}
+                            {% if form.comment.errors %}
+                                {% for error in form.comment.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <p id="answerRemark" hidden>
+                                {% get_verbose_field_name "answer_remark" %}<br />
+                            </p>
+                            {{ form.answer_remark }}
+                            {% if form.answer_remark.errors %}
+                                {% for error in form.answer_remark.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
+                            <summary id="remark_summary">Информация о несоответствии</summary>
+                        </details>
+                        <br/>
+                        <p hidden>
+                            {{ form.status }}
+                        </p>
+                        <button class="turquoise-button" id="next_step" hidden><a href="{% url 'employee' id=remarkID %}" style="color:white">К следующему этапу заполнения</a></button>
+                        <br/>
+                        <br/>
+                        <script>
+                            let er_mes = document.getElementsByClassName("alert-danger");
+                            let suc_mes = document.getElementsByClassName("alert-success");
+                            if (er_mes.length == 0 && suc_mes.length > 0) {
+                                document.getElementById("remark_edit").removeAttribute("open");
+                                if (document.getElementById("next_step_key").innerHTML == "True") {
+                                    document.getElementById("next_step").removeAttribute("hidden");
+                                }
+                            }
+
+                            let calendars = document.querySelectorAll('input[type="date"]');
+                            let end_date = document.getElementById("end_date").innerHTML;
+                            let start_date = document.getElementById("start_date").innerHTML;
+                            for (let i = 0; i < calendars.length; i++) {
+                                calendars[i].max = end_date;
+                                calendars[i].min = start_date;
+                            }
+                            let reestStatus = document.getElementById("status").innerHTML;
+                            if (reestStatus == "На доработке" || reestStatus == "На согласовании Рецензентом") {
+                                document.getElementById("answerRemark").removeAttribute("hidden");
+                                document.getElementById("id_answer_remark").removeAttribute("hidden");
+                            }
+                            let dogovor = document.getElementById("id_project_dogovor").value;
+                            let reestr = document.getElementById("id_num_reestr").value;
+                            let s = "Реестр выявленных несоответствий № ";
+                            s = s.concat(dogovor.substring(4,9));
+                            s = s.concat(reestr);
+                            let subcontracts = document.getElementsByClassName('subcontracts');
+                            let subcntr = []
+                            for (i = 0; i < subcontracts.length; i++) {
+                                subcntr[i] = subcontracts[i].innerHTML;
+                            }
+                            document.getElementById("reest_num").innerHTML = s;
+
+                            if (document.getElementById("id_executor_fail_name").value == document.getElementById("emptyUserID").innerHTML) {
+                                document.getElementById("execFailText").removeAttribute("hidden");
+                                document.getElementById("executor_fail_text").removeAttribute("hidden");
+                                document.getElementById("executor_fail_text").setAttribute("required", "");
+                            }
+
+                            document.getElementById("remark_v").value = 0;
+
+                            document.getElementById("id_executor_fail_name").addEventListener('change', executorFailSelect);
+                            function executorFailSelect(e) {
+                                if (this.value == document.getElementById("emptyUserID").innerHTML) {
+                                    document.getElementById("execFailText").removeAttribute("hidden");
+                                    document.getElementById("executor_fail_text").removeAttribute("hidden");
+                                    document.getElementById("executor_fail_text").setAttribute("required", "");
+                                } else {
+                                    document.getElementById("execFailText").setAttribute("hidden", "");
+                                    document.getElementById("executor_fail_text").setAttribute("hidden", "");
+                                    document.getElementById("executor_fail_text").removeAttribute("required");
+                                }
+                            }
+                            let status = document.getElementById("status").innerHTML;
+                            if (status == "На согласовании Рецензентом" || status == "На доработке") {
+                                document.getElementById("answerRemark").removeAttribute("hidden");
+                                document.getElementById("id_answer_remark").removeAttribute("hidden");
+                            }
+
+                            function errorRespons() {
+                                let error = document.getElementById("ErrorRespons").children[1];
+                                let base = document.getElementById("comment");
+                                error.value = base.value;
+                                document.forms['ErrorRespons'].submit();
+                            }
+                        </script>
+                    </form>
+                    <button class="blue-button" onclick="document.forms['BossForm1'].submit();">Отправить форму</button>
+                    <button class="red-button" onclick="errorRespons();">Вернуть ГИПу</button>
+                    <button class="blue-button"><a href="{% url 'home' %}" style="color:white">Вернуться в профиль</a></button>
+                    <button class="blue-button"><a href="{% url 'homeGIP' id=reestrID.id %}" style="color:white">Вернуться в реестр</a></button>
+                    <form novalidate method="POST" id="ErrorRespons" onsubmit="return false;" hidden>
+                        {% csrf_token %}
+                        <textarea name="comment"></textarea>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

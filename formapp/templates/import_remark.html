@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Загрузка файла замечаний</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+</head>
+<body class="container custom">
+    <p hidden="hidden" id="group">{{ group }}</p>
+    {% if user.is_authenticated %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <div class="{{ message.tags }}">
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form novalidate method="post" id="UploadForm" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h2>Загрузка файлов</h2>
+        <p>
+            Файлы (общий объём загружаемых файлов не должен превышать 30 МБ)<br/>
+            {{ form.file }}
+            {% if form.file.errors %}
+                {% for error in form.add_files.errors %}
+                    <li class="alert alert-danger"> {{error}} </li>
+                {% endfor %}
+            {% endif %}
+        </p>
+        <p>
+            Наименование документов<br/>
+            {{ form.file_name }}
+        </p>
+        <p>
+            Комментарий к файлам<br/>
+            {{ form.comment }}
+        </p>
+        <button class="turquoise-button" onclick="document.forms['UploadForm'].submit();">Загрузить</button>
+        <button class="blue-button" id="reestmanage"><a style="color:white" href="{% url 'homeGIP' id=reest.id %}">Вернуться к реестру</a></button>
+    </form>
+    {% else %}
+    <p>Вы не авторизованы</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+    {% endif %}
+    <script>
+        document.getElementById("id_comment").innerHTML = "Не удалять файл до закрытия реестра.";
+    </script>
+</body>
+</html>

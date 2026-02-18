@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru" xmlns:font-size="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+</head>
+<body class="container custom" style="background: white">
+    {% load verbose_names %}
+    <div class="container">
+    {% if user.is_authenticated %}
+    <div class="py-f">
+	{% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+            <div class="{{ message.tags }}">
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                {{ message }}
+            </div>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <table style="width: 100%; table-layout: fixed; border: 0px; font-size: 90%;">
+        <tr>
+            <td class="head-block-left" style="width: 85%;">
+                <h3 style="margin-bottom: 0;">Личный кабинет</h3>
+            </td>
+            <td class="head-block-right" style="width: 10%;">
+                <h5 style="margin-bottom: 0;">Пользователь: </h5>
+            </td>
+            <td class="head-block-left" style="width: 5%;">
+                <h5 style="margin-bottom: 0;">{{ user.last_name }} {{ user.first_name }}</h5>
+            </td>
+        </tr>
+        <tr>
+            <td class="head-block-left" style="width: 85%;"></td>
+            <td class="head-block-right" style="width: 10%;">
+                <h5 style="margin-bottom: 10px; margin-top: 5px">Роль:</h5>
+            </td>
+            <td class="head-block-left" style="width: 5%;">
+                <h5 id="group" style="margin-bottom: 10px; margin-top: 5px">{{ group }}</h5>
+            </td>
+        </tr>
+    </table>
+    <h4 id="to_reviewer" hidden>{{ to_reviewer }}</h4>
+    <h4 id="answered" hidden>{{ answered }}</h4>
+    <h4 id="closed" hidden>{{ closed }}</h4>
+    <h4 id="worked" hidden>{{ worked }}</h4>
+    <h4 id="max_remark_num" hidden>{{ max_remark_num }}</h4>
+    <h4 id="max_remark_point_num" hidden>{{ max_remark_point_num }}</h4>
+    <h4 hidden id="user">{{ user.id }}</h4>
+    {% for s in subs %}
+		<h4 hidden name="subs">{{ s.id }}</h4>
+	{% endfor %}
+    {% for s in subcontracts %}
+        <h4 hidden name="subcontracts">{{ s.id }}</h4>
+    {% endfor %}
+    <h4 hidden id="reestID">{{ reest.id }}</h4>
+    <h4 hidden id="reestGIP">{{ reest.gip.id }}</h4>
+    <h4 hidden id="reviewer">{{ reest.project_reviewer.name }}</h4>
+    <p hidden id="dubl">{{ dubl }}</p>
+    <p hidden id="first_dubl">{{ first_dubl }}</p>
+    <table cellspacing="0" style="width: 100%; table-layout: fixed; border: 0px;" class="timeline">
+        {% if reest.status == "Формирование" %}
+        <tr>
+            <th style="width: 4.02%; background: var(--blue);"></th>
+            <th class="first_current">ФОРМИРОВАНИЕ</th>
+            <th class="current-future">ЗАПОЛНЕНИЕ ПЛАНА</th>
+            <th class="future-future">СОГЛАСОВАНИЕ ПЛАНА</th>
+            <th class="future-future">ПОДГОТОВКА ОТВЕТОВ</th>
+            <th class="future-future">НА СОГЛАСОВАНИИ РЕЦЕНЗЕНТОМ</th>
+            <th class="future-future_last">ЗАКРЫТ</th>
+        </tr>
+        <tr>
+        {% elif reest.status == "На заполнении" or reest.status == "На доработке" %}
+        <tr>
+            <th style="width: 4.02%; background: var(--light_grey);"></th>
+            <th class="first_past">ФОРМИРОВАНИЕ</th>
+            <th class="past-current">ЗАПОЛНЕНИЕ ПЛАНА</th>
+            <th class="current-future">СОГЛАСОВАНИЕ ПЛАНА</th>
+            <th class="future-future">ПОДГОТОВКА ОТВЕТОВ</th>
+            <th class="future-future">НА СОГЛАСОВАНИИ РЕЦЕНЗЕНТОМ</th>
+            <th class="future-future_last">ЗАКРЫТ</th>
+        </tr>
+        <tr>
+        {% elif reest.status == "На согласовании" or reest.status == "Согласовано ГИПом" %}
+        <tr>
+            <th style="width: 4.02%; background: var(--light_grey);"></th>
+            <th class="first_past">ФОРМИРОВАНИЕ</th>
+            <th class="past-past">ЗАПОЛНЕНИЕ ПЛАНА</th>
+            <th class="past-current">СОГЛАСОВАНИЕ ПЛАНА</th>
+            <th class="current-future">ПОДГОТОВКА ОТВЕТОВ</th>
+            <th class="future-future">НА СОГЛАСОВАНИИ РЕЦЕНЗЕНТОМ</th>
+            <th class="future-future_last">ЗАКРЫТ</th>
+        </tr>
+        {% elif reest.status == "Подготовка ответов" %}
+        <tr>
+            <th style="width: 4.02%; background: var(--light_grey);"></th>
+            <th class="first_past">ФОРМИРОВАНИЕ</th>
+            <th class="past-past">ЗАПОЛНЕНИЕ ПЛАНА</th>
+            <th class="past-past">СОГЛАСОВАНИЕ ПЛАНА</th>
+            <th class="past-current">ПОДГОТОВКА ОТВЕТОВ</th>
+            <th class="current-future">НА СОГЛАСОВАНИИ РЕЦЕНЗЕНТОМ</th>
+            <th class="future-future_last">ЗАКРЫТ</th>
+        </tr>
+        <tr>
+        {% elif reest.status == "На согласовании Рецензентом" %}
+        <tr>
+            <th style="width: 4.02%; background: var(--light_grey);"></th>
+            <th class="first_past">ФОРМИРОВАНИЕ</th>
+            <th class="past-past">ЗАПОЛНЕНИЕ ПЛАНА</th>
+            <th class="past-past">СОГЛАСОВАНИЕ ПЛАНА</th>
+            <th class="past-past">ПОДГОТОВКА ОТВЕТОВ</th>
+            <th class="past-current">НА СОГЛАСОВАНИИ РЕЦЕНЗЕНТОМ</th>
+            <th class="current-future_last">ЗАКРЫТ</th>
+        </tr>
+        {% else %}
+        <tr>
+            <th style="width: 4.02%; background: var(--light_grey);"></th>
+            <th class="first_past">ФОРМИРОВАНИЕ</th>
+            <th class="past-past">ЗАПОЛНЕНИЕ ПЛАНА</th>
+            <th class="past-past">СОГЛАСОВАНИЕ ПЛАНА</th>
+            <th class="past-past">ПОДГОТОВКА ОТВЕТОВ</th>
+            <th class="past-past">НА СОГЛАСОВАНИИ РЕЦЕНЗЕНТОМ</th>
+            <th class="past-current_last">ЗАКРЫТ</th>
+        </tr>
+        {% endif %}
+        <tr>
+            <td class="timeline-date">ПЛАН</td>
+            <td class="timeline-date">{{ plan.0 }}</td>
+            <td class="timeline-date">{{ plan.1 }}</td>
+            <td class="timeline-date">{{ plan.2 }}</td>
+            <td class="timeline-date">{{ plan.3 }}</td>
+            <td class="timeline-date"></td>
+            <td class="timeline-date"></td>
+        </tr>
+        <tr>
+            <td class="timeline-date">ФАКТ</td>
+            <td class="timeline-date">{{ fact.0 }}</td>
+            <td class="timeline-date">{{ fact.1 }}</td>
+            <td class="timeline-date">{{ fact.2 }}</td>
+            <td class="timeline-date">{{ fact.3 }}</td>
+            <td class="timeline-date">{{ fact.4 }}</td>
+            <td class="timeline-date">{{ fact.5 }}</td>
+        </tr>
+    </table>
+    <br/>
+    <h4 id="reest_num">{{ reest.project_dogovor }}-{{ reest.num_reestr }}</h4>
+    <table id="table1" border="1" cellspacing="0" class="work-table">
+        <tr>
+            <th>
+                <div style="display: flex;">
+                    <div style="flex: 4;">№ Замечания</div>
+                    <button id="sort_number" class="navy-button" style="padding: 2px 3px; flex: 1;" value="0">&#9650;<br>&#9660;</button>
+                </div>
+            </th>
+            <th>
+                <div style="display: flex;">
+                    <div style="flex: 4;">Версия замечания</div>
+                    <button hidden id="sort_version" class="navy-button" style="padding: 2px 3px; flex: 1;" value="0">&#9650;<br>&#9660;</button>
+                </div>
+            </th>
+            <th>Обозначение раздела в проекте</th>
+            <th>Наименование замечания</th>
+            <th>
+                <div style="display: flex;">
+                    {% if group == "Руководитель" or group == "Исполнитель"%}
+                    <div style="flex: 4;">Исполнитель, ответственный за устранение замечания</div>
+                    {% else %}
+                    <div style="flex: 4;">Ответственный за устранение замечания</div>
+                    {% endif %}
+                    <button id="sort_resp" class="navy-button" style="padding: 2px 3px; flex: 1;" value="0">&#9650;<br>&#9660;</button>
+                </div>
+            </th>
+            <th>Получено</th>
+            <th>Срок исполнения</th>
+            <th>Мониторинг за сроками (дн.)</th>
+            <th style="background: #F96925">Статус</th>
+            <th>Трудозатраты, дн. (на устранение замечания) (план)</th>
+            <th>Трудозатраты, дн. (на устранение замечания) (факт)</th>
+            <th>Значимость замечания</th>
+        </tr>
+        {% for r in reestrs %}
+        <tr class="reestr" id="{{ r.id }}" >
+            {% if r.status == 'Замечание снято' %}
+                <td align="center" name="remark_numbers" style="background: #ededed">{{ r.num_remark }}</td>
+                <td align="center" style="background: #ededed">{{ r.remark_v }}</td>
+                <td style="background: #ededed">{{ r.designation_name }}</td>
+                <td style="background: #ededed">{{ r.remark_name }}</td>
+                {% if group == "Руководитель" or group == "Исполнитель"%}
+                    {% if r.executor_name.first_name != " " %}
+                    <td align="center" class="names" style="background: #ededed">{{ r.executor_name }}</td>
+                    {% else %}
+                    <td align="center" style="background: #ededed">{{ r.executor_name }}</td>
+                    {% endif %}
+                {% else %}
+                    <td align="center" class="names" style="background: #ededed">{{ r.responsibleTrouble_name }}</td>
+                {% endif %}
+                <td align="center" style="background: #ededed">{{ reest.start_date.day }} {{ reest.start_date.month }} {{ reest.start_date.year }}</td>
+                {% if r.status != "Принято ГИПом" and r.status != "На согласовании Рецензентом" and r.status != "Замечание снято" %}
+                <td align="center" style="background: #ededed">{{ r.deadline.day }} {{ r.deadline.month }} {{ r.deadline.year }}</td>
+                {% else %}
+                <td align="center" style="background: #ededed"> </td>
+                {% endif %}
+                {% if r.status != "Принято ГИПом" and r.status != "На согласовании Рецензентом" and r.status != "Замечание снято" %}
+                <td align="center" class="deadline" style="background: #ededed"> </td>
+                {% else %}
+                <td align="center" class="no_deadline" style="background: #ededed"> </td>
+                {% endif %}
+                <td style="background: #ededed">{{ r.status }}</td>
+                {% if r.labor_costs_plan %}
+                    <td align="center" style="background: #ededed">{{ r.labor_costs_plan }}</td>
+                {% else %}
+                    <td style="background: #ededed"> </td>
+                {% endif %}
+                {% if r.labor_costs_fact %}
+                    <td align="center" style="background: #ededed">{{ r.labor_costs_fact }}</td>
+                {% else %}
+                    <td style="background: #ededed"> </td>
+                {% endif %}
+                {% if r.total_importance %}
+                    <td class="importance" style="background: #ededed">{{ r.total_importance }}</td>
+                {% else %}
+                    <td style="background: #ededed"> </td>
+                {% endif %}
+                <td hidden>{{ r.responsibleTrouble_name.id }}</td>
+                <td hidden>{{ r.executor_name.id }}</td>
+            {% elif r.status == 'Принято ГИПом' %}
+                <td align="center" name="remark_numbers" style="background: #edffe6">{{ r.num_remark }}</td>
+                <td align="center" style="background: #edffe6">{{ r.remark_v }}</td>
+                <td style="background: #edffe6">{{ r.designation_name }}</td>
+                <td style="background: #edffe6">{{ r.remark_name }}</td>
+                {% if group == "Руководитель" or group == "Исполнитель"%}
+                    {% if r.executor_name.first_name != " " %}
+                    <td align="center" class="names" style="background: #edffe6">{{ r.executor_name }}</td>
+                    {% else %}
+                    <td align="center" style="background: #edffe6">{{ r.executor_name }}</td>
+                    {% endif %}
+                {% else %}
+                    <td align="center" class="names" style="background: #edffe6">{{ r.responsibleTrouble_name }}</td>
+                {% endif %}
+                <td align="center" style="background: #edffe6">{{ reest.start_date.day }} {{ reest.start_date.month }} {{ reest.start_date.year }}</td>
+                {% if r.status != "Принято ГИПом" and r.status != "На согласовании Рецензентом" and r.status != "Замечание снято" %}
+                <td align="center" style="background: #edffe6">{{ r.deadline.day }} {{ r.deadline.month }} {{ r.deadline.year }}</td>
+                {% else %}
+                <td align="center" style="background: #edffe6"> </td>
+                {% endif %}
+                {% if r.status != "Принято ГИПом" and r.status != "На согласовании Рецензентом" and r.status != "Замечание снято" %}
+                <td align="center" class="deadline" style="background: #edffe6"> </td>
+                {% else %}
+                <td align="center" class="no_deadline" style="background: #edffe6"> </td>
+                {% endif %}
+                <td style="background: #edffe6">{{ r.status }}</td>
+                {% if r.labor_costs_plan %}
+                    <td align="center" style="background: #edffe6">{{ r.labor_costs_plan }}</td>
+                {% else %}
+                    <td style="background: #edffe6"> </td>
+                {% endif %}
+                {% if r.labor_costs_fact %}
+                    <td align="center" style="background: #edffe6">{{ r.labor_costs_fact }}</td>
+                {% else %}
+                    <td style="background: #edffe6"> </td>
+                {% endif %}
+                {% if r.total_importance %}
+                    <td class="importance" style="background: #edffe6">{{ r.total_importance }}</td>
+                {% else %}
+                    <td style="background: #edffe6"> </td>
+                {% endif %}
+                <td hidden>{{ r.responsibleTrouble_name.id }}</td>
+                <td hidden>{{ r.executor_name.id }}</td>
+            {% elif r.status == 'На согласовании Рецензентом' %}
+                <td align="center" name="remark_numbers" style="background: #e5f3ff">{{ r.num_remark }}</td>
+                <td align="center" style="background: #e5f3ff">{{ r.remark_v }}</td>
+                <td style="background: #e5f3ff">{{ r.designation_name }}</td>
+                <td style="background: #e5f3ff">{{ r.remark_name }}</td>
+                {% if group == "Руководитель" or group == "Исполнитель"%}
+                    {% if r.executor_name.first_name != " " %}
+                    <td align="center" class="names" style="background: #e5f3ff">{{ r.executor_name }}</td>
+                    {% else %}
+                    <td align="center" style="background: #e5f3ff">{{ r.executor_name }}</td>
+                    {% endif %}
+                {% else %}
+                    <td align="center" class="names" style="background: #e5f3ff">{{ r.responsibleTrouble_name }}</td>
+                {% endif %}
+                <td align="center" style="background: #e5f3ff">{{ reest.start_date.day }} {{ reest.start_date.month }} {{ reest.start_date.year }}</td>
+                {% if r.status != "Принято ГИПом" and r.status != "На согласовании Рецензентом" and r.status != "Замечание снято" %}
+                <td align="center" style="background: #e5f3ff">{{ r.deadline.day }} {{ r.deadline.month }} {{ r.deadline.year }}</td>
+                {% else %}
+                <td align="center" style="background: #e5f3ff"> </td>
+                {% endif %}
+                {% if r.status != "Принято ГИПом" and r.status != "На согласовании Рецензентом" and r.status != "Замечание снято" %}
+                <td align="center" class="deadline" style="background: #e5f3ff"> </td>
+                {% else %}
+                <td align="center" class="no_deadline" style="background: #e5f3ff"> </td>
+                {% endif %}
+                <td style="background: #e5f3ff">{{ r.status }}</td>
+                {% if r.labor_costs_plan %}
+                    <td align="center" style="background: #e5f3ff">{{ r.labor_costs_plan }}</td>
+                {% else %}
+                    <td style="background: #e5f3ff"> </td>
+                {% endif %}
+                {% if r.labor_costs_fact %}
+                    <td align="center" style="background: #e5f3ff">{{ r.labor_costs_fact }}</td>
+                {% else %}
+                    <td style="background: #e5f3ff"> </td>
+                {% endif %}
+                {% if r.total_importance %}
+                    <td class="importance" style="background: #e5f3ff">{{ r.total_importance }}</td>
+                {% else %}
+                    <td style="background: #e5f3ff"> </td>
+                {% endif %}
+                <td hidden>{{ r.responsibleTrouble_name.id }}</td>
+                <td hidden>{{ r.executor_name.id }}</td>
+            {% else %}
+                <td align="center" name="remark_numbers">{{ r.num_remark }}</td>
+                <td align="center">{{ r.remark_v }}</td>
+                <td>{{ r.designation_name }}</td>
+                <td>{{ r.remark_name }}</td>
+                {% if group == "Руководитель" or group == "Исполнитель"%}
+                    {% if r.executor_name.first_name != " " %}
+                    <td align="center" class="names">{{ r.executor_name }}</td>
+                    {% else %}
+                    <td align="center">{{ r.executor_name }}</td>
+                    {% endif %}
+                {% else %}
+                    <td align="center" class="names">{{ r.responsibleTrouble_name }}</td>
+                {% endif %}
+                <td align="center" >{{ reest.start_date.day }} {{ reest.start_date.month }} {{ reest.start_date.year }}</td>
+                {% if r.status != "Принято ГИПом" and r.status != "На согласовании Рецензентом" and r.status != "Замечание снято" %}
+                <td align="center">{{ r.deadline.day }} {{ r.deadline.month }} {{ r.deadline.year }}</td>
+                {% else %}
+                <td align="center"> </td>
+                {% endif %}
+                {% if r.status != "Принято ГИПом" and r.status != "На согласовании Рецензентом" and r.status != "Замечание снято" %}
+                <td align="center" class="deadline"> </td>
+                {% else %}
+                <td align="center" class="no_deadline"> </td>
+                {% endif %}
+                <td>{{ r.status }}</td>
+                {% if r.labor_costs_plan %}
+                    <td align="center" >{{ r.labor_costs_plan }}</td>
+                {% else %}
+                    <td> </td>
+                {% endif %}
+                {% if r.labor_costs_fact %}
+                    <td align="center" >{{ r.labor_costs_fact }}</td>
+                {% else %}
+                    <td> </td>
+                {% endif %}
+                {% if r.total_importance %}
+                    <td class="importance">{{ r.total_importance }}</td>
+                {% else %}
+                    <td> </td>
+                {% endif %}
+                <td hidden>{{ r.responsibleTrouble_name.id }}</td>
+                <td hidden>{{ r.executor_name.id }}</td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </table>
+    <br/>
+    <form hidden novalidate method="post" id="r" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="id" hidden value="{{ reest.id }}">
+        <input name="customer" hidden value="{{ reest.customer }}">
+        <input name="project_dogovor" hidden value="{{ reest.project_dogovor }}">
+        <input name="project_date_contract" hidden value="{{ reest.project_date_contract }}">
+        <input name="project_name" hidden value="{{ reest.project_name }}">
+        <input name="gip" hidden value="{{ reest.gip }}">
+        <input name="project_reviewer" hidden value="{{ reest.project_reviewer }}">
+        <input name="out_mail_num" hidden value="{{ reest.out_mail_num }}">
+        <input name="out_mail_date" hidden value="{{ reest.out_mail_date }}">
+        <input name="in_mail_num" hidden value="{{ reest.in_mail_num }}">
+        <input name="in_mail_date" hidden value="{{ reest.in_mail_date }}">
+        <input name="num_reestr" hidden value="{{ reest.num_reestr }}">
+    </form>
+    <form hidden novalidate method="post" id="actual" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="actuality" hidden value="false">
+        <input name="id" hidden value="{{ reest.id }}">
+        <input name="customer" hidden value="{{ reest.customer }}">
+        <input name="project_dogovor" hidden value="{{ reest.project_dogovor }}">
+        <input name="project_date_contract" hidden value="{{ reest.project_date_contract }}">
+        <input name="project_name" hidden value="{{ reest.project_name }}">
+        <input name="gip" hidden value="{{ reest.gip }}">
+        <input name="project_reviewer" hidden value="{{ reest.project_reviewer }}">
+        <input name="out_mail_num" hidden value="{{ reest.out_mail_num }}">
+        <input name="out_mail_date" hidden value="{{ reest.out_mail_date }}">
+        <input name="in_mail_num" hidden value="{{ reest.in_mail_num }}">
+        <input name="in_mail_date" hidden value="{{ reest.in_mail_date }}">
+        <input name="num_reestr" hidden value="{{ reest.num_reestr }}">
+    </form>
+	<form hidden novalidate method="post" id="report" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="status" hidden value="{{ reest.status }}">
+        <input name="id" hidden value="{{ reest.id }}">
+        <input name="customer" hidden value="{{ reest.customer }}">
+        <input name="project_dogovor" hidden value="{{ reest.project_dogovor }}">
+        <input name="project_date_contract" hidden value="{{ reest.project_date_contract }}">
+        <input name="project_name" hidden value="{{ reest.project_name }}">
+        <input name="gip" hidden value="{{ reest.gip }}">
+        <input name="project_reviewer" hidden value="{{ reest.project_reviewer }}">
+        <input name="out_mail_num" hidden value="{{ reest.out_mail_num }}">
+        <input name="out_mail_date" hidden value="{{ reest.out_mail_date }}">
+        <input name="in_mail_num" hidden value="{{ reest.in_mail_num }}">
+        <input name="in_mail_date" hidden value="{{ reest.in_mail_date }}">
+        <input name="num_reestr" hidden value="{{ reest.num_reestr }}">
+    </form>
+    <form hidden novalidate method="post" id="dynamic" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="dynamic" value="true">
+    </form>
+    <form hidden novalidate method="post" id="change" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="status" id="step" hidden value="{{ reest.status }}">
+    </form>
+    <form hidden novalidate method="post" id="auto" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="autoExport" hidden value="true">
+    </form>
+    <form hidden novalidate method="post" id="planner" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="plannerCheck" hidden value="true">
+    </form>
+    <button id="actuality" onclick="event.stopPropagation(); document.getElementById('r').submit();" class="blue-button">Выгрузить актуальный реестр</button>
+    <button id="history" onclick="event.stopPropagation(); document.getElementById('actual').submit();" class="blue-button">Выгрузить историю реестра</button>
+    <button id="plannerCheck" hidden onclick="event.stopPropagation(); document.getElementById('planner').submit();" class="blue-button">Выгрузить файл для сверки трудозатрат</button>
+    <button hidden id="files" class="blue-button"><a style="color:white" href="{% url 'fileManage' id=reest.id %}">Работа с файлами</a></button>
+    <button class="blue-button"><a style="color:white" class="text" href="{% url 'home' %}">Вернуться к реестрам</a></button>
+    <button class="orange-button"><a style="color:white" class="text" href="{% url 'logout' %}">Выйти</a></button> <br/> <br/>
+    <button class="turquoise-button" id="new_reestr" hidden><a style="color:white" class="text" href="{% url 'GIP' id=reest.id %}">Создать новое замечание</a></button>
+    <button class="turquoise-button" id="import" hidden><a style="color:white" class="text" href="{% url 'import_remark' id=reest.id %}">Загрузить файл от ФАУ "Главгосэкспертиза России"</a></button>
+	<button class="green-button" id="close_remarks" hidden><a style="color:white" class="text" href="{% url 'close_remarks' id=reest.id %}">Закрыть замечания</a></button>
+    <button class="red-button" id="return_remarks" hidden><a style="color:white" class="text" href="{% url 'return_remarks' id=reest.id %}">Отправить замечания на доработку</a></button>
+    <br/><br/>
+    <button class="turquoise-button" id="formed" onclick="event.stopPropagation(); document.getElementById('change').submit();" hidden>Сформировать реестр</button>
+    <button class="turquoise-button" id="answers" hidden>Загрузить подписанный реестр</button>
+    <button class="turquoise-button" id="planner_export" hidden><a style="color:white" class="text" href="{% url 'planner_link' id=reest.id %}">Сформировать файл для синхронизации с Planner</a></button>
+	<button class="turquoise-button" id="auto_export" hidden><a style="color:white" class="text" href="{% url 'export_remark' id=reest.id %}">Выгрузить ответы в формате ФАУ "Главгосэкспертиза России"</a></button>
+	<button class="turquoise-button" id="viewer_report" onclick="event.stopPropagation(); document.getElementById('report').submit();" hidden>Выгрузить реестр в форме для отчёта</button>
+    <button class="turquoise-button" id="dynamic_report" hidden><a style="color:white" class="text" href="{% url 'dynamic' id=reest.id %}">Динамика замечаний</a></button>
+    <button class="turquoise-button" id="mail" hidden>Подтвердить отправку письма</button>
+    <button class="red-button" id="status_change" hidden><a style="color:white" class="text" href="{% url 'status' id=reest.id %}">Изменить статусы замечаний</a></button>
+    </div>
+    {% else %}
+        <div class="py-5">
+            <p>Вы не авторизованы</p>
+            <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+        </div>
+    {% endif %}
+    <br/> <br/>
+    <footer class="site-footer">
+        <div style="display: flex; justify-content: space-between; width: 100%">
+            <div style="margin-left: 5px;">
+                <h5 style="margin-bottom: 0;">Контакты разработчиков:</h5>
+                <ul>
+                    <li>crds@vnipipt.ru</li>
+                    <li>ilyina-s-a@vnipipt.ru</li>
+                </ul>
+            </div>
+            <div style="margin-right: 5px; display: flex; align-items: center;">
+                <img src="../../static/vnipi_logo-2.svg">
+            </div>
+        </div>
+    </footer>
+    </div>
+    <script>
+        let hrefS = "http://127.0.0.1:8000/";
+        let tbl = document.getElementById("table1").children[0];
+        let dubl = document.getElementById("dubl").innerHTML;
+        let first_dubl = document.getElementById("first_dubl").innerHTML;
+        dubl = dubl.slice(1, dubl.length-1);
+        first_dubl = first_dubl.slice(1, first_dubl.length-1);
+        let dubl_array = [];
+        let first_dubl_array = [];
+        let j = 0;
+        for (let i=0; i<dubl.length; i++) {
+            if (dubl[i] == ',') {
+                dubl_array.push(dubl.slice(j, i));
+                j = i+2;
+            }
+            if (i == dubl.length-1) {
+                dubl_array.push(dubl.slice(j, i+1));
+            }
+        }
+        j = 0;
+        for (let i=0; i<first_dubl.length; i++) {
+            if (first_dubl[i] == ',') {
+                first_dubl_array.push(first_dubl.slice(j, i));
+                j = i+2;
+            }
+            if (i == first_dubl.length-1) {
+                first_dubl_array.push(first_dubl.slice(j, i+1));
+            }
+        }
+        if (dubl_array.length > 0) {
+            for (let i=0; i < tbl.childElementCount; i++) {
+                if (dubl_array.includes(tbl.children[i].id)) {
+                    tbl.children[i].cells[0].setAttribute("style","background: #F9692566;");
+                }
+                if (first_dubl_array.includes(tbl.children[i].id)) {
+                    for (let j=1; j<tbl.children[i].cells.length; j++) {
+                        tbl.children[i].cells[j].setAttribute("style","background: #F9692566;");
+                    }
+                }
+            }
+        }
+        let timeline_date = document.getElementsByClassName("timeline-date");
+        for (let i=0; i < timeline_date.length; i++) {
+            if (timeline_date[i].innerHTML.includes('(-') || timeline_date[i].innerHTML.includes('задержано')) {
+                timeline_date[i].style.color = 'red';
+            }
+            if (timeline_date[i].innerHTML.includes('(осталось дней: 0')) {
+                timeline_date[i].style.color = 'orange';
+            }
+            if (timeline_date[i].innerHTML.includes('(+')) {
+                timeline_date[i].style.color = 'green';
+            }
+        }
+        let reviewer = document.getElementById("reviewer").innerHTML;
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+        let role = document.getElementById("group").innerHTML;
+        let step = document.getElementById('step');
+        if (role == "Наблюдатель" || role == "ГИП") {
+            document.getElementById("viewer_report").removeAttribute("hidden");
+        }
+        if (role == "Администратор" || document.getElementById("user").innerHTML == '237') {
+            document.getElementById("status_change").removeAttribute("hidden");
+        }
+        if (role == "Наблюдатель" || role == "Администратор") {
+            document.getElementById("dynamic_report").removeAttribute("hidden");
+        }
+        if (step.value != "Формирование") {
+            let button = document.getElementById("formed");
+            button.setAttribute("disabled","");
+            button.innerHTML = "Реестр сформирован";
+        }
+        if ((step.value == "Формирование" || step.value == "На согласовании ГИПом" || step.value == "На доработке") && (role == "ГИП" || role == "Наблюдатель")) {
+            document.getElementById("new_reestr").removeAttribute("hidden");
+            if (reviewer == "ФАУ «Главгосэкспертиза России»") {
+                document.getElementById("import").removeAttribute("hidden");
+            }
+        }
+        if (step.value == "Согласовано ГИПом" && role == "ГИП") {
+            let ansButton = document.getElementById("answers");
+            ansButton.removeAttribute("hidden");
+            ansButton.addEventListener("click", answering);
+        }
+        let mailButton = document.getElementById("mail");
+		mailButton.addEventListener('click', mailing)
+        function mailing(e) {
+            mailButton.setAttribute("disabled","");
+            mailButton.innerHTML = "Письмо отправлено";
+            step.value = "На согласовании Рецензентом";
+            document.getElementById("new_reestr").removeAttribute("hidden");
+            if (reviewer == "ФАУ «Главгосэкспертиза России»") {
+                document.getElementById("import").removeAttribute("hidden");
+            }
+            <!-- event.stopPropagation(); -->
+            document.getElementById('change').submit();
+        }
+        function answering(e) {
+            document.getElementById("answers").setAttribute("hidden", "");
+            step.value = "Подготовка ответов";
+            event.stopPropagation();
+            document.getElementById('change').submit();
+        }
+
+        document.getElementById("auto_export").addEventListener("click", autoExport);
+        function autoExport(e) {
+            event.stopPropagation();
+            document.getElementById('auto').submit();
+        }
+
+        if (role == "Руководитель" || role == "Исполнитель") {
+            document.getElementById("new_reestr").setAttribute("hidden","");
+            document.getElementById("import").setAttribute("hidden", "");
+            document.getElementById("actuality").innerHTML = "Выгрузить реестр"
+            document.getElementById("files").removeAttribute("hidden");
+        }
+
+        function nextStep(e) {
+            let s = hrefS;
+            let state = "";
+            let responsible = "";
+            let executor = "";
+            let user = document.getElementById("user").innerHTML;
+            let gip = document.getElementById("reestGIP").innerHTML;
+            let subs = document.getElementsByName("subs");
+            let subs_name = []
+            for (let i=0; i < subs.length; i++) {
+                subs_name[i] = subs[i].innerHTML;
+            }
+            let subcontracts = document.getElementsByName("subcontracts");
+            let subcontracts_name = []
+            for (let i=0; i < subcontracts.length; i++) {
+                subcontracts_name[i] = subcontracts[i].innerHTML;
+            }
+            let labor_plan = "";
+            state = this.children[8].innerHTML;
+            labor = this.children[10].innerHTML;
+            responsible = this.children[12].innerHTML;
+            executor = this.children[13].innerHTML;
+            labor_plan = this.children[9].innerHTML;
+            if (role == "Наблюдатель" || role == "Администратор") {
+                s = s.concat("remark/");
+                s = s.concat(this.id);
+                s = s.concat("/");
+            }
+            if (role == "ГИП") {
+                if (state == "На заполнении ГИПом" && (gip == user || subs_name.includes(gip))) {
+                    s = s.concat("gip1/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+                else if ((state == "На согласовании ГИПом" || state == "На доработке ГИПом") && (gip == user || subs_name.includes(gip))) {
+                    if (labor_plan == " ") {
+                        s = s.concat("gip1/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    } else if (labor == " ") {
+                        s = s.concat("gip2/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    } else {
+                        s = s.concat("answer/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    }
+                }
+                else if ((state == "Подготовка ответов ГИПом" && (gip == user || subs_name.includes(gip))) || (state == "Подготовка ответов руководителем" && (responsible == user || subs_name.includes(responsible))) || (state == "Подготовка ответов исполнителем" && (executor == user || subs_name.includes(executor) || ((gip == user || subs_name.includes(gip)) && subcontracts_name.includes(executor))))) {
+                    s = s.concat("final/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+                else if (state == "Согласовано ГИПом" && (gip == user || subs_name.includes(gip))) {
+                    if (labor == " ") {
+                        s = s.concat("gip2/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    } else {
+                        s = s.concat("final/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    }
+                }
+                else if (state == "На заполнении руководителем" && (responsible == user || subs_name.includes(responsible))) {
+                    s = s.concat("boss/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+                else if (state == "На заполнении исполнителем" && (executor == user || subs_name.includes(executor) || ((gip == user || subs_name.includes(gip)) && subcontracts_name.includes(executor)))) {
+                    s = s.concat("employee/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+                else if ((state == "На согласовании руководителем" || state == "На доработке руководителем") && (responsible == user || subs_name.includes(responsible))) {
+                    if (labor == " ") {
+                        s = s.concat("boss2/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    } else {
+                        s = s.concat("answer/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    }
+                }
+                else if (state == "На доработке исполнителем" && (executor == user || subs_name.includes(executor))) {
+                    if (labor == " ") {
+                        s = s.concat("employee/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    } else {
+                        s = s.concat("final/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    }
+                }
+                else {
+                    s = s.concat("remark/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+            } else if (role == "Руководитель") {
+                if (state == "На заполнении руководителем" && (responsible == user || subs_name.includes(responsible))) {
+                    s = s.concat("boss/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+                else if (state == "На заполнении исполнителем" && (executor == user || subs_name.includes(executor))) {
+                    s = s.concat("employee/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+                else if (state == "На согласовании руководителем" && (responsible == user || subs_name.includes(responsible))) {
+                    if (labor == " ") {
+                        s = s.concat("boss2/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    } else {
+                        s = s.concat("answer/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    }
+                }
+                else if (state == "На доработке руководителем" && (responsible == user || subs_name.includes(responsible))) {
+                    if (labor == " ") {
+                        s = s.concat("boss2/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    } else {
+                        s = s.concat("final/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    }
+                }
+                else if (state == "На доработке исполнителем" && (executor == user || subs_name.includes(executor))) {
+                    if (labor == " ") {
+                        s = s.concat("employee/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    } else {
+                        s = s.concat("final/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    }
+                }
+                else if ((state == "Подготовка ответов руководителем" && (responsible == user || subs_name.includes(responsible))) || (state == "Подготовка ответов исполнителем" && (executor == user || subs_name.includes(executor)))) {
+                    s = s.concat("final/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+                else {
+                    s = s.concat("remark/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+            } else if (role == "Исполнитель") {
+                if (state == "На заполнении руководителем" && subs_name.includes(responsible)) {
+                    s = s.concat("boss/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+                else if (state == "На согласовании руководителем" && subs_name.includes(responsible)) {
+                    if (labor == " ") {
+                        s = s.concat("boss2/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    } else {
+                        s = s.concat("answer/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    }
+                }
+                else if (state == "На доработке руководителем" && subs_name.includes(responsible)) {
+                    if (labor == " ") {
+                        s = s.concat("boss2/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    } else {
+                        s = s.concat("final/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    }
+                }
+                else if (state == "Подготовка ответов руководителем" && subs_name.includes(responsible)) {
+                    s = s.concat("final/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+                else if (state == "На заполнении исполнителем" && (executor == user || subs_name.includes(executor))) {
+                    s = s.concat("employee/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+                else if (state == "На доработке исполнителем" && (executor == user || subs_name.includes(executor))) {
+                    if (labor == " ") {
+                        s = s.concat("employee/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    } else {
+                        s = s.concat("final/");
+                        s = s.concat(this.id);
+                        s = s.concat("/");
+                    }
+                }
+                else if (state == "Подготовка ответов исполнителем" && (executor == user || subs_name.includes(executor))) {
+                    s = s.concat("final/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+                else {
+                    s = s.concat("remark/");
+                    s = s.concat(this.id);
+                    s = s.concat("/");
+                }
+            }
+            window.location.href = s;
+            return false;
+        }
+
+        const table = document.getElementById("table1");
+
+
+        if ((step.value == "Принято ГИПом" || step.value == "На согласовании Рецензентом" || step.value == "Подготовка ответов") && role == "ГИП" && reviewer == "ФАУ «Главгосэкспертиза России»") {
+            document.getElementById("auto_export").removeAttribute("hidden");
+        }
+        if ((step.value == "Принято ГИПом" || step.value == "Подготовка ответов") && role == "ГИП") {
+            mailButton.removeAttribute("hidden");
+            mailButton.addEventListener("click", mailing);
+        }
+
+        let deadlines = document.getElementsByClassName("deadline");
+        let monthDict = {};
+        monthDict[1] = 'января';
+        monthDict[2] = 'февраля';
+        monthDict[3] = 'марта';
+        monthDict[4] = 'апреля';
+        monthDict[5] = 'мая';
+        monthDict[6] = 'июня';
+        monthDict[7] = 'июля';
+        monthDict[8] = 'августа';
+        monthDict[9] = 'сентября';
+        monthDict[10] = 'октября';
+        monthDict[11] = 'ноября';
+        monthDict[12] = 'декабря';
+        if (deadlines.length > 0) {
+            for (let i=0; i < deadlines.length; i++) {
+                let startDate = deadlines[i].previousSibling.previousSibling.previousSibling.previousSibling;
+                let endDate = deadlines[i].previousSibling.previousSibling
+                let startDay = Number(startDate.innerHTML.slice(0, startDate.innerHTML.indexOf(" ")+1));
+                let startMonth = Number(startDate.innerHTML.slice(startDate.innerHTML.indexOf(" ")+1, startDate.innerHTML.indexOf(" ", startDate.innerHTML.indexOf(" ")+1)));
+                let startYear = Number(startDate.innerHTML.slice(-4, startDate.innerHTML.length));
+                startDate.innerHTML = String(startDay) + " " + monthDict[startMonth] + " " + String(startYear);
+                let endDay = Number(endDate.innerHTML.slice(0, endDate.innerHTML.indexOf(" ")+1));
+                let endMonth = Number(endDate.innerHTML.slice(endDate.innerHTML.indexOf(" ")+1, endDate.innerHTML.indexOf(" ", endDate.innerHTML.indexOf(" ")+1)));
+                let endYear = Number(endDate.innerHTML.slice(-4, endDate.innerHTML.length));
+                endDate.innerHTML = String(endDay) + " " + monthDict[endMonth] + " " + String(endYear);
+
+                const deadlineDate = new Date(endYear, endMonth-1, endDay);
+                let d = new Date();
+                d = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                let j = 0;
+                if (deadlineDate >= d) {
+                    while (d < deadlineDate) {
+                        d.setDate(d.getDate() + 1)
+                        if (d.getDay() < 6 && d.getDay() > 0) {
+                            j = j + 1;
+                        }
+                    }
+                } else {
+                    while (d > deadlineDate) {
+                        d.setDate(d.getDate() - 1)
+                        if (d.getDay() < 6 && d.getDay() > 0) {
+                            j = j - 1;
+                        }
+                    }
+                }
+                deadlines[i].innerHTML = j;
+                if (deadlines[i].innerHTML < 0) {
+                    deadlines[i].style.color = 'red';
+                } else if (deadlines[i].innerHTML > 1) {
+                    deadlines[i].style.color = 'green';
+                } else {
+                    deadlines[i].style.color = 'orange';
+                }
+            }
+        }
+        deadlines = document.getElementsByClassName("no_deadline");
+        for (let i=0; i < deadlines.length; i++) {
+            let startDate = deadlines[i].previousElementSibling.previousElementSibling;
+            let startDay = Number(startDate.innerHTML.slice(0, startDate.innerHTML.indexOf(" ")+1));
+            let startMonth = Number(startDate.innerHTML.slice(startDate.innerHTML.indexOf(" ")+1, startDate.innerHTML.indexOf(" ", startDate.innerHTML.indexOf(" ")+1)));
+            let startYear = Number(startDate.innerHTML.slice(-4, startDate.innerHTML.length));
+            startDate.innerHTML = String(startDay) + " " + monthDict[startMonth] + " " + String(startYear);
+        }
+
+        let reest_num = document.getElementById("reest_num").innerHTML;
+        let s = "Реестр выявленных несоответствий № ";
+        s = s.concat(reest_num.substring(4,8));
+        s = s.concat(reest_num.substring(reest_num.indexOf("Д")+1,reest_num.length));
+        document.getElementById("reest_num").innerHTML = s;
+
+        let remark_numbers = document.getElementsByName("remark_numbers");
+        for (let i=0; i < remark_numbers.length; i++) {
+            let brkt = remark_numbers[i].innerHTML.indexOf("[");
+            if (brkt > -1) {
+                remark_numbers[i].innerHTML = remark_numbers[i].innerHTML.slice(0, brkt);
+            }
+        }
+
+        let reestrs = document.getElementsByClassName("reestr");
+        let rem_status = "";
+        let to_reviewer = document.getElementById("to_reviewer").innerHTML;
+        let answered = document.getElementById("answered").innerHTML;
+        let closed = document.getElementById("closed").innerHTML;
+        let worked = document.getElementById("worked").innerHTML;
+        for (let i=0; i<reestrs.length; i++) {
+            reestrs[i].addEventListener("click", nextStep);
+        }
+
+        let rows = Array.from(table.rows);
+        rows.shift();
+        let answered_rows = Array();
+        let closed_rows = Array();
+        let reviewer_rows = Array();
+        if (rows.length > 0) {
+            let row = rows[rows.length-1];
+            while (row.cells[8].textContent.trim() == "Замечание снято") {
+                closed_rows.push(rows.pop());
+                if (rows.length > 0) {
+                    row = rows[rows.length-1];
+                } else {
+                    break;
+                }
+            }
+            while (row.cells[8].textContent.trim() == "Принято ГИПом") {
+                answered_rows.push(rows.pop());
+                if (rows.length > 0) {
+                    row = rows[rows.length-1];
+                } else {
+                    break;
+                }
+            }
+            while (row.cells[8].textContent.trim() == "На согласовании Рецензентом") {
+                reviewer_rows.push(rows.pop());
+                if (rows.length > 0) {
+                    row = rows[rows.length-1];
+                } else {
+                    break;
+                }
+            }
+        }
+        rows = rows.sort(compareRowsVersions);
+        let work_rows = Array();
+        if (rows.length > 0) {
+            work_rows.push([]);
+            for (i=0; i < rows.length-1; i++) {
+                work_rows[work_rows.length-1].push(rows[i]);
+                if (rows[i].cells[1].innerHTML != rows[i+1].cells[1].innerHTML) {
+                    work_rows.push([]);
+                }
+            }
+            work_rows[work_rows.length-1].push(rows[rows.length-1]);
+        }
+
+        const max_remark_num = parseInt(document.getElementById("max_remark_num").innerHTML);
+        const max_remark_point_num = parseInt(document.getElementById("max_remark_point_num").innerHTML);
+
+
+        let names = document.getElementsByClassName("names");
+        let forming_available = true;
+        let download_available = false;
+        let newRowAdding = false;
+        for (let i=0; i<names.length; i++) {
+            newRowAdding = false;
+            rem_status = names[i].nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.innerHTML;
+            rem_verse = names[i].previousElementSibling.previousElementSibling.previousElementSibling.innerHTML;
+            if (i == 0 && rem_status != "На согласовании Рецензентом" && rem_status != "Принято ГИПом" && rem_status != "Замечание снято") {
+                newRowAdding = true;
+            }
+            if (rem_status == "На согласовании Рецензентом" || rem_status == "Принято ГИПом" || rem_status == "Замечание снято") {
+                names[i].parentElement.setAttribute("hidden", "");
+                if (i == 0 || (i != 0 && names[i-1].nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.innerHTML != rem_status)) {
+                    newRowAdding = true;
+                }
+            }
+            if (newRowAdding) {
+                const chosenRow = names[i].parentElement;
+                const chosenRowIdx = chosenRow.rowIndex;
+                const newRow = table.insertRow(chosenRowIdx);
+                newRow.className = "table-break";
+                newRow.addEventListener("click", showHidden)
+                const cell1 = newRow.insertCell(0);
+                let cell2 = newRow.insertCell(1);
+                cell2.colSpan = 10;
+                const cell3 = newRow.insertCell(2);
+                cell1.style.border = 0;
+                cell2.style.border = 0;
+                cell3.style.border = 0;
+                let bcg = "";
+                if (rem_status == "Замечание снято") {
+                    bcg = "#9B9B9B";
+                    cell2.textContent = "ЗАМЕЧАНИЯ СНЯТЫ";
+                    cell3.textContent = "Кол-во: "+ closed;
+                    cell1.textContent = "\u25B6";
+                } else if (rem_status == "Принято ГИПом") {
+                    bcg = "var(--green)";
+                    cell2.textContent = "ОТВЕТЫ ПОДГОТОВЛЕНЫ";
+                    cell3.textContent = "Кол-во: "+ answered;
+                    cell1.textContent = "\u25B6";
+                } else if (rem_status == "На согласовании Рецензентом") {
+                    bcg = "var(--blue)";
+                    cell2.textContent = "НА СОГЛАСОВАНИИ РЕЦЕНЗЕНТОМ";
+                    cell3.textContent = "Кол-во: "+ to_reviewer;
+                    cell1.textContent = "\u25B6";
+                } else {
+                    bcg = "#55abe5";
+                    cell2.textContent = "В РАБОТЕ";
+                    cell3.textContent = "Кол-во: "+ worked;
+                    cell1.innerHTML = "&#9660;"
+                }
+                cell1.style.background = bcg;
+                cell2.style.background = bcg;
+                cell3.style.background = bcg;
+                cell1.style.textAlign = 'center';
+                cell3.style.textAlign = 'center';
+            }
+			if (rem_status == "Принято ГИПом") {
+				download_available = true;
+			}
+			if (names[i].innerHTML.length > 0 && names[i].innerHTML != "None") {
+                let shortName = "";
+                let k = 0;
+                for (let j=0; j<names[i].innerHTML.length; j++) {
+                    if (names[i].innerHTML[j] == " ") {
+                        k++;
+                        if (k == 1) {
+                            shortName += names[i].innerHTML.slice(0,j) + " " + names[i].innerHTML[j+1] + ".";
+                        }
+                        if (k == 2) {
+                            shortName += names[i].innerHTML[j+1] + ".";
+                            break;
+                        }
+                    }
+                }
+                names[i].innerHTML = shortName;
+            } else {
+				names[i].innerHTML = "";
+                forming_available = false;
+            }
+        }
+        if ((step.value == "Согласовано ГИПом" || step.value == "Подготовка ответов" || step.value == "На согласовании Рецензентом") && role == "Администратор") {
+            document.getElementById("planner_export").removeAttribute("hidden");
+        }
+        if ((step.value == "Подготовка ответов" || step.value == "На согласовании Рецензентом") && role == "ГИП") {
+            document.getElementById("plannerCheck").removeAttribute("hidden");
+        }
+        if (step.value == "На согласовании Рецензентом" && (role == "ГИП" || role == "Наблюдатель")) {
+            mailButton.removeAttribute("hidden");
+            if (!download_available) {
+                mailButton.setAttribute("disabled","");
+                mailButton.innerHTML = "Письмо отправлено";
+            }
+            document.getElementById("new_reestr").removeAttribute("hidden");
+            if (reviewer == "ФАУ «Главгосэкспертиза России»") {
+                document.getElementById("import").removeAttribute("hidden");
+            }
+            document.getElementById("close_remarks").removeAttribute("hidden");
+			document.getElementById("return_remarks").removeAttribute("hidden");
+        }
+        if (forming_available == true && role == "ГИП" && step.value == "Формирование") {
+            document.getElementById("formed").removeAttribute("hidden");
+        }
+        const statusOrderGIP = {
+            "Формирование": 1,
+            "На заполнении ГИПом": 2,
+            "На доработке ГИПом": 3,
+            "На согласовании ГИПом": 4,
+            "Подготовка ответов ГИПом": 5,
+            "На заполнении руководителем": 6,
+            "На доработке руководителем": 7,
+            "На согласовании руководителем": 8,
+            "Подготовка ответов руководителем": 9,
+            "На заполнении исполнителем": 10,
+            "На доработке исполнителем": 11,
+            "Подготовка ответов исполнителем": 12
+        };
+        const statusOrderBoss = {
+            "Формирование": 1,
+            "На заполнении ГИПом": 9,
+            "На доработке ГИПом": 10,
+            "На согласовании ГИПом": 11,
+            "Подготовка ответов ГИПом": 12,
+            "На заполнении руководителем": 2,
+            "На доработке руководителем": 3,
+            "На согласовании руководителем": 4,
+            "Подготовка ответов руководителем": 5,
+            "На заполнении исполнителем": 6,
+            "На доработке исполнителем": 7,
+            "Подготовка ответов исполнителем": 8
+        };
+        const statusOrderEmployee = {
+            "Формирование": 1,
+            "На заполнении ГИПом": 9,
+            "На доработке ГИПом": 10,
+            "На согласовании ГИПом": 11,
+            "Подготовка ответов ГИПом": 12,
+            "На заполнении руководителем": 5,
+            "На доработке руководителем": 6,
+            "На согласовании руководителем": 7,
+            "Подготовка ответов руководителем": 8,
+            "На заполнении исполнителем": 2,
+            "На доработке исполнителем": 3,
+            "Подготовка ответов исполнителем": 4
+        };
+        if (work_rows.length > 1) {
+            while (table.rows[2].className == 'reestr') {
+                table.deleteRow(2);
+            }
+            k = 2
+            for (let i=0; i < work_rows.length; i++) {
+                if (role == "Руководитель") {
+                    work_rows[i].sort((a, b) => statusOrderBoss[a.cells[8].innerHTML] - statusOrderBoss[b.cells[8].innerHTML]);
+                } else if (role == "Исполнитель") {
+                    work_rows[i].sort((a, b) => statusOrderEmployee[a.cells[8].innerHTML] - statusOrderEmployee[b.cells[8].innerHTML]);
+                } else {
+                    work_rows[i].sort((a, b) => statusOrderGIP[a.cells[8].innerHTML] - statusOrderGIP[b.cells[8].innerHTML]);
+                }
+                const chosenRow = table.rows[k];
+                const chosenRowIdx = chosenRow.rowIndex;
+                const newRow = table.insertRow(chosenRowIdx);
+                newRow.className = "table-break2";
+                newRow.addEventListener("click", showHidden);
+                const cell1 = newRow.insertCell(0);
+                let cell2 = newRow.insertCell(1);
+                cell2.colSpan = 10;
+                const cell3 = newRow.insertCell(2);
+                cell1.style.border = 0;
+                cell2.style.border = 0;
+                cell3.style.border = 0;
+                cell1.style.textAlign = 'right';
+                cell2.style.paddingLeft = '20px';
+                let bcg = "#80bbe2";
+                if (i == 0) {
+                    cell2.textContent = "ИСХОДНЫЕ";
+                } else {
+                    cell2.textContent = "ПОВТОРНЫЕ, ВЕРСИЯ " + work_rows[i][0].cells[1].innerHTML;
+                }
+                cell3.textContent = "Кол-во: "+ String(work_rows[i].length);
+                cell1.innerHTML = "&#9660;"
+                cell1.style.background = bcg;
+                cell2.style.background = bcg;
+                cell3.style.background = bcg;
+                cell3.style.textAlign = 'center';
+                k = k + 1;
+                for (let j = 0; j < work_rows[i].length; j++) {
+                    const chosenRow = table.rows[k];
+                    const chosenRowIdx = chosenRow.rowIndex;
+                    const clonedRaw = work_rows[i][j].cloneNode(true);
+                    clonedRaw.addEventListener("click", nextStep);
+                    chosenRow.parentNode.insertBefore(clonedRaw, chosenRow);
+                    k = k + 1;
+                }
+            }
+        }
+        function compareRowsVersions(a, b) {
+            let strA = a.cells[1].textContent.trim();
+            let strB = b.cells[1].textContent.trim();
+            if (strA != strB) {
+                return strA.localeCompare(strB);
+            }
+        }
+        function compareRowsRespons(a, b) {
+            let strA = a.cells[4].textContent.trim();
+            let strB = b.cells[4].textContent.trim();
+            if (strA != strB) {
+                return strA.localeCompare(strB);
+            } else {
+                strA = a.cells[0].textContent.trim();
+				strB = b.cells[0].textContent.trim();
+				return strA.localeCompare(strB);
+            }
+        }
+        function compareRowsNumbers(a, b) {
+            let isAsc = true;
+            let strA = a.cells[0].textContent.trim();
+            let strB = b.cells[0].textContent.trim();
+            let pointA = strA.indexOf(".");
+            let pointB = strB.indexOf(".");
+            if (pointA != -1) {
+                let bufA = strA.slice(0, pointA);
+                while (bufA.length < max_remark_num) {
+                        bufA = '0' + bufA;
+                }
+                let bufApoint = strA.slice(pointA + 1);
+                while (bufApoint.length < max_remark_point_num) {
+                        bufApoint = '0' + bufApoint;
+                }
+                strA = bufA + "." + bufApoint;
+            } else {
+                while (strA.length < max_remark_num) {
+                        strA = '0' + strA;
+                }
+            }
+            if (pointB != -1) {
+                let bufB = strB.slice(0, pointB);
+                while (bufB.length < max_remark_num) {
+                        bufB = '0' + bufB;
+                }
+                let bufBpoint = strB.slice(pointB + 1);
+                while (bufBpoint.length < max_remark_point_num) {
+                        bufBpoint = '0' + bufBpoint;
+                }
+                strB = bufB + "." + bufBpoint;
+            } else {
+                while (strB.length < max_remark_num) {
+                        strB = '0' + strB;
+                }
+            }
+            if (strA != strB) {
+                return strA.localeCompare(strB);
+            } else {
+                strA = a.cells[4].textContent.trim();
+				strB = b.cells[4].textContent.trim();
+				return strA.localeCompare(strB);
+            }
+        }
+        function sorting(arr1, arr2, arr3, arr4) {
+            let states = Array();
+            let states2 = Array();
+            while (table.rows.length > 1) {
+                if (table.rows[table.rows.length-1].className == "table-break" ) {
+                    states.push(table.rows[table.rows.length-1].children[0].innerHTML);
+                }
+                if (table.rows[table.rows.length-1].className == "table-break2" ) {
+                    states2.push(table.rows[table.rows.length-1].children[0].innerHTML);
+                }
+                table.deleteRow(table.rows.length-1);
+            }
+            let states_buf = states.slice();
+            let states2_buf = states2.slice();
+            if (arr1.length > 0) {
+                for (let i=0; i < arr1.length; i++) {
+                    if (states2[arr1.length-1-i] != "▼") {
+                        for (let j=0; j < arr1[i].length; j++) {
+                            try {
+                                arr1[i][j].setAttribute("hidden", "");
+                            } catch {
+                                console.log(arr1);
+                            }
+                        }
+                    }
+                }
+                const newRow = table.insertRow(table.rows.length);
+                newRow.className = "table-break";
+                newRow.addEventListener("click", showHidden)
+                const cell1 = newRow.insertCell(0);
+                let cell2 = newRow.insertCell(1);
+                cell2.colSpan = 10;
+                const cell3 = newRow.insertCell(2);
+                cell1.style.border = 0;
+                cell2.style.border = 0;
+                cell3.style.border = 0;
+                cell1.textContent = states.pop();
+                bcg = "#55abe5";
+                cell2.textContent = "В РАБОТЕ";
+                cell3.textContent = "Кол-во: "+ worked;
+                cell1.style.background = bcg;
+                cell2.style.background = bcg;
+                cell3.style.background = bcg;
+                cell1.style.textAlign = 'center';
+                cell3.style.textAlign = 'center';
+                for (let i=0; i < arr1.length; i++) {
+                    if (arr1.length > 1) {
+                        try {
+                            let head_text = "";
+                            if (arr1[i][0].cells[1].innerHTML == '0') {
+                                head_text = "ИСХОДНЫЕ";
+                            } else {
+                                head_text = "ПОВТОРНЫЕ, ВЕРСИЯ " + arr1[i][0].cells[1].innerHTML;
+                            }
+                            const newRow = table.insertRow(table.rows.length);
+                            newRow.className = "table-break2";
+                            newRow.addEventListener("click", showHidden)
+                            const cell1 = newRow.insertCell(0);
+                            let cell2 = newRow.insertCell(1);
+                            cell2.colSpan = 10;
+                            const cell3 = newRow.insertCell(2);
+                            cell1.style.border = 0;
+                            cell2.style.border = 0;
+                            cell3.style.border = 0;
+                            cell1.textContent = states2.pop();
+                            bcg = "#80bbe2";
+                            cell2.style.paddingLeft = '20px';
+                            cell1.style.textAlign = 'right';
+                            cell3.style.textAlign = 'center';
+                            cell2.textContent = head_text;
+                            cell3.textContent = "Кол-во: "+ String(arr1[i].length);
+                            cell1.style.background = bcg;
+                            cell2.style.background = bcg;
+                            cell3.style.background = bcg;
+                        } catch {
+                            console.log(arr1);
+                        }
+                    }
+                    table.firstElementChild.append(...arr1[i]);
+                }
+            }
+            if (arr2.length > 0) {
+                const newRow = table.insertRow(table.rows.length);
+                newRow.className = "table-break";
+                newRow.addEventListener("click", showHidden)
+                const cell1 = newRow.insertCell(0);
+                let cell2 = newRow.insertCell(1);
+                cell2.colSpan = 10;
+                const cell3 = newRow.insertCell(2);
+                cell1.style.border = 0;
+                cell2.style.border = 0;
+                cell3.style.border = 0;
+                cell1.textContent = states.pop();
+                bcg = "var(--blue)";
+                cell2.textContent = "НА СОГЛАСОВАНИИ РЕЦЕНЗЕНТОМ";
+                cell3.textContent = "Кол-во: "+ to_reviewer;
+                cell1.style.background = bcg;
+                cell2.style.background = bcg;
+                cell3.style.background = bcg;
+                cell1.style.textAlign = 'center';
+                cell3.style.textAlign = 'center';
+                table.firstElementChild.append(...arr2);
+            }
+            if (arr3.length > 0) {
+                const newRow = table.insertRow(table.rows.length);
+                newRow.className = "table-break";
+                newRow.addEventListener("click", showHidden)
+                const cell1 = newRow.insertCell(0);
+                let cell2 = newRow.insertCell(1);
+                cell2.colSpan = 10;
+                const cell3 = newRow.insertCell(2);
+                cell1.style.border = 0;
+                cell2.style.border = 0;
+                cell3.style.border = 0;
+                cell1.textContent = states.pop();
+                bcg = "var(--green)";
+                cell2.textContent = "ОТВЕТЫ ПОДГОТОВЛЕНЫ";
+                cell3.textContent = "Кол-во: "+ answered;
+                cell1.style.background = bcg;
+                cell2.style.background = bcg;
+                cell3.style.background = bcg;
+                cell1.style.textAlign = 'center';
+                cell3.style.textAlign = 'center';
+                table.firstElementChild.append(...arr3);
+            }
+            if (arr4.length > 0) {
+                const newRow = table.insertRow(table.rows.length);
+                newRow.className = "table-break";
+                newRow.addEventListener("click", showHidden)
+                const cell1 = newRow.insertCell(0);
+                let cell2 = newRow.insertCell(1);
+                cell2.colSpan = 10;
+                const cell3 = newRow.insertCell(2);
+                cell1.style.border = 0;
+                cell2.style.border = 0;
+                cell3.style.border = 0;
+                cell1.textContent = states.pop();
+                bcg = "#9B9B9B";
+                cell2.textContent = "ЗАМЕЧАНИЯ СНЯТЫ";
+                cell3.textContent = "Кол-во: "+ closed;
+                cell1.style.background = bcg;
+                cell2.style.background = bcg;
+                cell3.style.background = bcg;
+                cell1.style.textAlign = 'center';
+                cell3.style.textAlign = 'center';
+                table.firstElementChild.append(...arr4);
+            }
+            let last_state = "";
+            for (let i=0; i<table.rows.length; i++) {
+                if (table.rows[i].className == "table-break") {
+                    last_state = states_buf.pop();
+                    table.rows[i].children[0].innerHTML = last_state;
+                } else if (table.rows[i].className == "table-break2") {
+                    last_state = states2_buf.pop();
+                    table.rows[i].children[0].innerHTML = last_state;
+                } else if (last_state != "▼" && table.rows[i].className == "reestr") {
+                    table.rows[i].setAttribute("hidden", "");
+                } else if (last_state == "▼" && table.rows[i].className == "reestr") {
+                    table.rows[i].removeAttribute("hidden");
+                }
+            }
+        }
+        function showHidden(e) {
+            let sibling = this.nextElementSibling;
+            let state = this.firstChild.innerHTML;
+            if (this.className == "table-break") {
+                while (sibling.className == "reestr" || sibling.className == "table-break2") {
+                    if (state == "\u25B6") {
+                        sibling.removeAttribute("hidden");
+                        if (sibling.className == "table-break2") {
+                            sibling.children[0].innerHTML = "▼";
+                        }
+                    } else {
+                        sibling.setAttribute("hidden", "");
+                    }
+                    if (sibling != table.lastElementChild.lastElementChild) {
+                        sibling = sibling.nextElementSibling;
+                    } else {
+                        break;
+                    }
+                }
+                if (state == "\u25B6") {
+                    this.firstChild.innerHTML = "&#9660;";
+                } else {
+                    this.firstChild.innerHTML = "\u25B6";
+                }
+            } else {
+                while (sibling.className == "reestr") {
+                    if (state == "\u25B6") {
+                        sibling.removeAttribute("hidden");
+                    } else {
+                        sibling.setAttribute("hidden", "");
+                    }
+                    if (sibling != table.lastElementChild.lastElementChild) {
+                        sibling = sibling.nextElementSibling;
+                    } else {
+                        break;
+                    }
+                }
+                if (state == "\u25B6") {
+                    this.firstChild.innerHTML = "&#9660;";
+                } else {
+                    this.firstChild.innerHTML = "\u25B6";
+                }
+            }
+        }
+        let rows_buf = Array.from(table.rows);
+        function sortByResp(e) {
+            if (this.value == "0") {
+                for (let i=0; i < work_rows.length; i++) {
+                    work_rows[i] = work_rows[i].sort(compareRowsRespons);
+                }
+                sorting(work_rows, reviewer_rows.sort(compareRowsRespons), answered_rows.sort(compareRowsRespons), closed_rows.sort(compareRowsRespons));
+                this.innerHTML = "&#9660;";
+                this.value = "1";
+            } else if (this.value == "1") {
+                for (let i=0; i < work_rows.length; i++) {
+                    work_rows[i] = work_rows[i].sort(compareRowsRespons).reverse();
+                }
+                sorting(work_rows, reviewer_rows.sort(compareRowsRespons).reverse(), answered_rows.sort(compareRowsRespons).reverse(), closed_rows.sort(compareRowsRespons).reverse());
+                this.innerHTML = "&#9650;";
+                this.value = "2";
+            } else {
+                let states = Array();
+                let states2 = Array();
+                while (table.rows.length > 1) {
+                    if (table.rows[table.rows.length-1].className == "table-break") {
+                        states.push(table.rows[table.rows.length-1].children[0].innerHTML);
+                    }
+                    if (table.rows[table.rows.length-1].className == "table-break2") {
+                        states2.push(table.rows[table.rows.length-1].children[0].innerHTML);
+                    }
+                    table.deleteRow(table.rows.length-1);
+                }
+                let last_state = "";
+                for (let i=0; i<rows_buf.length; i++) {
+                    if (rows_buf[i].className == "table-break") {
+                        last_state = states.pop();
+                        rows_buf[i].children[0].innerHTML = last_state;
+                    }
+                    else if (rows_buf[i].className == "table-break2") {
+                        last_state = states2.pop();
+                        rows_buf[i].children[0].innerHTML = last_state;
+                    } else if (last_state != "▼" && rows_buf[i].className == "reestr"){
+                        rows_buf[i].setAttribute("hidden", "");
+                    } else if (last_state == "▼" && rows_buf[i].className == "reestr"){
+                        rows_buf[i].removeAttribute("hidden");
+                    }
+                    table.firstElementChild.appendChild(rows_buf[i]);
+                }
+                this.innerHTML = buf_inner
+                this.value = "0";
+            }
+        }
+        function sortByNumber(e) {
+            if (this.value == "0") {
+                for (let i=0; i < work_rows.length; i++) {
+                    work_rows[i] = work_rows[i].sort(compareRowsNumbers);
+                }
+                sorting(work_rows, reviewer_rows.sort(compareRowsNumbers), answered_rows.sort(compareRowsNumbers), closed_rows.sort(compareRowsNumbers));
+                this.innerHTML = "&#9660;";
+                this.value = "1";
+            } else if (this.value == "1") {
+                for (let i=0; i < work_rows.length; i++) {
+                    work_rows[i] = work_rows[i].sort(compareRowsNumbers).reverse();
+                }
+                sorting(work_rows, reviewer_rows.sort(compareRowsNumbers).reverse(), answered_rows.sort(compareRowsNumbers).reverse(), closed_rows.sort(compareRowsNumbers).reverse());
+                this.innerHTML = "&#9650;";
+                this.value = "2";
+            } else {
+                let states = Array();
+                let states2 = Array();
+                while (table.rows.length > 1) {
+                    if (table.rows[table.rows.length-1].className == "table-break") {
+                        states.push(table.rows[table.rows.length-1].children[0].innerHTML);
+                    }
+                    if (table.rows[table.rows.length-1].className == "table-break2") {
+                        states2.push(table.rows[table.rows.length-1].children[0].innerHTML);
+                    }
+                    table.deleteRow(table.rows.length-1);
+                }
+                let last_state = "";
+                for (let i=0; i<rows_buf.length; i++) {
+                    if (rows_buf[i].className == "table-break") {
+                        last_state = states.pop();
+                        rows_buf[i].children[0].innerHTML = last_state;
+                    }
+                    else if (rows_buf[i].className == "table-break2") {
+                        last_state = states2.pop();
+                        rows_buf[i].children[0].innerHTML = last_state;
+                    } else if (last_state != "▼" && rows_buf[i].className == "reestr"){
+                        rows_buf[i].setAttribute("hidden", "");
+                    } else if (last_state == "▼" && rows_buf[i].className == "reestr"){
+                        rows_buf[i].removeAttribute("hidden");
+                    }
+                    table.firstElementChild.appendChild(rows_buf[i]);
+                }
+                this.innerHTML = buf_inner
+                this.value = "0";
+            }
+        }
+        function sortByVersion(e) {
+            if (this.value == "0") {
+                for (let i=0; i < work_rows.length; i++) {
+                    work_rows[i] = work_rows[i].sort(compareRowsVersions);
+                }
+                sorting(work_rows, reviewer_rows.sort(compareRowsVersions), answered_rows.sort(compareRowsVersions), closed_rows.sort(compareRowsVersions));
+                this.innerHTML = "&#9660;";
+                this.value = "1";
+            } else if (this.value == "1") {
+            for (let i=0; i < work_rows.length; i++) {
+                    work_rows[i] = work_rows[i].sort(compareRowsVersions).reverse();
+                }
+                sorting(work_rows, reviewer_rows.sort(compareRowsVersions).reverse(), answered_rows.sort(compareRowsVersions).reverse(), closed_rows.sort(compareRowsVersions).reverse());
+                this.innerHTML = "&#9650;";
+                this.value = "2";
+            } else {
+                let states = Array();
+                while (table.rows.length > 1) {
+                    if (table.rows[table.rows.length-1].className == "table-break") {
+                        states.push(table.rows[table.rows.length-1].children[0].innerHTML);
+                    }
+                    table.deleteRow(table.rows.length-1);
+                }
+                for (let i=0; i<rows_buf.length; i++) {
+                    if (rows_buf[i].className == "table-break") {
+                        rows_buf[i].children[0].innerHTML = states.pop();
+                    }
+                    if (rows_buf[i].className == "table-break2") {
+                        rows_buf[i].children[0].innerHTML = "▼";
+                    }
+                    table.firstElementChild.appendChild(rows_buf[i]);
+                }
+                this.innerHTML = buf_inner
+                this.value = "0";
+            }
+        }
+        document.getElementById("sort_resp").addEventListener("click", sortByResp);
+        document.getElementById("sort_number").addEventListener("click", sortByNumber);
+        document.getElementById("sort_version").addEventListener("click", sortByVersion);
+        buf_inner = document.getElementById("sort_resp").innerHTML;
+    </script>
+</body>
+</html>

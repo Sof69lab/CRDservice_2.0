@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Выход</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        a:active,
+        a:hover,
+        a {
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+<body class="container custom">
+<div class="container">
+{% block content %}
+    <div class="py-f">
+  <p>Вы вышли из аккаунта!</p>
+  <button class="blue-button"><a class="text" style="color:white" href="{% url 'login'%}">Войти снова</a></button>
+    </div>
+{% endblock %}
+    <footer class="site-footer">
+        <div style="display: flex; justify-content: space-between; width: 100%">
+            <div style="margin-left: 5px;">
+                <h4>Контакты разработчиков:</h4>
+                <ul>
+                    <li>crds@vnipipt.ru</li>
+                    <li>ilyina-s-a@vnipipt.ru</li>
+                </ul>
+            </div>
+            <div style="margin-right: 5px; display: flex; align-items: center;">
+                <img src="../../static/vnipi_logo-2.svg">
+            </div>
+        </div>
+    </footer>
+</div>
+</body>
+</html>

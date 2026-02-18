@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Ошибка авторизации</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        a:active,
+        a:hover,
+        a {
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+<body style="text-align:center;" class="container custom">
+    <p>{{ text }}</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+</body>
+</html>

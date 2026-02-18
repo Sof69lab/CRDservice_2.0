@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Просмотр замечания</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        td {
+            border-style: none;
+            background: var(--light_blue);
+        }
+        tbody td:nth-child(1) {
+            width: 60%;
+        }
+    </style>
+</head>
+<body class="container custom">
+    <div class="container" style="max-width:99%">
+        <div class="px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+            <h1 class="display-4" id="header">Реестр выявленных несоответствий № {{ form.project_dogovor.value }}/{{ form.num_reestr.value }}</h1>
+        </div>
+        <div class="py-5">
+            <div class="row">
+                <div class="col-12">
+                    {% load verbose_names %}
+                    <p hidden id="role">{{ role }}</p>
+                    <details>
+                        <summary>Информация о реестре</summary>
+                        <p>
+                            {% get_verbose_field_name "customer" %}<br />
+                            {{ form.customer }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "project_dogovor" %}<br />
+                            {{ form.project_dogovor }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "project_date_contract" %}<br />
+                            {{ form.project_date_contract }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "project_name" %}<br />
+                            {{ form.project_name }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "gip" %}<br />
+                            <input type="text" class="form-readonly" readonly="readonly" value="{{ gipcontext }}">
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "project_reviewer" %}<br />
+                            {{ form.project_reviewer }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "out_mail_num" %}<br />
+                            {{ form.out_mail_num }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "out_mail_date" %}<br />
+                            {{ form.out_mail_date }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "in_mail_num" %}<br />
+                            {{ form.in_mail_num }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "in_mail_date" %}<br />
+                            {{ form.in_mail_date }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "num_reestr" %}<br />
+                            {{ form.num_reestr }}
+                        </p>
+                    </details>
+                    <br />
+                    <details open>
+                        <summary id="remark_summary">Информация о несоответствии</summary>
+                        <p>
+                            {% get_verbose_field_name "num_remark" %}<br />
+                            {{ form.num_remark }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "remark_v" %}<br />
+                            {{ form.remark_v }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "remark_name" %}<br />
+                            {{ form.remark_name }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "rational" %}<br />
+                            {{ form.rational }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "designation_name" %}<br />
+                            {{ form.designation_name }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "section_name" %}<br />
+                            {{ form.section_name }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "responsibleTrouble_name" %}<br />
+                            <input type="text" class="form-readonly" readonly="readonly" value="{{ rescontext }}">
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "executor_fail_name" %}<br />
+                            <input type="text" class="form-readonly" readonly="readonly" value="{{ exfcontext }}" id="id_executor_fail_name">
+                        </p>
+                        <p id="execFailText">
+                            {% get_verbose_field_name "executor_fail_text" %}<br />
+                            {{ form.executor_fail_text }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "executor_name" %}<br />
+                            <input type="text" class="form-readonly" readonly="readonly" value="{{ excontext }}">
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "answer_date_plan" %}<br />
+                            {{ form.answer_date_plan }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "answer_date_fact" %}<br />
+                            {{ form.answer_date_fact }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "answer_deadline_correct_plan" %}<br />
+                            {{ form.answer_deadline_correct_plan }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "answer_deadline_correct_fact" %}<br />
+                            {{ form.answer_deadline_correct_fact }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "labor_costs_plan" %}<br />
+                            {{ form.labor_costs_plan }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "labor_costs_fact" %}<br />
+                            {{ form.labor_costs_fact }}
+                        </p>
+                        <p>
+                            <b>{% get_verbose_field_name "comment" %}</b><br />
+                            {{ form.comment }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "answer_remark" %}<br />
+                            {{ form.answer_remark }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "link_tech_name" %}<br />
+                            {{ form.link_tech_name }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "cancel_remark" %}<br />
+                            {{ form.cancel_remark }}
+                        </p>
+                        <table id="importance_table" style="width:70%">
+                            <tr>
+                                <td>{% get_verbose_field_name "importance1" %}</td>
+                                <td>{{ form.importance1 }}</td>
+                            </tr>
+                            <tr id="imp2" hidden>
+                                <td>Корректировка документации (свой раздел, глава, том, книга, др. док.)</td>
+                                <td>{{ form.importance2 }}</td>
+                            </tr>
+                            <tr id="imp3" hidden>
+                                <td>Корректировка смежных разделов (глав, томов, др. док.)</td>
+                                <td>{{ form.importance3 }}</td>
+                            </tr>
+                            <tr class="imp3" hidden>
+                                <td colspan="2">{% get_verbose_field_name "imp3_comment" %}</td>
+                            </tr>
+                            <tr class="imp3" hidden>
+                                <td colspan="2">{{ form.imp3_comment }}
+                                    {% if form.imp3_comment.errors %}
+                                        {% for error in form.imp3_comment.errors %}
+                                            <li class="alert danger"> {{error}} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr id="imp4" hidden>
+                                <td>Выдача задания смежным подразделениям (без учёта ОКиВД) и (или) получение исходных данных от них</td>
+                                <td>{{ form.importance4 }}</td>
+                            </tr>
+                            <tr class="imp4" hidden>
+                                <td colspan="2">{% get_verbose_field_name "imp4_comment" %}</td>
+                            </tr>
+                            <tr class="imp4" hidden>
+                                <td colspan="2">{{ form.imp4_comment }}
+                                    {% if form.imp4_comment.errors %}
+                                        {% for error in form.imp4_comment.errors %}
+                                            <li class="alert danger"> {{error}} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr id="imp5" hidden>
+                                <td>Корректировка принятых проектных решений</td>
+                                <td>{{ form.importance5 }}</td>
+                            </tr>
+                            <tr id="imp6" hidden>
+                                <td>Корректировка принятых проектных решений требуется по причине</td>
+                                <td>{{ form.importance6 }} </td>
+                            </tr>
+                            <tr id="imp7" hidden>
+                                <td>Получение дополнительных исходных данных от Заказчика</td>
+                                <td>{{ form.importance7 }}</td>
+                            </tr>
+                            <tr class="imp7" hidden>
+                                <td colspan="2">{% get_verbose_field_name "imp7_comment" %}</td>
+                            </tr>
+                            <tr class="imp7" hidden>
+                                <td colspan="2">{{ form.imp7_comment }}
+                                    {% if form.imp7_comment.errors %}
+                                        {% for error in form.imp7_comment.errors %}
+                                            <li class="alert danger"> {{error}} </li>
+                                        {% endfor %}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                        <p>
+                            {% get_verbose_field_name "total_importance" %}<br />
+                            {{ form.total_importance }}
+                        </p>
+                        <p>
+                            {% get_verbose_field_name "root_cause_list" %}<br />
+                            {{ form.root_cause_list }}
+                        </p>
+                        <p id="root_cause_define">
+                            {% get_verbose_field_name "root_cause_text" %}<br />
+                            {{ form.root_cause_text }}
+                        </p>
+                        <p id="root_cause_comment">
+                            <label for="root_cause_comment" id="cause_label"></label><br />
+                            {{ form.root_cause_comment }}
+                        </p>
+                    </details>
+                    <br />
+                    <p hidden id="status">{{ status }}</p>
+                    <button class="turquoise-button" id="employee" hidden><a href="{% url 'employee' id=remarkID %}" style="color:white">Заполнить за исполнителя</a></button>
+                    <button class="turquoise-button" id="boss" hidden><a href="{% url 'boss' id=remarkID %}" style="color:white">Заполнить за руководителя</a></button>
+                    <button class="turquoise-button" id="answer" hidden><a href="{% url 'final' id=remarkID %}" style="color:white">Внести ответ за исполнителя</a></button>
+                    <button class="blue-button"><a href="{% url 'home'%}" style="color:white">Вернуться в профиль</a></button>
+                    <button class="blue-button"><a href="{% url 'homeGIP' id=reestrID %}" style="color:white">Вернуться в реестр</a></button>
+                    <script>
+                        let s = document.getElementById("header").innerHTML;
+                        s = s.substring(0,35).concat(s.substring(39,43),s.substring(45,47));
+                        document.getElementById("header").innerHTML = s;
+
+                        let imp2 = document.getElementById("imp2");
+                        let imp3 = document.getElementById("imp3");
+                        let imp4 = document.getElementById("imp4");
+                        let imp5 = document.getElementById("imp5");
+                        let imp6 = document.getElementById("imp6");
+                        let imp7 = document.getElementById("imp7");
+                        let imps3 = document.getElementsByClassName("imp3");
+                        let imps4 = document.getElementsByClassName("imp4");
+                        let imps7 = document.getElementsByClassName("imp7");
+                        const radioButtons1 = document.querySelectorAll('input[name="importance1"]');
+                        for (const i of radioButtons1) {
+                            i.disabled = true;
+                        }
+                        const radioButtons2 = document.querySelectorAll('input[name="importance2"]');
+                        for (const i of radioButtons2) {
+                            i.disabled = true;
+                        }
+                        const radioButtons3 = document.querySelectorAll('input[name="importance3"]');
+                        for (const i of radioButtons3) {
+                            i.disabled = true;
+                        }
+                        const radioButtons4 = document.querySelectorAll('input[name="importance4"]');
+                        for (const i of radioButtons4) {
+                            i.disabled = true;
+                        }
+                        const radioButtons5 = document.querySelectorAll('input[name="importance5"]');
+                        for (const i of radioButtons5) {
+                            i.disabled = true;
+                        }
+                        const radioButtons6 = document.querySelectorAll('input[name="importance6"]');
+                        for (const i of radioButtons6) {
+                            i.disabled = true;
+                        }
+                        const radioButtons7 = document.querySelectorAll('input[name="importance7"]');
+                        for (const i of radioButtons7) {
+                            i.disabled = true;
+                        }
+                        for(const i of radioButtons1) {
+                            if (i.checked && i.value=="True") {
+                                imp4.removeAttribute("hidden");
+                                for (const j of radioButtons4) {
+                                    if (j.checked) {
+                                        imp7.removeAttribute("hidden");
+                                        if (j.value == "True") {
+                                            imps4[0].removeAttribute("hidden");
+                                            imps4[1].removeAttribute("hidden");
+                                        }
+                                        for (const k of radioButtons7) {
+                                            if (k.checked && k.value=="True") {
+                                                imps7[0].removeAttribute("hidden");
+                                                imps7[1].removeAttribute("hidden");
+                                            }
+                                        }
+                                    }
+                                }
+                            } else if (i.checked && i.value=="False"){
+                                imp2.removeAttribute("hidden");
+                                for (const j of radioButtons2) {
+                                    if (j.checked && j.value == "True") {
+                                        imp3.removeAttribute("hidden");
+                                        for (const k of radioButtons3) {
+                                            if (k.checked) {
+                                                if (k.value == "True") {
+                                                    imps3[0].removeAttribute("hidden");
+                                                    imps3[1].removeAttribute("hidden");
+                                                }
+                                                imp4.removeAttribute("hidden");
+                                                for (const l of radioButtons4) {
+                                                    if (l.checked) {
+                                                        if (l.value == "True") {
+                                                            imps4[0].removeAttribute("hidden");
+                                                            imps4[1].removeAttribute("hidden");
+                                                        }
+                                                        imp5.removeAttribute("hidden");
+                                                        for (const n of radioButtons5) {
+                                                            if (n.checked) {
+                                                                if (n.value == "True") {
+                                                                    imp6.removeAttribute("hidden");
+                                                                    for (const m of radioButtons6) {
+                                                                        if (m.checked) {
+                                                                            imp7.removeAttribute("hidden");
+                                                                            for (const q of radioButtons7) {
+                                                                                if (q.checked && q.value == "True") {
+                                                                                    imps7[0].removeAttribute("hidden");
+                                                                                    imps7[1].removeAttribute("hidden");
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                } else {
+                                                                    imp7.removeAttribute("hidden");
+                                                                    for (const m of radioButtons7) {
+                                                                        if (m.checked && m.value == "True") {
+                                                                            imps7[0].removeAttribute("hidden");
+                                                                            imps7[1].removeAttribute("hidden");
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        if (document.getElementById("root_cause").value != "0.") {
+                            document.getElementById("root_cause_define").setAttribute("hidden", "");
+                        }
+
+                        if (document.getElementById("id_executor_fail_name").value != "1. Сотрудник больше не работает ") {
+                            document.getElementById("execFailText").setAttribute("hidden", "");
+                        }
+                        let cause = document.getElementById("root_cause").value;
+                        let lbl = document.getElementById("cause_label");
+                        if (cause == "1.3.1." || cause == "1.3.2." || cause == "3.1.1." || cause == "3.1.2.") {
+                            lbl.innerHTML = "Конкретные пункты НД";
+                        }
+                        else if (cause == "2.2.1.") {
+                            lbl.innerHTML = "Конкретное ПО или оборудование";
+                        }
+                        else if (cause == "3.1.5.") {
+                            lbl.innerHTML = "Конкретный субподрядчик";
+                        }
+                        else if (cause == "3.1.6.") {
+                            lbl.innerHTML = "Конкретный исполнитель";
+                        }
+                        else if (cause == "3.2.1." || cause == "3.2.3." || cause == "3.3.1.") {
+                            lbl.innerHTML = "Конкретные подразделения";
+                        }
+                        else if (cause == "4.1.1." || cause == "4.2.1.") {
+                            lbl.innerHTML = "Конкретные факты и Руководители";
+                        }
+                        else if (cause == "4.1.2." || cause == "4.2.2.") {
+                            lbl.innerHTML = "Конкретные факты, Руководители и конкретные распоряжения";
+                        }
+                        else if (cause == "4.3.1.") {
+                            lbl.innerHTML = "Конкретные Руководители";
+                        }
+                        else if (cause == "4.4.1." || cause == "4.5.1." || cause == "4.5.2.") {
+                            lbl.innerHTML = "Конкретные факты";
+                        }
+                        else if (cause == "4.6.1.") {
+                            lbl.innerHTML = "Конкретные Распоряжения и документы";
+                        }
+                        else if (cause == "5.3.1.") {
+                            lbl.innerHTML = "Конкретные Руководители (нормоконтролёры)";
+                        }
+                        else if (cause == "5.3.2.") {
+                            lbl.innerHTML = "Конкретные Руководители и исполнители (нормоконтролёры)";
+                        } else {
+                            document.getElementById("root_cause_comment").setAttribute("hidden", "");
+                        }
+
+                        let status = document.getElementById("status").innerHTML;
+                        if (document.getElementById("role").innerHTML == "ГИП") {
+                            if (status == "На заполнении руководителем" || (status == "На доработке руководителем" && document.getElementById("id_labor_costs_fact").value == "")) {
+                                document.getElementById("boss").removeAttribute("hidden");
+                            }
+                            if (status == "Подготовка ответов руководителем" || (status == "На доработке руководителем" && document.getElementById("id_labor_costs_fact").value != "")) {
+                                document.getElementById("answer").removeAttribute("hidden");
+                            }
+                        }
+                        if (document.getElementById("role").innerHTML == "ГИП" || document.getElementById("role").innerHTML == "Руководитель") {
+                            if (status == "На заполнении исполнителем" || (status == "На доработке исполнителем" && document.getElementById("id_labor_costs_fact").value == "")) {
+                                document.getElementById("employee").removeAttribute("hidden");
+                            }
+                            if (status == "Подготовка ответов исполнителем" || (status == "На доработке исполнителем" && document.getElementById("id_labor_costs_fact").value != "")) {
+                                document.getElementById("answer").removeAttribute("hidden");
+                            }
+                        }
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

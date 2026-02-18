@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Личный кабинет</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        table{
+            font-size: 80%;
+            border: 1px solid var(--light_grey);
+            width:100%;
+        }
+        a:active,
+        a:hover,
+        a {
+            text-decoration: none;
+            color: #56C02B;
+        }
+        a:visited {
+            color: #025EA1;
+        }
+        th {
+            background: var(--navy);
+            border: 1px solid var(--light_grey);
+            color: var(--white);
+        }
+    </style>
+</head>
+<body class="container custom" style="background: white">
+    {% load verbose_names %}
+	<div class="container">
+<!--    <img src="../static/vnipi_logo-1.svg" height="45px">-->
+    <div class="py-f">
+	{% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+            <div class="{{ message.tags }}">
+				<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+				{{ message }}
+            </div>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <table style="width: 100%; table-layout: fixed; border: 0px; font-size: 90%;">
+        <tr>
+            <td class="head-block-left" style="width: 85%;">
+                <h3 style="margin-bottom: 0;">Личный кабинет</h3>
+            </td>
+            <td class="head-block-right" style="width: 10%;">
+                <h5 style="margin-bottom: 0;">Пользователь: </h5>
+            </td>
+            <td class="head-block-left" style="width: 5%;">
+                <h5 style="margin-bottom: 0;">{{ user.last_name }} {{ user.first_name }}</h5>
+            </td>
+        </tr>
+        <tr>
+            <td class="head-block-left" style="width: 85%;"></td>
+            <td class="head-block-right" style="width: 10%;">
+                <h5 style="margin-bottom: 10px; margin-top: 5px">Роль:</h5>
+            </td>
+            <td class="head-block-left" style="width: 5%;">
+                <h5 id="group" style="margin-bottom: 10px; margin-top: 5px">{{ group }}</h5>
+            </td>
+        </tr>
+    </table>
+	<h4 id="reviewer_sended" hidden>{{ reviewer_sended }}</h4>
+    <h4 id="closed" hidden>{{ closed }}</h4>
+    <h4 id="worked" hidden>{{ worked }}</h4>
+    <h4 id="userID" hidden>{{ user.id }}</h4>
+	<h4 hidden id="department">{{ department }}</h4>
+    <table id="table2" border="1" cellspacing="0">
+        <tr>
+            <th class="main">Реестр №</th>
+            <th class="main">Наименование проекта</th>
+            <th class="main">Рецензент</th>
+            <th class="main">ГИП</th>
+            <th class="main">Дата создания</th>
+            <th class="main">Срок исполнения</th>
+            <th class="main">Мониторинг за сроками (дн.)</th>
+            <th class="main" style="background: #F96925">Статус</th>
+            <th class="main" colspan="4">Количество несоответствий</th>
+            <th class="main">Действия</th>
+        </tr>
+        {% for r in reestrs %}
+        <tr class="reestr">
+            {% if r.status == 'Закрыт' or r.status == 'Скрыт' %}
+                <td class="numbers" style="background: #ededed"> {{ r.project_dogovor }}-{{ r.num_reestr }}</td>
+                <td style="background: #ededed">{{ r.project_name }}</td>
+                <td style="background: #ededed">{{ r.project_reviewer }}</td>
+                <td align="center" class="names" style="background: #ededed">{{ r.gip }}</td>
+                <td align="center" style="background: #ededed">{{ r.start_date.day }} {{ r.start_date.month }} {{ r.start_date.year }}</td>
+                <td align="center" style="background: #ededed">{{ r.end_date.day }} {{ r.end_date.month }} {{ r.end_date.year }}</td>
+                <td align="center" class="deadline" style="background: #ededed"> </td>
+                <td style="background: #ededed">{{ r.status }}</td>
+                {% for i in info %}
+                {% if i.0 == r.id %}
+                <td align="center" class="remarks" colspan="4" style="background: #ededed"> {{i.1}} </td>
+                {% endif %}
+                {% endfor %}
+                <td style="background: #ededed">
+                    <button hidden class="info" onclick="event.stopPropagation()" style="background: #ededed; border: none;"><a href="{% url 'reestInfo' id=r.id %}">Подробнее</a></button>
+                    <button onclick="event.stopPropagation()" style="background: #ededed; border: none;"><a href="{% url 'homeGIP' id=r.id %}">К замечаниям</a></button>
+                    <form novalidate method="post" id="{{ r.id }}" onsubmit="return false;" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input name="id" hidden value="{{ r.id }}">
+                        <input name="customer" hidden value="{{ r.customer }}">
+                        <input name="project_dogovor" hidden value="{{ r.project_dogovor }}">
+                        <input name="project_date_contract" hidden value="{{ r.project_date_contract }}">
+                        <input name="project_name" hidden value="{{ r.project_name }}">
+                        <input name="gip" hidden value="{{ r.gip }}">
+                        <input name="project_reviewer" hidden value="{{ r.project_reviewer }}">
+                        <input name="out_mail_num" hidden value="{{ r.out_mail_num }}">
+                        <input name="out_mail_date" hidden value="{{ r.out_mail_date }}">
+                        <input name="in_mail_num" hidden value="{{ r.in_mail_num }}">
+                        <input name="in_mail_date" hidden value="{{ r.in_mail_date }}">
+                        <input name="num_reestr" hidden value="{{ r.num_reestr }}">
+                    </form>
+                    <button onclick="event.stopPropagation(); document.getElementById('{{ r.id }}').submit();" style="background: #ededed; border: none; color: #025EA1; cursor: pointer;">Выгрузить</button>
+                </td>
+            {% elif r in reviewer_sended_reestNum %}
+                <td class="numbers" style="background: #e5f3ff"> {{ r.project_dogovor }}-{{ r.num_reestr }}</td>
+                <td style="background: #e5f3ff">{{ r.project_name }}</td>
+                <td style="background: #e5f3ff">{{ r.project_reviewer }}</td>
+                <td align="center" class="names" style="background: #e5f3ff">{{ r.gip }}</td>
+                <td align="center" style="background: #e5f3ff">{{ r.start_date.day }} {{ r.start_date.month }} {{ r.start_date.year }}</td>
+                <td align="center" style="background: #e5f3ff">{{ r.end_date.day }} {{ r.end_date.month }} {{ r.end_date.year }}</td>
+                <td align="center" class="deadline" style="background: #e5f3ff"> </td>
+                <td style="background: #e5f3ff">{{ r.status }}</td>
+                {% for i in info %}
+                {% if i.0 == r.id %}
+                <td align="center" class="remarks" colspan="4" style="background: #e5f3ff"> {{i.1}} </td>
+                {% endif %}
+                {% endfor %}
+                <td style="background: #e5f3ff">
+                    <button hidden class="info" onclick="event.stopPropagation()" style="background: #e5f3ff; border: none;"><a href="{% url 'reestInfo' id=r.id %}">Подробнее</a></button>
+                    <button onclick="event.stopPropagation()" style="background: #e5f3ff; border: none;"><a href="{% url 'homeGIP' id=r.id %}">К замечаниям</a></button>
+                    <form novalidate method="post" id="{{ r.id }}" onsubmit="return false;" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input name="id" hidden value="{{ r.id }}">
+                        <input name="customer" hidden value="{{ r.customer }}">
+                        <input name="project_dogovor" hidden value="{{ r.project_dogovor }}">
+                        <input name="project_date_contract" hidden value="{{ r.project_date_contract }}">
+                        <input name="project_name" hidden value="{{ r.project_name }}">
+                        <input name="gip" hidden value="{{ r.gip }}">
+                        <input name="project_reviewer" hidden value="{{ r.project_reviewer }}">
+                        <input name="out_mail_num" hidden value="{{ r.out_mail_num }}">
+                        <input name="out_mail_date" hidden value="{{ r.out_mail_date }}">
+                        <input name="in_mail_num" hidden value="{{ r.in_mail_num }}">
+                        <input name="in_mail_date" hidden value="{{ r.in_mail_date }}">
+                        <input name="num_reestr" hidden value="{{ r.num_reestr }}">
+                    </form>
+                    <button onclick="event.stopPropagation(); document.getElementById('{{ r.id }}').submit();" style="background: #e5f3ff; border: none; color: #025EA1; cursor: pointer;">Выгрузить</button>
+                </td>
+            {% else %}
+                <td class="numbers"> {{ r.project_dogovor }}-{{ r.num_reestr }}</td>
+                <td>{{ r.project_name }}</td>
+                <td>{{ r.project_reviewer }}</td>
+                <td align="center" class="names">{{ r.gip }}</td>
+                <td align="center">{{ r.start_date.day }} {{ r.start_date.month }} {{ r.start_date.year }}</td>
+                <td align="center">{{ r.end_date.day }} {{ r.end_date.month }} {{ r.end_date.year }}</td>
+                <td align="center" class="deadline"> </td>
+                <td>{{ r.status }}</td>
+                {% for i in info %}
+                {% if i.0 == r.id %}
+                <td align="center" class="remarks" colspan="4"> {{i.1}} </td>
+                {% endif %}
+                {% endfor %}
+                <td>
+                    <button hidden class="info" onclick="event.stopPropagation()" style="background: white; border: none;"><a href="{% url 'reestInfo' id=r.id %}">Подробнее</a></button>
+                    <button onclick="event.stopPropagation()" style="background: white; border: none;"><a href="{% url 'homeGIP' id=r.id %}">К замечаниям</a></button>
+                    <form novalidate method="post" id="{{ r.id }}" onsubmit="return false;" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input name="id" hidden value="{{ r.id }}">
+                        <input name="customer" hidden value="{{ r.customer }}">
+                        <input name="project_dogovor" hidden value="{{ r.project_dogovor }}">
+                        <input name="project_date_contract" hidden value="{{ r.project_date_contract }}">
+                        <input name="project_name" hidden value="{{ r.project_name }}">
+                        <input name="gip" hidden value="{{ r.gip }}">
+                        <input name="project_reviewer" hidden value="{{ r.project_reviewer }}">
+                        <input name="out_mail_num" hidden value="{{ r.out_mail_num }}">
+                        <input name="out_mail_date" hidden value="{{ r.out_mail_date }}">
+                        <input name="in_mail_num" hidden value="{{ r.in_mail_num }}">
+                        <input name="in_mail_date" hidden value="{{ r.in_mail_date }}">
+                        <input name="num_reestr" hidden value="{{ r.num_reestr }}">
+                    </form>
+                    <button onclick="event.stopPropagation(); document.getElementById('{{ r.id }}').submit();" style="background: white; border: none; color: #025EA1; cursor: pointer;">Выгрузить</button>
+                </td>
+            {% endif %}
+        </tr>
+        {% for i in info %}
+        {% if i.0 == r.id %}
+        <tr hidden>
+            <td colspan="8"> </td>
+            <td align="center" style="background: #d9d9d9;">Всего<br/>{{i.1}}</td>
+            <td align="center" style="background: #4472c4; color: white;">Заказчик<br/>{{i.2}}</td>
+            <td align="center" style="background: var(--baby_blue); color: white;">Несущественные<br/>{{i.4}}</td>
+            <td align="center" style="background: #c00000; color: white;">Существенные<br/>{{i.3}}</td>
+            <td class="info" align="center" style="color: var(--blue)"> Подробнее </td>
+        </tr>
+        <tr hidden>
+            <td colspan="7"> </td>
+            <td>ВСЕГО</td>
+            <td align="center" style="background: #ededed;">{{i.1}}</td>
+            <td align="center" style="background: #b4c6e7;">{{i.2}}</td>
+            <td align="center" style="background: #ddebf7;">{{i.4}}</td>
+            <td align="center" style="background: #ffafaf;">{{i.3}}</td>
+            <td> </td>
+        </tr>
+        <tr hidden>
+            <td colspan="7"> </td>
+            <td style="color: #70AD47">СНЯТО</td>
+            <td align="center" style="background: #ededed;">{{i.7}}</td>
+            <td align="center" style="background: #b4c6e7;">{{i.11}}</td>
+            <td align="center" style="background: #ddebf7;">{{i.19}}</td>
+            <td align="center" style="background: #ffafaf;">{{i.15}}</td>
+            <td> </td>
+        </tr>
+        <tr hidden>
+            <td colspan="7"> </td>
+            <td style="color: #FFC000">ОТВЕТ ПОДГОТОВЛЕН</td>
+            <td align="center" style="background: #ededed;">{{i.6}}</td>
+            <td align="center" style="background: #b4c6e7;">{{i.10}}</td>
+            <td align="center" style="background: #ddebf7;">{{i.18}}</td>
+            <td align="center" style="background: #ffafaf;">{{i.14}}</td>
+            <td> </td>
+        </tr>
+        <tr hidden>
+            <td colspan="7"> </td>
+            <td style="color: #ED7D31">В РАБОТЕ</td>
+            <td align="center" style="background: #ededed;">{{i.5}}</td>
+            <td align="center" style="background: #b4c6e7;">{{i.9}}</td>
+            <td align="center" style="background: #ddebf7;">{{i.17}}</td>
+            <td align="center" style="background: #ffafaf;">{{i.13}}</td>
+            <td> </td>
+        </tr>
+        <tr hidden>
+            <td colspan="7"> </td>
+            <td>% завершения</td>
+            <td align="center" style="background: #ededed;">{{i.8}}</td>
+            <td align="center" style="background: #b4c6e7;">{{i.12}}</td>
+            <td align="center" style="background: #ddebf7;">{{i.20}}</td>
+            <td align="center" style="background: #ffafaf;">{{i.16}}</td>
+            <td> </td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+        {% endfor %}
+    </table>
+    <br/>
+    <button class="turquoise-button" id="new_reestr" hidden><a style="color:white" class="text" href="{% url 'newReestr' %}">Создать новый реестр</a></button>
+    <button class="blue-button" id="adm" hidden><a style="color:white" class="text" href="{% url 'admin:index' %}">Администрирование</a></button>
+    <button class="orange-button"><a style="color:white" class="text" href="{% url 'logout' %}">Выйти</a></button>
+	<br/> <br/>
+	<button class="turquoise-button"><a id="dashboard_button" style="color:white" class="text" href="http://localhost:3000/d/wNTrA3dHk/crds?orgId=1&refresh=1m&var-Year=All&var-GIP=All&var-reviewer=All&var-customers=All&var-contracts=All&var-reestrs=All&var-importance=All&var-departments=All&var-respons=%D0%BD&from=1582875132393&to=1740727932393&kiosk" target="_blank">Дашборд</a></button>
+    <button class="turquoise-button" id="AI_button" hidden>ИИ-ассистент</button>
+    <button class="turquoise-button" id="causes_file_download" hidden>Формулировки коренных причин</button>
+    <form hidden novalidate method="post" id="causes_download" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="causes_downloader" value="true" hidden>
+        <br/>
+        от
+        <input name="begin_date" type="date" value="">
+        до
+        <input name="end_date" type="date">
+        <br/><br/>
+        <button class="turquoise-button" id="download" onclick="event.stopPropagation(); document.getElementById('causes_download').submit();">Выгрузить</button>
+    </form>
+    <br/> <br/>
+    </div>
+    <footer class="site-footer">
+        <div style="display: flex; justify-content: space-between; width: 100%">
+            <div style="margin-left: 5px;">
+                <h5 style="margin-bottom: 0;">Контакты разработчиков:</h5>
+                <ul>
+                    <li>crds@vnipipt.ru</li>
+                    <li>ilyina-s-a@vnipipt.ru</li>
+                </ul>
+            </div>
+            <div style="margin-right: 5px; display: flex; align-items: center;">
+                <img src="../static/vnipi_logo-2.svg">
+            </div>
+        </div>
+    </footer>
+    </div>
+    <script>
+        let hrefS = "http://127.0.0.1:8000/aiGIP/";
+        function aiGIPlink() {
+            let s = hrefS;
+            s = s.concat(document.getElementById("userID").innerHTML);
+            s = s.concat(Date.now());
+            window.open(s, '_blank');
+            return true;
+        }
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+        function causes_download_file(e) {
+            dwnld_form = document.getElementById("causes_download");
+            if (e.target.innerHTML == "Формулировки коренных причин") {
+                dwnld_form.removeAttribute("hidden");
+                e.target.innerHTML = "Скрыть";
+            } else {
+                dwnld_form.setAttribute("hidden", "");
+                e.target.innerHTML = "Формулировки коренных причин";
+            }
+        }
+        let dashboard_button = document.getElementById("dashboard_button");
+		let role = document.getElementById("group").innerHTML;
+        if (role == "ГИП" || role == "Администратор" || role == "Наблюдатель") {
+            document.getElementById("new_reestr").removeAttribute("hidden");
+            document.getElementById("AI_button").removeAttribute("hidden");
+            document.getElementById("AI_button").addEventListener("click", aiGIPlink);
+            let infos = document.getElementsByClassName("info");
+            for (let i=0; i<infos.length; i++) {
+                infos[i].removeAttribute("hidden");
+            }
+        }
+        if (role == "Наблюдатель") {
+            document.getElementById("causes_file_download").removeAttribute("hidden");
+            document.getElementById("causes_file_download").addEventListener("click", causes_download_file);
+        }
+		if (role == "ГИП") {
+			changeURL('var-GIP', document.getElementById("userID").innerHTML);
+		}
+		if (role == "Руководитель" || role == "Исполнитель") {
+			changeURL('var-departments', document.getElementById("department").innerHTML);
+		}
+        if (role == "Администратор") {
+            document.getElementById("adm").removeAttribute("hidden");
+        }
+		var now = new Date();
+        let to = now.getTime();
+        let from = now.setFullYear(now.getFullYear() - 5);
+        let first_year = new Date(from);
+        if (first_year.getFullYear() > 2024) {
+            from = now.setFullYear(2024);
+        }
+		changeURL('from', from)
+		changeURL('to', to)
+		function changeURL(param_name, param_value) {
+            let url_str = new URL(dashboard_button.href);
+			url_str.searchParams.set(param_name, param_value);
+            dashboard_button.href = url_str.href;
+        }
+
+        let names = document.getElementsByClassName("names");
+        for (let i=0; i<names.length; i++) {
+            let shortName = "";
+            let k = 0;
+            for (let j=0; j<names[i].innerHTML.length; j++) {
+                if (names[i].innerHTML[j] == " ") {
+                    k++;
+                    if (k == 1) {
+                        shortName += names[i].innerHTML.slice(0,j) + " " + names[i].innerHTML[j+1] + ".";
+                    }
+                    if (k == 2) {
+                        shortName += names[i].innerHTML[j+1] + ".";
+                        break;
+                    }
+                }
+            }
+            names[i].innerHTML = shortName;
+        }
+
+        let numbers = document.getElementsByClassName("numbers");
+        for (let i=0; i<numbers.length; i++) {
+            let s = numbers[i].innerHTML.substring(5,9).concat(numbers[i].innerHTML.substring(numbers[i].innerHTML.indexOf("Д")+1,numbers[i].innerHTML.length));
+            numbers[i].innerHTML = s;
+        }
+
+        function remarksInfo(e) {
+            let sibling = this.nextSibling.nextSibling;
+            if (sibling.hasAttribute('hidden')) {
+                sibling.removeAttribute('hidden');
+            } else {
+                sibling.lastChild.previousSibling.innerHTML = "Подробнее";
+                for (let i=0; i < 6; i++) {
+                    sibling.setAttribute('hidden', 'hidden');
+                    sibling = sibling.nextSibling.nextSibling;
+                }
+            }
+        }
+
+        let reestrs = document.getElementsByClassName("reestr");
+        for (let i=0; i<reestrs.length; i++) {
+            reestrs[i].addEventListener("click", remarksInfo);
+        }
+
+        function addInfo(e) {
+            let sibling = this.parentNode.nextSibling.nextSibling;
+            if (sibling.hasAttribute('hidden')) {
+                for (let i=0; i < 5; i++) {
+                    sibling.removeAttribute('hidden');
+                    sibling = sibling.nextSibling.nextSibling;
+                }
+                this.innerHTML = "Скрыть";
+            } else {
+                for (let i=0; i < 5; i++) {
+                    sibling.setAttribute('hidden', 'hidden');
+                    sibling = sibling.nextSibling.nextSibling;
+                }
+                this.innerHTML = "Подробнее";
+            }
+        }
+        const table = document.getElementById("table2");
+        function showHidden(e) {
+            let sibling = this.nextElementSibling;
+            let state = this.firstChild.innerHTML;
+            while (sibling.className != "table-break") {
+                if (state == "\u25B6" && sibling.className == "reestr") {
+                    sibling.removeAttribute("hidden");
+                } else {
+                    sibling.setAttribute("hidden", "");
+                }
+                if (sibling != table.lastElementChild.lastElementChild) {
+                    sibling = sibling.nextElementSibling;
+                } else {
+                    break;
+                }
+            }
+            if (state == "\u25B6") {
+                this.firstChild.innerHTML = "&#9660;";
+            } else {
+                this.firstChild.innerHTML = "\u25B6";
+            }
+        }
+
+        let infos = document.getElementsByClassName("info");
+        for (let i=0; i<infos.length; i++) {
+            infos[i].addEventListener("click", addInfo);
+        }
+        let deadlines = document.getElementsByClassName("deadline");
+        let monthDict = {};
+        monthDict[1] = 'января';
+        monthDict[2] = 'февраля';
+        monthDict[3] = 'марта';
+        monthDict[4] = 'апреля';
+        monthDict[5] = 'мая';
+        monthDict[6] = 'июня';
+        monthDict[7] = 'июля';
+        monthDict[8] = 'августа';
+        monthDict[9] = 'сентября';
+        monthDict[10] = 'октября';
+        monthDict[11] = 'ноября';
+        monthDict[12] = 'декабря';
+        for (let i=0; i < deadlines.length; i++) {
+            let startDate = deadlines[i].previousSibling.previousSibling.previousSibling.previousSibling
+            let endDate = deadlines[i].previousSibling.previousSibling
+            let startDay = Number(startDate.innerHTML.slice(0, startDate.innerHTML.indexOf(" ")+1));
+            let startMonth = Number(startDate.innerHTML.slice(startDate.innerHTML.indexOf(" ")+1, startDate.innerHTML.indexOf(" ", startDate.innerHTML.indexOf(" ")+1)));
+            let startYear = Number(startDate.innerHTML.slice(-4, startDate.innerHTML.length));
+            startDate.innerHTML = String(startDay) + " " + monthDict[startMonth] + " " + String(startYear);
+            let endDay = Number(endDate.innerHTML.slice(0, endDate.innerHTML.indexOf(" ")+1));
+            let endMonth = Number(endDate.innerHTML.slice(endDate.innerHTML.indexOf(" ")+1, endDate.innerHTML.indexOf(" ", endDate.innerHTML.indexOf(" ")+1)));
+            let endYear = Number(endDate.innerHTML.slice(-4, endDate.innerHTML.length));
+            endDate.innerHTML = String(endDay) + " " + monthDict[endMonth] + " " + String(endYear);
+
+            let status = deadlines[i].nextSibling.nextSibling.innerHTML;
+            if (status == "Скрыт") {
+                deadlines[i].innerHTML = 0;
+                deadlines[i].style.color = 'green';
+                deadlines[i].parentElement.setAttribute("hidden", "");
+            }
+            if (status == "На согласовании Рецензентом" || status == "Закрыт") {
+                deadlines[i].innerHTML = 0;
+                deadlines[i].style.color = 'green';
+                if (deadlines[i].style.background != "") {
+                    deadlines[i].parentElement.setAttribute("hidden", "");
+                }
+                let reviewer_sended = document.getElementById("reviewer_sended").innerHTML;
+                let closed = document.getElementById("closed").innerHTML;
+                if ((i == 0 && deadlines[i].style.background != "") || (i != 0 && deadlines[i].style.background != deadlines[i-1].style.background)) {
+                    console.log(deadlines[i].style.background);
+                    const chosenRow = deadlines[i].parentElement;
+                    const chosenRowIdx = chosenRow.rowIndex;
+                    const backgroundStyle = deadlines[i].style.background;
+                    const newRow = table.insertRow(chosenRowIdx);
+                    newRow.className = "table-break";
+                    newRow.addEventListener("click", showHidden)
+                    const cell1 = newRow.insertCell(0);
+                    let cell2 = newRow.insertCell(1);
+                    cell2.colSpan = 10;
+                    const cell3 = newRow.insertCell(2);
+                    const cell4 = newRow.insertCell(3);
+                    cell1.textContent = "\u25B6";
+                    let bcg = "";
+                    if (status == "На согласовании Рецензентом") {
+                        cell3.textContent = "Кол-во: "+reviewer_sended;
+                        bcg = "var(--blue)";
+                        cell2.textContent = "НА СОГЛАСОВАНИИ РЕЦЕНЗЕНТОМ";
+                    } else {
+                        cell3.textContent = "Кол-во: "+closed;
+                        bcg = "#9B9B9B";
+                        cell2.textContent = "ЗАКРЫТЫ";
+                    }
+                    cell1.style.background = bcg;
+                    cell2.style.background = bcg;
+                    cell3.style.background = bcg;
+                    cell4.style.background = bcg;
+                    cell1.style.border = 0;
+                    cell2.style.border = 0;
+                    cell3.style.border = 0;
+                    cell4.style.border = 0;
+                    cell1.style.textAlign = 'center';
+                    cell3.style.textAlign = 'center';
+                }
+            } else {
+                let worked = document.getElementById("worked").innerHTML;
+                if (i == 0) {
+                    const chosenRow = deadlines[i].parentElement;
+                    const chosenRowIdx = chosenRow.rowIndex;
+                    const backgroundStyle = deadlines[i].style.background;
+                    const newRow = table.insertRow(chosenRowIdx);
+                    newRow.className = "table-break";
+                    newRow.addEventListener("click", showHidden)
+                    const cell1 = newRow.insertCell(0);
+                    let cell2 = newRow.insertCell(1);
+                    cell2.colSpan = 10;
+                    const cell3 = newRow.insertCell(2);
+                    const cell4 = newRow.insertCell(3);
+                    cell1.innerHTML = "&#9660;"
+                    cell2.textContent = "В РАБОТЕ";
+                    let bcg = "";
+                    cell3.textContent = "Кол-во: "+worked;
+                    bcg = "#55abe5";
+                    cell1.style.background = bcg;
+                    cell2.style.background = bcg;
+                    cell3.style.background = bcg;
+                    cell4.style.background = bcg;
+                    cell1.style.border = 0;
+                    cell2.style.border = 0;
+                    cell3.style.border = 0;
+                    cell4.style.border = 0;
+                    cell1.style.textAlign = 'center';
+                    cell3.style.textAlign = 'center';
+                }
+                const deadlineDate = new Date(endYear, endMonth-1, endDay);
+                let d = new Date();
+				d = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                let j = 0;
+                if (deadlineDate >= d) {
+                    while (d < deadlineDate) {
+                        d.setDate(d.getDate() + 1)
+                        if (d.getDay() < 6 && d.getDay() > 0) {
+                            j = j + 1;
+                        }
+                    }
+                } else {
+                    while (d > deadlineDate) {
+                        d.setDate(d.getDate() - 1)
+                        if (d.getDay() < 6 && d.getDay() > 0) {
+                            j = j - 1;
+                        }
+                    }
+                }
+                deadlines[i].innerHTML = j;
+                if (deadlines[i].innerHTML < 0) {
+                    deadlines[i].style.color = 'red';
+                } else if (deadlines[i].innerHTML > 1) {
+                    deadlines[i].style.color = 'green';
+                } else {
+                    deadlines[i].style.color = 'orange';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Работа с файлами</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        table{
+            font-size: 80%;
+            border: 1px solid #F2F2F2;
+            width:100%;
+        }
+        td {
+            background: white;
+            border: 1px solid #F2F2F2;
+            cursor: default;
+        }
+        .main {
+            background: #1abff2;
+            color: white;
+            border: none;
+            border-left: 1px solid #F2F2F2;
+            border-right: 1px solid #F2F2F2;
+        }
+        th {
+            background: #09375c;
+            color: white;
+            border: none;
+            border-left: 1px solid #F2F2F2;
+            border-right: 1px solid #F2F2F2;
+        }
+    </style>
+</head>
+<body class="container custom">
+    {% load verbose_names %}
+    <div class="container">
+    <p hidden="hidden" id="group">{{ group }}</p>
+    {% if user.is_authenticated %}
+    <div class="py-f">
+    <h2 id="dogovor" hidden>{{ reest.project_dogovor }}</h2>
+	<h2 id="num" hidden>{{ reest.num_reestr }}</h2>
+    <h2 id="reest_num">-</h2>
+    <table border="1" cellspacing="0" id="fileManager">
+        <tr>
+            <th><input name="all" type="checkbox"></th>
+            <th>Имя</th>
+            <th>Тип</th>
+            <th>Наименование документа</th>
+            <th>Комментарий</th>
+            <th>Размер</th>
+            <th>Дата загрузки</th>
+            <th>Принадлежность</th>
+            <th>Действия</th>
+        </tr>
+        {% for f in files %}
+        <tr>
+            <td align="center"><input type="checkbox"></td>
+            <td class="name">{{ f.file }}</td>
+            <td class="ftype">{{ f.file }}</td>
+            {% if f.file_name %}
+                <td>{{ f.file_name }}</td>
+            {% else %}
+                <td> </td>
+            {% endif %}
+            {% if f.comment %}
+                <td>{{ f.comment }}</td>
+            {% else %}
+                <td> </td>
+            {% endif %}
+            <td> {{ f.file_size }}</td>
+            <td>{{ f.upload_date }}</td>
+            <td>{{ f.belong_to }}</td>
+            <td align="center">
+                <form id="{{ f.id }}" novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input hidden id="file_path" name="file_path" value="{{ f.file }}">
+                </form>
+                <button class="download" style='background: white; border: none; color: #025EA1; cursor: pointer' onclick="document.getElementById('{{ f.id }}').submit();">Выгрузить файл</button> <br/>
+                <button style="background: white; border: none;"><a style="color: #FF0000" class="del" href="{% url 'deleteFile' id=f.id %}">Удалить файл</a></button>
+            </td>
+            <td hidden>{{f.id}}</td>
+        </tr>
+        {% endfor %}
+    </table><br/>
+    <button class="blue-button" id="back1"><a style="color:white" href="{% url 'reestInfo' id=reest.id %}">К реестру</a></button>
+    <button class="blue-button" id="back2" hidden><a style="color:white" href="{% url 'homeGIP' id=reest.id %}">К реестру</a></button>
+    <button class="blue-button"><a style="color:white" href="{% url 'home'%}">В профиль</a></button>
+    <button id="upload1" class="blue-button"><a style="color:white" href="{% url 'uploadFile' id=reest.id %}">Загрузить файлы</a></button>
+    {% for f in file_links %}
+        <a hidden class="downloadlist" href="{{ f }}" target="_blank">Загрузить файлы</a>
+    {% endfor %}
+    <button class="blue-button" onclick="downloadAll()">Выгрузить все файлы</button>
+    <button id="delete1" class="red-button"><a style="color:white" href="{% url 'deleteAll' id=reest.id %}">Удалить все файлы</a></button><br/><br/>
+    <form id="DeleteForm" novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input hidden id="dl" name="deletelist">
+    </form>
+    <button hidden id="download" class="blue-button" onclick="downloadChosen()">Выгрузить выбранные файлы</button>
+    <button hidden id="delete" class="red-button" onclick="document.getElementById('DeleteForm').submit();">Удалить выбранные файлы</button>
+    </div>
+    {% else %}
+    <div class="py-f">
+    <p>Вы не авторизованы</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+    </div>
+    {% endif %}
+    <br/> <br/>
+    <footer class="site-footer">
+        <div style="display: flex; justify-content: space-between; width: 100%">
+            <div style="margin-left: 5px;">
+                <h4>Контакты разработчиков:</h4>
+                <ul>
+                    <li>crds@vnipipt.ru</li>
+                    <li>ilyina-s-a@vnipipt.ru</li>
+                </ul>
+            </div>
+            <div style="margin-right: 5px; display: flex; align-items: center;">
+                <img src="../../static/vnipi_logo-2.svg">
+            </div>
+        </div>
+    </footer>
+    <script>
+        if ( window.history.replaceState ) {
+            window.history.replaceState( null, null, window.location.href );
+        }
+
+        let role = document.getElementById("group").innerHTML;
+        let reest_num = document.getElementById("dogovor").innerHTML;
+		let reest_num2 = document.getElementById("num").innerHTML;
+        let s = "Реестр выявленных несоответствий № ";
+        s = s.concat(reest_num.substring(4,9));
+        s = s.concat(reest_num2);
+        document.getElementById("reest_num").innerHTML = s;
+
+        let names = document.getElementsByClassName("name");
+		let dwnlButtons = document.getElementsByClassName("downloadlist");
+
+        if (role != "ГИП") {
+            let dels = document.getElementsByClassName("del");
+            for (let i=0; i < dels.length; i++) {
+                dels[i].setAttribute("hidden", "");
+            }
+            document.getElementById("upload1").setAttribute("hidden", "");
+            document.getElementById("delete1").setAttribute("hidden", "");
+            document.getElementById("back1").setAttribute("hidden", "");
+            document.getElementById("back2").removeAttribute("hidden");
+        }
+
+        function downloadAll() {
+            for (let i=0; i < dwnlButtons.length; i++) {
+                window.open(dwnlButtons[i].href);
+            }
+        }
+
+        for (let i=0; i<names.length; i++) {
+            for (let j=names[i].innerHTML.length-1; j>0; j--) {
+                if (names[i].innerHTML[j] == "/") {
+                    names[i].innerHTML = names[i].innerHTML.slice(j+1,names[i].innerHTML.length);
+                    break;
+                }
+            }
+        }
+
+        let types = document.getElementsByClassName("ftype");
+        for (let i=0; i<types.length; i++) {
+            for (let j=types[i].innerHTML.length-1; j>0; j--) {
+                if (types[i].innerHTML[j] == ".") {
+                    types[i].innerHTML = types[i].innerHTML.slice(j+1,types[i].innerHTML.length);
+                    break;
+                }
+            }
+        }
+
+        let table = document.getElementById("fileManager");
+        if (document.querySelectorAll("input:checked").length == dwnlButtons.length+1) {
+            document.querySelector("input[name='all']").checked = true;
+            let tableRows = table.children[0].children;
+            for (let j = 0; j < tableRows.length; j++) {
+                let checkbox = tableRows[j].children[0].firstChild;
+                checkbox.checked = true;
+            }
+        }
+        if (document.querySelectorAll("input:checked").length > 0) {
+            document.getElementById("download").removeAttribute("hidden");
+            if (role == "ГИП") {
+                document.getElementById("delete").removeAttribute("hidden");
+            }
+        }
+        function downloadChosen() {
+            if (document.querySelectorAll("input:checked").length == dwnlButtons.length+1) {
+                downloadAll();
+            } else {
+                hrefs = [];
+                let tableRows = table.children[0].children;
+                for (let j = 0; j < tableRows.length; j++) {
+                    if (tableRows[j].children[0].firstChild.checked) {
+                       window.open(dwnlButtons[j-1].href);
+                    }
+                }
+            }
+        }
+
+        let forDel = [];
+        document.addEventListener("click", function(e) {
+            let element = e.target;
+            if (element.tagName == "INPUT") {
+                let tableRows = table.children[0].children;
+                if (element.name == "all" && element.checked) {
+                    forDel = []
+                    for (let j = 0; j < tableRows.length; j++) {
+                        let checkbox = tableRows[j].children[0].firstChild;
+                        checkbox.checked = true;
+                        tableRows[j].classList.add("checked");
+                        if (j > 0) {
+                            forDel[j] = tableRows[j].children[9].innerHTML;
+                        }
+                    }
+                    document.getElementById("download").removeAttribute("hidden");
+                    if (role == "ГИП") {
+                        document.getElementById("delete").removeAttribute("hidden");
+                    }
+                    document.getElementById("dl").value = forDel;
+                } else if (element.name == "all" && !element.checked) {
+                    for (let j = 0; j < tableRows.length; j++) {
+                        let checkbox = tableRows[j].children[0].firstChild;
+                        checkbox.checked = false;
+                        tableRows[j].classList.remove("checked");
+                        document.getElementById("download").setAttribute("hidden", "");
+                        document.getElementById("delete").setAttribute("hidden", "");
+                        forDel = [];
+                    }
+                } else if (!element.checked) {
+                    document.querySelector("input[name='all']").checked = false;
+                    element.checked = false;
+                    element.parentElement.parentElement.classList.remove("checked");
+                    if (document.querySelectorAll("input:checked").length == 0) {
+                        document.getElementById("download").setAttribute("hidden", "");
+                        document.getElementById("delete").setAttribute("hidden", "");
+                        forDel = []
+                    } else {
+                        document.getElementById("download").removeAttribute("hidden");
+                        if (role == "ГИП") {
+                            document.getElementById("delete").removeAttribute("hidden");
+                        }
+                        forDel = [];
+                        let i = 0;
+                        for (let j = 0; j < tableRows.length; j++) {
+                            if (tableRows[j].children[0].firstChild.checked) {
+                                forDel[i] = tableRows[j].children[9].innerHTML;
+                                i = i + 1;
+                            }
+                        }
+                        document.getElementById("dl").value = forDel;
+                    }
+                } else if (element.checked) {
+                    if (document.querySelectorAll("input:checked").length == dwnlButtons.length) {
+                        document.querySelector("input[name='all']").checked = true;
+                    }
+                    element.checked = true;
+                    element.parentElement.parentElement.classList.add("checked");
+                    document.getElementById("download").removeAttribute("hidden");
+                    if (role == "ГИП") {
+                        document.getElementById("delete").removeAttribute("hidden");
+                    }
+                    forDel = [];
+                    let i = 0;
+                    for (let j = 0; j < tableRows.length; j++) {
+                        if (tableRows[j].children[0].firstChild.checked) {
+                            forDel[i] = tableRows[j].children[9].innerHTML;
+                            i = i + 1;
+                        }
+                    }
+                    document.getElementById("dl").value = forDel;
+                    console.log(document.getElementById("dl").value);
+                }
+            }
+        });
+    </script>
+    </div>
+</body>
+</html>

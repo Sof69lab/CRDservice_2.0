@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Карточка реестра</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        form {
+            background: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="container custom">
+    {% load verbose_names %}
+    {% if user.is_authenticated %}
+	<h2 id="dogovor" hidden>{{ reest.project_dogovor }}</h2>
+	<h2 id="num" hidden>{{ reest.num_reestr }}</h2>
+    <h2 id="reest_num">-</h2>
+    <form>
+        <h3>{% get_verbose_field_name2 "project_dogovor" %}:</h3>
+        <p>{{ reest.project_dogovor }}</p>
+
+        <h3>{% get_verbose_field_name2 "project_name" %}:</h3>
+        <p>{{ reest.project_name }}</p>
+
+        <h3>{% get_verbose_field_name2 "project_date_contract" %}:</h3>
+        <p>{{ reest.project_date_contract }}</p>
+
+        <h3>{% get_verbose_field_name2 "project_reviewer" %}:</h3>
+        <p>{{ reest.project_reviewer }}</p>
+
+        <h3>{% get_verbose_field_name2 "gip" %}:</h3>
+        <p>{{ reest.gip }}</p>
+
+        <h3>Дата создания реестра:</h3>
+        <p>{{ reest.start_date }}</p>
+
+        <h3>Срок исполнения реестра:</h3>
+        <p>{{ reest.end_date }}</p>
+        <iframe src="http://localhost:3000/d-solo/g9WaXudHk/new-dashboard?orgId=1&var-reestrs={{ reest.id }}&theme=light&panelId=4" width="450" height="200" frameborder="0"></iframe>
+    </form></br>
+    <button class="blue-button"><a style="color:white" href="{% url 'home'%}">К реестрам</a></button>
+    <button class="blue-button"><a style="color:white" href="{% url 'fileManage' id=reest.id %}">Работа с файлами</a></button>
+    <button class="blue-button"><a style="color:white" href="{% url 'homeGIP' id=reest.id %}">К замечаниям</a></button>
+    {% else %}
+    <p>Вы не авторизованы</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+    {% endif %}
+    <script>
+        let reest_num = document.getElementById("dogovor").innerHTML;
+		let reest_num2 = document.getElementById("num").innerHTML;
+        let s = "Реестр выявленных несоответствий № ";
+        s = s.concat(reest_num.substring(4,9));
+        s = s.concat(reest_num2);
+        document.getElementById("reest_num").innerHTML = s;
+    </script>
+</body>
+</html>

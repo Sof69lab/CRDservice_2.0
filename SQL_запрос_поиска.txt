@@ -1,0 +1,134 @@
+-- FUNCTION: public.basic_similarity_search(text)
+
+-- DROP FUNCTION IF EXISTS public.basic_similarity_search(text);
+
+CREATE OR REPLACE FUNCTION public.basic_similarity_search(
+	search_query text)
+    RETURNS TABLE(remark_id bigint, remark_name text, rational text, section_name text, score real, match_type text, remark_index text)
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+    ROWS 1000
+
+AS $BODY$
+DECLARE
+	result_record RECORD;
+	cleaned_query TEXT;
+	safe_tsquery tsquery;
+	exact_phrase_query tsquery;
+	all_words_query tsquery;
+	any_word_query tsquery;
+	valid_words TEXT[];
+BEGIN
+	cleaned_query := regexp_replace(search_query, '[\(\)\*\.,:;!?\-\+\&\|\0-9]', ' ', 'g');
+    cleaned_query := regexp_replace(cleaned_query, '\s+', ' ', 'g');
+    cleaned_query := trim(cleaned_query);
+	SELECT array_agg(DISTINCT lexeme) INTO valid_words
+	FROM unnest(to_tsvector('russian', cleaned_query))
+	WHERE lexeme ~ '^[а-яa-z]{2,}$';
+	IF valid_words IS NULL OR array_length(valid_words, 1) = 0 THEN
+		RETURN;
+	END IF;
+
+	BEGIN
+		IF length(cleaned_query) > 0 THEN
+			exact_phrase_query := phraseto_tsquery('russian', cleaned_query);
+		ELSE
+			exact_phrase_query := to_tsquery('russian', '');
+		END IF;
+    EXCEPTION
+        WHEN OTHERS THEN
+            exact_phrase_query := to_tsquery('russian', '');
+    END;
+	BEGIN
+        all_words_query := plainto_tsquery('russian', cleaned_query);
+    EXCEPTION
+        WHEN OTHERS THEN
+            all_words_query := to_tsquery('russian', '');
+    END;
+	BEGIN
+		any_word_query := to_tsquery('russian', array_to_string(valid_words, ' | '));
+	EXCEPTION
+		WHEN OTHERS THEN
+			any_word_query := to_tsquery('russian', '');
+	END;
+
+	IF (exact_phrase_query IS NULL OR exact_phrase_query = ''::tsquery) AND
+	   (all_words_query IS NULL OR all_words_query = ''::tsquery) AND
+	   (any_word_query IS NULL OR any_word_query = ''::tsquery) THEN
+        RETURN;
+    END IF;
+
+	RETURN QUERY
+
+	SELECT
+		r.id,
+		r.remark_name,
+		r.rational,
+		r.section_name,
+		ts_rank(si.search_tsvector, exact_phrase_query) AS score,
+		'exact_phrase'::TEXT,
+		r.remark_index
+	FROM formapp_reestr r
+	JOIN remark_search_index si ON r.id = si.remark_id
+	WHERE
+		exact_phrase_query IS NOT NULL AND
+		exact_phrase_query != ''::tsquery AND
+		si.search_tsvector @@ exact_phrase_query AND r.actuality=True
+
+	UNION ALL
+
+	SELECT
+		r.id,
+		r.remark_name,
+		r.rational,
+		r.section_name,
+		ts_rank(si.search_tsvector, all_words_query) * 2.0::REAL AS score,
+		'all_words'::TEXT,
+		r.remark_index
+	FROM formapp_reestr r
+	JOIN remark_search_index si ON r.id = si.remark_id
+	WHERE
+		all_words_query IS NOT NULL AND
+		all_words_query != ''::tsquery AND
+		si.search_tsvector @@ all_words_query AND r.actuality=True
+		AND r.id NOT IN (SELECT r2.id
+          FROM formapp_reestr r2
+          JOIN remark_search_index si2 ON r2.id = si2.remark_id
+          WHERE exact_phrase_query IS NOT NULL AND
+		exact_phrase_query != ''::tsquery AND
+		si.search_tsvector @@ exact_phrase_query)
+
+	UNION ALL
+
+	SELECT
+		r.id,
+		r.remark_name,
+		r.rational,
+		r.section_name,
+		ts_rank(si.search_tsvector, any_word_query) * 0.5::REAL AS score,
+		'any_word'::TEXT,
+		r.remark_index
+	FROM formapp_reestr r
+	JOIN remark_search_index si ON r.id = si.remark_id,
+	to_tsquery('russian', regexp_replace(cleaned_query, '\s+', ' | ', 'g')) query
+	WHERE any_word_query IS NOT NULL AND
+	any_word_query != ''::tsquery AND
+	si.search_tsvector @@ any_word_query AND r.actuality=True
+	AND r.id NOT IN
+	(SELECT r2.id
+          FROM formapp_reestr r2
+          JOIN remark_search_index si2 ON r2.id = si2.remark_id
+          WHERE (exact_phrase_query IS NOT NULL AND
+		exact_phrase_query != ''::tsquery AND
+		si.search_tsvector @@ exact_phrase_query) OR
+					 (all_words_query IS NOT NULL AND
+		all_words_query != ''::tsquery AND
+		si.search_tsvector @@ all_words_query))
+
+	ORDER BY score DESC;
+END;
+$BODY$;
+
+ALTER FUNCTION public.basic_similarity_search(text)
+    OWNER TO postgres;

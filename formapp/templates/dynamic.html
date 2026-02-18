@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Динамика замечаний</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        form {
+            padding: 10px 20px;
+            border: none;
+            background: var(--white);
+            border-radius: 10px;
+        }
+        td {
+            border-style: none;
+            background: var(--white);
+            cursor: default;
+        }
+    </style>
+</head>
+<body class="container custom">
+    {% load verbose_names %}
+    {% if user.is_authenticated %}
+    <h3>Динамика замечаний</h3>
+    <h4 id="reest_num">{{ reest.project_dogovor }}-{{ reest.num_reestr }}</h4>
+    <form novalidate method="POST" id="remarks_list" onsubmit="return false;">
+        {% csrf_token %}
+        <input hidden name="dwnld" value="false">
+        <table hidden id="remark_depart">
+            {% for r in remarks %}
+                <tr>
+                    <td>{{r.id}}</td>
+                    <td>{{ r.num_remark }}-{{ r.remark_v }}</td>
+                    <td>{{r.department}}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <table style="width:100%">
+            <tr>
+                <td rowspan="3" style="width:50%">
+                    {{ plot|safe }}
+                </td>
+                <td style="width:25%" align="center" valign="center" id="right">
+                    Замечания
+                    </br>
+                    <select style="width:55%" name="remarks" id="remarks" class="form-dashboard" multiple size="7">
+                        {% for r in remarks %}
+                        <option value="{{ r.id }}">{{ r.num_remark }}-{{ r.remark_v }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td style="width:25%" align="center" valign="center">
+                    Подразделения
+                    </br>
+                    <select style="width:55%" name="departments" id="departments" class="form-dashboard" multiple size="7">
+                        <option value="">----</option>
+                        {% for d in departments %}
+                        <option value="{{ d }}">{{ d }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center" valign="upper">
+                    <button class="green-button" id="full">Построить все замечания</button>
+                    <button class="blue-button" id="update">Обновить график</button>
+                    <button class="red-button" id="nothing">Очистить график</button>
+                    </br>
+                    </br>
+                    <button class="blue-button" id="download">Выгрузить файл</button>
+                    </br>
+                    </br>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <form novalidate method="POST" id="all_remarks" onsubmit="return false;" hidden>
+        {% csrf_token %}
+        <input name="all" value="all">
+    </form>
+    <form novalidate method="POST" id="none_remarks" onsubmit="return false;" hidden>
+        {% csrf_token %}
+        <input name="none" value="no">
+    </form>
+    </br>
+    <button class="blue-button"><a style="color:white" href="{% url 'home'%}">К реестрам</a></button>
+    <button class="blue-button"><a style="color:white" href="{% url 'homeGIP' id=reestrID %}">К замечаниям</a></button>
+    {% else %}
+    <p>Вы не авторизованы</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+    {% endif %}
+    <script>
+        let reest_num = document.getElementById("reest_num").innerHTML;
+        let s = "Реестр выявленных несоответствий № ";
+        s = s.concat(reest_num.substring(4,8));
+        s = s.concat(reest_num.substring(reest_num.indexOf("Д")+1,reest_num.length));
+        document.getElementById("reest_num").innerHTML = s;
+
+        let remarksInfo = document.getElementById("remark_depart").getElementsByTagName("TR");
+        let indexes = [];
+        let numbers = [];
+        let departments = [];
+        for (i=0; i<remarksInfo.length; i++) {
+            indexes[i] = remarksInfo[i].getElementsByTagName("TD")[0].innerHTML;
+            numbers[i] = remarksInfo[i].getElementsByTagName("TD")[1].innerHTML;
+            departments[i] = remarksInfo[i].getElementsByTagName("TD")[2].innerHTML;
+        }
+
+        document.getElementById("departments").addEventListener('change', multipleSelect);
+        document.getElementById('update').addEventListener('click', update);
+        document.getElementById('full').addEventListener('click', full);
+        document.getElementById('nothing').addEventListener('click', nothing);
+        document.getElementById('download').addEventListener('click', download);
+        function update(e) {
+            document.forms['remarks_list'].submit();
+        }
+        function full(e) {
+            document.forms['all_remarks'].submit();
+        }
+        function nothing(e) {
+            document.forms['none_remarks'].submit();
+        }
+        function download(e) {
+            document.getElementsByName('dwnld')[0].value = true;
+            document.forms['remarks_list'].submit();
+        }
+        function multipleSelect(e) {
+            let opt = this.selectedOptions;
+            let remarks = document.getElementById("remarks");
+            let fragment = document.createDocumentFragment();
+            while (remarks.lastChild) {
+                remarks.removeChild(remarks.lastChild);
+            }
+            for (let i=0; i<opt.length; i++) {
+                if (opt[i].value == "") {
+                    fragment = document.createDocumentFragment();
+                    for (let j=0; j<indexes.length; j++) {
+                        let option = new Option(numbers[j], indexes[j]);
+                        fragment.appendChild(option);
+                    }
+                    break;
+                } else {
+                    for (let j=0; j<indexes.length; j++) {
+                        if (departments[j] == opt[i].value) {
+                            let option = new Option(numbers[j], indexes[j]);
+                            fragment.appendChild(option);
+                        }
+                    }
+                }
+            }
+            remarks.appendChild(fragment);
+        }
+    </script>
+</body>
+</html>

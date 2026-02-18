@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        :root {
+            --navy: #003274;
+            --light_blue: #e2eefa;
+            --white: #FFFFFF;
+            --grey: #9B9B9B;
+            --red: #FF0000;
+            --green: #56C02B;
+            --blue: #025EA1;
+            --pink: #E20072;
+            --orange: #F96925;
+            --yellow: #FCC30B;
+            --turquoise: #259789;
+            --black: #333333;
+            --light_grey: #d7d7d7;
+        }
+        @font-face {
+        font-family: 'Rosatom';
+            src: url('../fonts/Rosatom-Regular.ttf') format("truetype");
+        }
+        body {
+            font-family: 'Rosatom';
+            background: var(--light_blue);
+        }
+        .custom {
+            background: var(--light_blue);
+        }
+        .blue-button {
+            background: var(--blue);
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: white;
+            cursor: pointer;
+        }
+        .blue-button:disabled {
+            background: var(--grey);
+            color: var(--white);
+            cursor: default;
+        }
+        .red-button {
+            background: var(--red);
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: var(--white);
+            cursor: pointer;
+        }
+        .green-button {
+            background: var(--green);
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: var(--white);
+            cursor: pointer;
+        }
+        .yellow-button {
+            background: var(--yellow);
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: var(--white);
+            cursor: pointer;
+        }
+        .orange-button {
+            background: var(--orange);
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: var(--white);
+            cursor: pointer;
+        }
+        .pink-button {
+            background: var(--pink);
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: var(--white);
+            cursor: pointer;
+        }
+        .turquoise-button {
+            background: var(--turquoise);
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: var(--white);
+            cursor: pointer;
+        }
+        .navy-button {
+            background: var(--navy);
+            border: none;
+            border-radius: 2px;
+            padding: 10px 15px;
+            color: var(--white);
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="container custom">
+    <button class="blue-button">Основные</button>
+    <button class="green-button">Согласование</button>
+    <button class="red-button">Отклонение</button>
+    <button class="blue-button" disabled>Неактивная</button> <br/> <br/>
+    <button class="turquoise-button">Бирюзовый</button>
+    <button class="navy-button">Тёмно-синий</button>
+    <button class="pink-button">Розовый</button>
+    <button class="orange-button">Оранжевый</button>
+    <button class="yellow-button">Жёлтый</button>
+</body>
+</html>

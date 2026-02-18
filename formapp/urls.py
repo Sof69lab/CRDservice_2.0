@@ -1,0 +1,32 @@
+from django.urls import path
+from formapp import views
+
+urlpatterns = [
+    # path("", views.HomeView.as_view(), name='home'),
+    path("", views.home, name='home'),
+    path("reestr/<int:id>/", views.homeGIP, name='homeGIP'),
+    path("infoGIP/<int:id>/", views.infoGIP, name='reestInfo'),
+    path("fileManage/<int:id>/", views.fileManage, name='fileManage'),
+    path("deleteFile/<int:id>", views.delete_file, name='deleteFile'),
+    path("deleteAll/<int:id>", views.delete_all, name='deleteAll'),
+    path("uploadFile/<int:id>/", views.upload_file, name='uploadFile'),
+    path("new_reestr/", views.newReestr, name='newReestr'),
+    path("gip/<int:id>/", views.gip, name='GIP'),
+    path("gip1/<int:id>/", views.gip1, name='GIP1'),
+    path("boss/<int:id>/", views.boss, name='boss'),
+    path("boss2/<int:id>/", views.boss2, name='boss2'),
+    path("gip2/<int:id>/", views.gip2, name='gip2'),
+    path("final/<int:id>/", views.final, name='final'),
+    path("employee/<int:id>/", views.employee, name='employee'),
+    path("remark/<int:id>/", views.remark, name='remark'),
+    path("answer/<int:id>/", views.answer, name='answer'),
+    path("close_remarks/<int:id>/", views.close_remarks, name='close_remarks'),
+    path("return_remarks/<int:id>/", views.return_remarks, name='return_remarks'),
+    path("import_remark/<int:id>/", views.import_remark, name='import_remark'),
+    path("export_remark/<int:id>/", views.export_remark, name='export_remark'),
+    path("planner_link/<int:id>/", views.planner_link, name='planner_link'),
+    #path("dashboard/", views.dashboard, name='dashboard'),
+    path("dynamic/<int:id>/", views.dynamic, name='dynamic'),
+    path("aiGIP/<str:sessionKey>/", views.aiGIP, name='aiGIP'),
+    path("status/<int:id>/", views.status, name='status'),
+]

@@ -1,0 +1,349 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrahead %}
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+    <style>
+        .module {
+            background: #ddebf7;
+        }
+		.main > .content {
+			flex:  1 0;
+			max-width: 100%;
+			background: #ddebf7
+		}
+        label, .required label, label.required{
+            color: black;
+        }
+        .quiet {
+            color: #1abff2;
+        }
+        h1, h3, h5 , h2{
+            color: black;
+        }
+        a:link, a:visited {
+            color: #1abff2;
+            font-weight: normal;
+        }
+        #logout-form button {
+            color: white;
+        }
+        pre.literal-block {
+            background: #ddebf7;
+        }
+        input[type=text], input[type=password], input[type=email], input[type=url],
+        input[type=number], input[type=tel], input[type=date], textarea, select {
+            background: white;
+            color: black;
+        }
+        input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, input[type=url]:focus,
+        input[type=number]:focus, input[type=tel]:focus, input[type=date]:focus, textarea:focus, select:focus {
+            border-color: #1abff2;
+        }
+        input[type=file], p.file-upload, span.clearable-file-input label {
+            color: #1abff2;
+        }
+        form .aligned ul li {
+            background: #ddebf7;
+        }
+
+
+        hr {
+            color: #ddebf7;
+            background-color: #ddebf7;
+        }
+        thead th,
+        tfoot td {
+            background: #ddebf7;
+        }
+        tr.alt {
+            background: white;
+        }
+
+        tr:nth-child(odd), .row-form-errors {
+            background: white;
+        }
+        tr:nth-child(even),
+        tr:nth-child(even) .errorlist,
+        tr:nth-child(odd) + .row-form-errors,
+        tr:nth-child(odd) + .row-form-errors .errorlist {
+            background: white;
+        }
+
+
+        .module h2, .module caption, .inline-group h2 {
+            background: #1abff2;
+        }
+
+        #change-history .paginator {
+            color: black;
+            background: #ddebf7;
+        }
+
+
+        #header {
+            background: #09375c;
+            color: white;
+        }
+        #branding h1 a:link, #branding h1 a:visited {
+            color: white;
+        }
+
+        #content-related {
+            background: white;
+            color: #1abff2;
+        }
+        #content-related h3 {
+            color: #1abff2;
+        }
+        #content-related a {
+            color: #1abff2;
+        }
+        #content-related .module h2 {
+            background: #1abff2;
+            color: white;
+        }
+
+        div.breadcrumbs {
+            background: #09375c;
+            color: white;
+        }
+        div.breadcrumbs a {
+            color: white;
+        }
+        div.breadcrumbs a:focus, div.breadcrumbs a:hover {
+            text-decoration: underline;
+            color: white;
+        }
+
+
+        .toggle-nav-sidebar {
+            background-color: #ddebf7;
+            border-right: none;
+            color: #1abff2;
+        }
+        .toggle-nav-sidebar:hover,
+        .toggle-nav-sidebar:focus {
+            background-color: #1abff2;
+            color: white;
+        }
+        #nav-filter {
+            background-color: white;
+            color: black;
+            border: 1px solid black;
+        }
+        #nav-filter:focus {
+            border: 1px solid #1abff2;
+        }
+        #nav-sidebar {
+            background-color: #ddebf7;
+            border-top: 1px solid transparent;
+            border-right: 1px solid;
+        }
+        #nav-sidebar .current-app .section:link,
+        #nav-sidebar .current-app .section:visited {
+            color: white;
+            font-weight: bold;
+        }
+        #nav-sidebar .current-model {
+            background: white;
+            font-weight: bold;
+            color: black;
+        }
+
+
+        .button, input[type=submit], input[type=button], .submit-row input, a.button {
+            background: #1abff2;
+            color: white;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        a.button {
+            padding: 4px 5px;
+        }
+        .button:active, input[type=submit]:active, input[type=button]:active,
+        .button:focus, input[type=submit]:focus, input[type=button]:focus,
+        .button:hover, input[type=submit]:hover, input[type=button]:hover {
+            background: #1abff2;
+        }
+        .button.default, input[type=submit].default, .submit-row input.default {
+            background: #1abff2;
+        }
+        .button.default:active, input[type=submit].default:active,
+        .button.default:focus, input[type=submit].default:focus,
+        .button.default:hover, input[type=submit].default:hover {
+            background: #1abff2;
+        }
+
+        .object-tools a:link, .object-tools a:visited {
+            background: #1abff2;
+            color: white;
+        }
+        .object-tools a.addlink {
+            background-repeat: no-repeat;
+            background-position: right 7px center;
+            padding-right: 26px;
+			background-image: url('http://crds.vnipipt.ru/static/admin/img/tooltag-add.svg');
+        }
+
+        #changelist {
+            width: 100%;
+        }
+        #changelist .actions {
+            background: #1abff2;
+            color: white;
+            width: 98.5%;
+        }
+        #changelist .actions label{
+            color: white;
+        }
+        #changelist .actions select {
+            color: #1abff2;
+            background-color: white;
+            border-color: #1abff2;
+        }
+        #changelist .actions select:focus {
+            border-color: white;
+        }
+        #changelist .actions .button {
+            background: white;
+            color: #1abff2;
+            border-color: #1abff2;
+            box-shadow: none;
+        }
+        #changelist .actions .button:focus, #changelist .actions .button:hover {
+            border-color: white;
+        }
+        #changelist .paginator {
+            color: white;
+            border-bottom: none;
+            background: #1abff2;
+            width: 98.5%;
+        }
+        #changelist table thead th {
+            background: white;
+            color: #1abff2;
+        }
+        #changelist table tbody {
+            border-bottom: none;
+            width: 100%;
+        }
+        #toolbar #searchbar {
+            color: black;
+        }
+        #changelist-search {
+            background: #ddebf7;
+        }
+        #toolbar form input[type="submit"] {
+            background: #1abff2;
+            color: white;
+            border: none;
+        }
+        #toolbar {
+            background: #ddebf7;
+            border: none;
+        }
+        #toolbar #searchbar:focus {
+            border-color: #1abff2;
+        }
+        #changelist-filter {
+            background: white;
+        }
+        #changelist-filter li.selected {
+            border: none;
+        }
+        #changelist-filter li.selected a {
+            color: #1abff2;
+        }
+        #changelist-filter a {
+            color: black;
+        }
+        thead th a:link {
+            color: #1abff2;
+        }
+        table thead th .text a:focus, table thead th .text a:hover {
+            background: #1abff2;
+            color: white;
+        }
+		#changelist table tbody
+        tr.selected {
+            background-color: #09375c;
+        }
+
+
+        .timezonewarning {
+            color: #1abff2;
+        }
+        .datetimeshortcuts a {
+            color: #1abff2;
+        }
+        .calendarbox, .clockbox {
+            background: #09375c;
+            color: white;
+            border: 1px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+        .calendar table {
+            background: white;
+            color: #1abff2;
+        }
+        .calendar caption, .calendarbox h2 {
+            color: black;
+            background: white;
+        }
+        .calendar th {
+            background: white;
+            color: black;
+        }
+        .calendar td {
+            background: white;
+            color: black;
+            border-top: 1px solid var(--hairline-color);
+        }
+        .calendar td.selected a {
+            background: #1abff2;
+            color: white;
+        }
+        .calendar td.nonday {
+            background: white;
+        }
+        .calendar td a, .timelist a {
+            color: black;
+        }
+        .calendar td a:focus, .timelist a:focus,
+        .calendar td a:hover, .timelist a:hover {
+            background: #1abff2;
+            color: white;
+        }
+        .calendar td a:active, .timelist a:active {
+            background: #1abff2;
+            color: white;
+        }
+        .calendar-shortcuts {
+            background: white;
+            color: #1abff2;
+            border-top: 1px solid black;
+        }
+
+
+        .submit-row {
+            background: #ddebf7;
+            border: none;
+        }
+
+
+        .help, p.help, form p.help, div.help, form div.help, div.help li {
+            color: #1abff2;
+        }
+
+
+        .selector .selector-available h2 {
+            background: #09375c;
+            color: white;
+            border: 1px solid black;
+        }
+        .selector-chosen h2 {
+            color: white;
+            border: 1px solid black;
+        }
+    </style>
+{% endblock %}

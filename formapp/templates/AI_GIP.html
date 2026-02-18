@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>ИИ ассистент</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+</head>
+<body class="container custom">
+    <p hidden="hidden" id="group">{{ group }}</p>
+    {% if user.is_authenticated %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <div class="{{ message.tags }}">
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form novalidate method="post" id="AIChatForm" onsubmit="return false;" enctype="multipart/form-data" style="height: 90vh;">
+        {% csrf_token %}
+        <p id="sessionKey" hidden>{{ sessionKey }}</p>
+        <div class="chatbot-place">
+            <div class="chatbot-messages" id="chat-messages">
+            <!-- Сообщения добавляются сюда -->
+            <div class="message assistant-message">
+                <div class="message-content">
+                    <p>Сообщение ИИ ассистента</p>
+                </div>
+                <div class="message-time">{{ current_time|time:"H:i" }}</div>
+            </div>
+            <div class="message system-message"> <!-- Для примера, потом удалить!!! -->
+                <div class="message-content">
+                    <p>Системная информация</p>
+                </div>
+                <div class="message-time">{{ current_time|time:"H:i" }}</div>
+            </div>
+            {% for m in chat_messages %}
+                {% if m.role == "user" %}
+                    <div class="message user-message">
+                        <div class="message-content">
+                            <p>{{ m.content }}</p>
+                        </div>
+                        <div class="message-time">{{ m.timestamp|time:"H:i" }}</div>
+                    </div>
+                {% elif m.role == "assistant" %}
+                    <div class="message assistant-message">
+                        <div class="message-content">
+                            <p>{{ m.content }}</p>
+                        </div>
+                        <div class="message-time">{{ m.timestamp|time:"H:i" }}</div>
+                    </div>
+                {% elif m.role == "system" %}
+                    <div class="message system-message">
+                        <div class="message-content">
+                            <p>{{ m.content }}</p>
+                        </div>
+                        <div class="message-time">{{ m.timestamp|time:"H:i" }}</div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            </div>
+            <div class="chatbot-input-container">
+                <div class="input-group">
+                    <textarea id="chat-input" placeholder="Введите Ваш запрос..." rows="1" maxlength="10000" oninput="autoResize(this)"></textarea>
+                    <button class="btn btn-primary" id="send-button" disabled></button>
+                </div>
+                <br/>
+                <div id="group1">
+                    <button class="suggestion-button" id="b1_1">Найди записи похожие на замечания из реестра ...</button>
+                    <button class="suggestion-button" id="b1_2">Найди записи похожие на замечания ... из реестра ...</button>
+                </div>
+                <div id="group2-1" hidden>
+                    <button class="suggestion-button" id="b2_1">Выгрузи ... первых записей для всех замечаний, которые ты нашёл</button>
+                    <button class="suggestion-button" id="b2_2">Выгрузи замечания из реестров ...</button>
+                    <button class="suggestion-button" id="b2_3">Выгрузи всё что нашёл</button>
+                    <button class="suggestion-button" id="b2_4">Выгрузи всё что нашлось для замечаний ...</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <br/>
+    <button class="blue-button"><a style="color:white" class="text" href="{% url 'home' %}">Вернуться к реестрам</a></button>
+    {% else %}
+    <p>Вы не авторизованы</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
+    {% endif %}
+    <script>
+<!--        автоизменение высоты поля ввода-->
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) +'px';
+        }
+        let userText = document.getElementById("chat-input");
+        let send_button = document.getElementById("send-button");
+        if (userText.value != "") {
+            send_button.removeAttribute("disabled");
+        }
+<!--        логика кнопок со стандартными запросами-->
+        function standardQ(e) {
+            let customText = this.innerHTML;
+            if (this.id.indexOf("b1") > -1) {
+                document.getElementById("group1").setAttribute("hidden", "");
+                document.getElementById("group2-1").removeAttribute("hidden");
+            }
+            if (this.id.indexOf("b2") > -1) {
+                document.getElementById("group1").removeAttribute("hidden");
+                document.getElementById("group2-1").setAttribute("hidden", "");
+            }
+            let textIdx = customText.indexOf("реестра ...");
+            if (textIdx > -1) {
+                customText = customText.slice(0, textIdx+8) + "[введите номер реестра в формате 1234-1]" + customText.slice(textIdx+11);
+            }
+            textIdx = customText.indexOf("замечания ...");
+            if (textIdx > -1) {
+                customText = customText.slice(0, textIdx+10) + "[введите номера замечаний через запятую]" + customText.slice(textIdx+13);
+            }
+            textIdx = customText.indexOf("Выгрузи ...");
+            if (textIdx > -1) {
+                customText = customText.slice(0, textIdx+8) + "[введите количество замечаний числом]" + customText.slice(textIdx+11);
+            }
+            textIdx = customText.indexOf("реестров ...");
+            if (textIdx > -1) {
+                customText = customText.slice(0, textIdx+9) + "[введите через запятую номера реестров в формате 1234-1]" + customText.slice(textIdx+12);
+            }
+            textIdx = customText.indexOf("замечаний ...");
+            if (textIdx > -1) {
+                customText = customText.slice(0, textIdx+10) + "[введите номера замечаний через запятую]" + customText.slice(textIdx+13);
+            }
+            userText.value = customText;
+            send_button.removeAttribute("disabled");
+        }
+        let qButtons = document.getElementsByClassName("suggestion-button");
+        for (let i=0; i < qButtons.length; i++) {
+            qButtons[i].addEventListener("click", standardQ);
+        }
+<!--        активация кнопки отправки запроса-->
+        function input_text(e) {
+            if (this.value != "") {
+                send_button.removeAttribute("disabled");
+            } else {
+                send_button.setAttribute("disabled", "");
+            }
+        }
+        userText.addEventListener('input', input_text);
+<!--        добавление запроса в область диалога-->
+        const messagesContainer = document.getElementById("chat-messages");
+        function addMessage(content, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            const time = new Date().toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'});
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <p>${content}</p>
+                </div>
+                <div class="message-time">${time}</div>
+            `;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+<!--        отправка сообщения на сервер и получение ответа-->
+        async function sendToBackend(message) {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+            console.log(message);
+            try {
+                const response = await fetch('', {
+                    method: 'POST',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": csrfToken,
+                    },
+                    body: JSON.stringify({message: message})
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error. Status: ${response.status}`);
+                } else {
+                    console.log(response.response);
+                    console.log(response.status);
+                    console.log(response.headers.get('content-type'));
+                }
+                const data = await response.json();
+                addMessage(data.response, 'assistant');
+                return data.response;
+            } catch (error) {
+                console.error('Request failed:', error);
+                throw error;
+            }
+        }
+<!--        отправка сообщения-->
+        async function sendMessage(e) {
+            let message = userText.value;
+            userText.value = "";
+            addMessage(message, 'user');
+            sendToBackend(message);
+        }
+        send_button.addEventListener("click", () => {sendMessage();});
+    </script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+def home(request):
+    info = []
+    excluded_status = ["Доработан", "Закрыт", "Формирование", "Скрыт"]
+    try:
+        department = departments.objects.get(user=request.user.id).department
+        subs = departments.objects.get(user=request.user.id).substitute.all()
+    except Exception:
+        department = ""
+        subs = []
+    if request.user.groups.filter(name='ГИП').exists():
+        group = 'ГИП'
+        q1 = Q(gip=request.user) | Q(gip__in=subs)
+        remarkList = reestr.objects.filter(
+            ((Q(responsibleTrouble_name=request.user) | Q(executor_name=request.user) | Q(responsibleTrouble_name__in=subs) | Q(executor_name__in=subs)) & Q(actuality=True)))
+        IDlist = []
+        for r in remarkList:
+            IDlist.append(r.reestrID.id)
+        q2 = Q(id__in=IDlist)
+        reestrs = reestInfo.objects.filter(q1 | q2).exclude(status="Скрыт").annotate(
+            reestr_priority_order=reestr_priority_order).order_by('reestr_priority_order', 'project_dogovor',
+                                                                  'num_reestr')
+        reviewer_sended = len(reestInfo.objects.filter(((q1 | q2) & Q(status="На согласовании Рецензентом"))))
+        closed = len(reestInfo.objects.filter(((q1 | q2) & Q(status="Закрыт"))))
+        for r in reestrs:
+            remarks = len(reestr.objects.filter((Q(reestrID=r.id) & Q(actuality=True))))  # всего
+            close = len(reestr.objects.filter((Q(reestrID=r.id) & Q(actuality=True) & (
+                        Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")))))  # ответ подготовлен
+            final = len(
+                reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято") & Q(actuality=True))))  # закрыты
+            work = remarks - close - final  # в работе
+
+            customer = len(reestr.objects.filter(
+                (Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика') & Q(actuality=True))))
+            closeC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика') & Q(
+                actuality=True) & (Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")))))
+            finalC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято") & Q(
+                actuality=True) & Q(total_importance='В компетенции Заказчика'))))  # закрыты
+            workC = customer - closeC - finalC
+
+            signific = len(
+                reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное') & Q(actuality=True))))
+            closeS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное') & Q(
+                actuality=True) & (Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")))))
+            finalS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято") & Q(actuality=True) & Q(
+                total_importance='Существенное'))))  # закрыты
+            workS = signific - closeS - finalS
+
+            insignific = len(
+                reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное') & Q(actuality=True))))
+            closeI = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное') & Q(
+                actuality=True) & (Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")))))
+            finalI = len(reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято") & Q(
+                actuality=True) & Q(total_importance='Несущественное'))))  # закрыты
+            workI = insignific - closeI - finalI
+
+            info.append([r.id, remarks, customer, signific, insignific, work, close, final,
+                         round(final * 100.0 / remarks, 2) if remarks else 0,
+                         workC, closeC, finalC,
+                         round(finalC * 100.0 / customer, 2) if customer else 0,
+                         workS, closeS, finalS,
+                         round(finalS * 100.0 / signific, 2) if signific else 0,
+                         workI, closeI, finalI,
+                         round(finalI * 100.0 / insignific, 2) if insignific else 0])
+    elif request.user.is_superuser:
+        group = 'Администратор'
+        reestrs = reestInfo.objects.all().annotate(reestr_priority_order=reestr_priority_order).order_by(
+            'reestr_priority_order', 'project_dogovor', 'num_reestr')
+        reviewer_sended = len(reestInfo.objects.filter(Q(status="На согласовании Рецензентом")))
+        closed = len(reestInfo.objects.filter(Q(status="Закрыт")))
+        for r in reestrs:
+            remarks = len(reestr.objects.filter(reestrID=r.id))
+            close = len(reestr.objects.filter(
+                (Q(reestrID=r.id) & (Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")))))
+            final = len(reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято"))))  # закрыты
+            work = remarks - close - final  # в работе
+
+            customer = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика'))))
+            closeC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика') & (
+                        Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")))))
+            finalC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято") & Q(
+                total_importance='В компетенции Заказчика'))))  # закрыты
+            workC = customer - closeC - finalC
+
+            signific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное'))))
+            closeS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное') & (
+                        Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")))))
+            finalS = len(reestr.objects.filter(
+                (Q(reestrID=r.id) & Q(status="Замечание снято") & Q(total_importance='Существенное'))))  # закрыты
+            workS = signific - closeS - finalS
+
+            insignific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное'))))
+            closeI = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное') & (
+                        Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")))))
+            finalI = len(reestr.objects.filter(
+                (Q(reestrID=r.id) & Q(status="Замечание снято") & Q(total_importance='Несущественное'))))  # закрыты
+            workI = insignific - closeI - finalI
+
+            info.append([r.id, remarks, customer, signific, insignific, work, close, final,
+                         round(final * 100.0 / remarks, 2) if remarks else 0,
+                         workC, closeC, finalC,
+                         round(finalC * 100.0 / customer, 2) if customer else 0,
+                         workS, closeS, finalS,
+                         round(finalS * 100.0 / signific, 2) if signific else 0,
+                         workI, closeI, finalI,
+                         round(finalI * 100.0 / insignific, 2) if insignific else 0])
+    elif request.user.groups.filter(name='Руководитель').exists():
+        group = 'Руководитель'
+        remarkList = reestr.objects.filter(
+            ((Q(responsibleTrouble_name=request.user) | Q(executor_name=request.user) | Q(responsibleTrouble_name__in=subs) | Q(executor_name__in=subs)) & Q(actuality=True)))
+        IDlist = []
+        for r in remarkList:
+            IDlist.append(r.reestrID.id)
+        reestrs = reestInfo.objects.filter(id__in=IDlist).exclude(status__in=excluded_status).annotate(
+            reestr_priority_order=reestr_priority_order).order_by('reestr_priority_order', 'project_dogovor',
+                                                                  'num_reestr')
+        reviewer_sended = len(reestInfo.objects.filter((Q(id__in=IDlist) & Q(status="На согласовании Рецензентом"))))
+        closed = len(reestInfo.objects.filter((Q(id__in=IDlist) & Q(status="Закрыт"))))
+        for r in reestrs:
+            remarks = len(reestr.objects.filter((Q(reestrID=r.id) & (
+                        Q(responsibleTrouble_name=request.user) | Q(executor_name=request.user) | Q(responsibleTrouble_name__in=subs) | Q(executor_name__in=subs)) & Q(actuality=True))))
+            close = len(reestr.objects.filter((Q(reestrID=r.id) & (
+                        Q(responsibleTrouble_name=request.user) | Q(executor_name=request.user) | Q(responsibleTrouble_name__in=subs) | Q(executor_name__in=subs)) & Q(actuality=True) & (
+                                                           Q(status="Принято ГИПом") | Q(
+                                                       status="На согласовании Рецензентом")))))
+            final = len(reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято") & Q(actuality=True) & (
+                        Q(responsibleTrouble_name=request.user) | Q(executor_name=request.user) | Q(responsibleTrouble_name__in=subs) | Q(executor_name__in=subs)))))  # закрыты
+            work = remarks - close - final  # в работе
+
+            customer = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика')
+                                                  & (Q(responsibleTrouble_name=request.user) | Q(
+                        executor_name=request.user)) & Q(actuality=True))))
+            closeC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика')
+                                                & (Q(responsibleTrouble_name=request.user) | Q(
+                        executor_name=request.user)) & (Q(status="Принято ГИПом") | Q(
+                        status="На согласовании Рецензентом")) & Q(actuality=True))))
+            finalC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято") &
+                                                Q(actuality=True) & Q(total_importance='В компетенции Заказчика') & (
+                                                            Q(responsibleTrouble_name=request.user) | Q(
+                                                        executor_name=request.user)))))  # закрыты
+            workC = customer - closeC - finalC
+
+            signific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное') &
+                                                  (Q(responsibleTrouble_name=request.user) | Q(
+                                                      executor_name=request.user)) & Q(actuality=True))))
+            closeS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное')
+                                                & (Q(responsibleTrouble_name=request.user) | Q(
+                        executor_name=request.user))
+                                                & (Q(status="Принято ГИПом") | Q(
+                        status="На согласовании Рецензентом")) & Q(actuality=True))))
+            finalS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято") & Q(actuality=True) &
+                                                Q(total_importance='Существенное') & (
+                                                            Q(responsibleTrouble_name=request.user) | Q(
+                                                        executor_name=request.user)))))  # закрыты
+            workS = signific - closeS - finalS
+
+            insignific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное')
+                                                    & (Q(responsibleTrouble_name=request.user) | Q(
+                        executor_name=request.user)) & Q(actuality=True))))
+            closeI = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное')
+                                                & (Q(responsibleTrouble_name=request.user) | Q(
+                        executor_name=request.user)) & (Q(status="Принято ГИПом") | Q(
+                        status="На согласовании Рецензентом"))
+                                                & Q(actuality=True))))
+            finalI = len(reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято") & Q(actuality=True) &
+                                                Q(total_importance='Несущественное') & (
+                                                            Q(responsibleTrouble_name=request.user) | Q(
+                                                        executor_name=request.user)))))  # закрыты
+            workI = insignific - closeI - finalI
+
+            info.append([r.id, remarks, customer, signific, insignific, work, close, final,
+                         round(final * 100.0 / remarks, 2) if remarks else 0,
+                         workC, closeC, finalC,
+                         round(finalC * 100.0 / customer, 2) if customer else 0,
+                         workS, closeS, finalS,
+                         round(finalS * 100.0 / signific, 2) if signific else 0,
+                         workI, closeI, finalI,
+                         round(finalI * 100.0 / insignific, 2) if insignific else 0])
+    elif request.user.groups.filter(name='Исполнитель').exists():
+        group = 'Исполнитель'
+        remarkList = reestr.objects.filter(((Q(executor_name=request.user) | Q(responsibleTrouble_name__in=subs) | Q(executor_name__in=subs)) & Q(actuality=True)))
+        IDlist = []
+        for r in remarkList:
+            IDlist.append(r.reestrID.id)
+        reestrs = reestInfo.objects.filter(id__in=IDlist).exclude(status__in=excluded_status).annotate(
+            reestr_priority_order=reestr_priority_order).order_by('reestr_priority_order', 'project_dogovor',
+                                                                  'num_reestr')
+        reviewer_sended = len(reestInfo.objects.filter((Q(id__in=IDlist) & Q(status="На согласовании Рецензентом"))))
+        closed = len(reestInfo.objects.filter((Q(id__in=IDlist) & Q(status="Закрыт"))))
+        for r in reestrs:
+            remarks = len(reestr.objects.filter((Q(reestrID=r.id) & (Q(executor_name=request.user) | Q(responsibleTrouble_name__in=subs) | Q(executor_name__in=subs)) & Q(actuality=True))))
+            close = len(reestr.objects.filter(
+                (Q(reestrID=r.id) & (Q(executor_name=request.user) | Q(responsibleTrouble_name__in=subs) | Q(executor_name__in=subs)) & (
+                            Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом"))
+                 & Q(actuality=True))))
+            final = len(reestr.objects.filter((Q(reestrID=r.id) & (Q(executor_name=request.user) | Q(responsibleTrouble_name__in=subs) | Q(executor_name__in=subs)) & Q(
+                status="Замечание снято") & Q(actuality=True))))  # закрыты
+            work = remarks - close - final  # в работе
+
+            customer = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика')
+                                                  & Q(executor_name=request.user) & Q(actuality=True))))
+            closeC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика')
+                                                & Q(executor_name=request.user) &
+                                                (Q(status="Принято ГИПом") | Q(
+                                                    status="На согласовании Рецензентом")) & Q(actuality=True))))
+            finalC = len(reestr.objects.filter(
+                (Q(reestrID=r.id) & Q(executor_name=request.user) & Q(status="Замечание снято") & Q(
+                    actuality=True) & Q(total_importance='В компетенции Заказчика'))))  # закрыты
+            workC = customer - closeC - finalC
+
+            signific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное')
+                                                  & Q(executor_name=request.user) & Q(actuality=True))))
+            closeS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное')
+                                                & Q(executor_name=request.user) & (Q(status="Принято ГИПом") | Q(
+                        status="На согласовании Рецензентом")) & Q(actuality=True))))
+            finalS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(executor_name=request.user) & Q(
+                status="Замечание снято") & Q(actuality=True) & Q(total_importance='Существенное'))))  # закрыты
+            workS = signific - closeS - finalS
+
+            insignific = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное')
+                                                    & Q(executor_name=request.user) & Q(actuality=True))))
+            closeI = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное')
+                                                & Q(executor_name=request.user) & (Q(status="Принято ГИПом") | Q(
+                        status="На согласовании Рецензентом"))
+                                                & Q(actuality=True))))
+            finalI = len(
+                reestr.objects.filter((Q(reestrID=r.id) & Q(executor_name=request.user) & Q(status="Замечание снято") &
+                                       Q(actuality=True) & Q(total_importance='Несущественное'))))  # закрыты
+            workI = insignific - closeI - finalI
+
+            info.append([r.id, remarks, customer, signific, insignific, work, close, final,
+                         round(final * 100.0 / remarks, 2) if remarks else 0,
+                         workC, closeC, finalC,
+                         round(finalC * 100.0 / customer, 2) if customer else 0,
+                         workS, closeS, finalS,
+                         round(finalS * 100.0 / signific, 2) if signific else 0,
+                         workI, closeI, finalI,
+                         round(finalI * 100.0 / insignific, 2) if insignific else 0])
+    elif request.user.groups.filter(name='Наблюдатель').exists():
+        group = 'Наблюдатель'
+        reestrs = reestInfo.objects.all().exclude(status="Скрыт").annotate(
+            reestr_priority_order=reestr_priority_order).order_by('reestr_priority_order', 'project_dogovor',
+                                                                  'num_reestr')
+        reviewer_sended = len(reestInfo.objects.filter(Q(status="На согласовании Рецензентом")))
+        closed = len(reestInfo.objects.filter(Q(status="Закрыт")))
+        for r in reestrs:
+            remarks = len(reestr.objects.filter((Q(reestrID=r.id) & Q(actuality=True))))
+            close = len(reestr.objects.filter(
+                (Q(reestrID=r.id) & (Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")) & Q(
+                    actuality=True))))
+            final = len(
+                reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято") & Q(actuality=True))))  # закрыты
+            work = remarks - close - final  # в работе
+
+            customer = len(reestr.objects.filter(
+                (Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика') & Q(actuality=True))))
+            closeC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='В компетенции Заказчика') & (
+                    Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")) & Q(actuality=True))))
+            finalC = len(reestr.objects.filter((Q(reestrID=r.id) & Q(status="Замечание снято") & Q(
+                total_importance='В компетенции Заказчика') & Q(actuality=True))))  # закрыты
+            workC = customer - closeC - finalC
+
+            signific = len(
+                reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное') & Q(actuality=True))))
+            closeS = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Существенное') & (
+                    Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")) & Q(actuality=True))))
+            finalS = len(reestr.objects.filter(
+                (Q(reestrID=r.id) & Q(status="Замечание снято") & Q(total_importance='Существенное') & Q(
+                    actuality=True))))  # закрыты
+            workS = signific - closeS - finalS
+
+            insignific = len(
+                reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное') & Q(actuality=True))))
+            closeI = len(reestr.objects.filter((Q(reestrID=r.id) & Q(total_importance='Несущественное') & (
+                    Q(status="Принято ГИПом") | Q(status="На согласовании Рецензентом")) & Q(actuality=True))))
+            finalI = len(reestr.objects.filter(
+                (Q(reestrID=r.id) & Q(status="Замечание снято") & Q(total_importance='Несущественное') & Q(
+                    actuality=True))))  # закрыты
+            workI = insignific - closeI - finalI
+
+            info.append([r.id, remarks, customer, signific, insignific, work, close, final,
+                         round(final * 100.0 / remarks, 2) if remarks else 0,
+                         workC, closeC, finalC,
+                         round(finalC * 100.0 / customer, 2) if customer else 0,
+                         workS, closeS, finalS,
+                         round(finalS * 100.0 / signific, 2) if signific else 0,
+                         workI, closeI, finalI,
+                         round(finalI * 100.0 / insignific, 2) if insignific else 0])
+    else:
+        return redirect("accounts/login/?next=/")
+    if request.method == 'POST':
+        if request.POST.get('email'):
+            return render(request, 'index.html',
+                          {'reestrs': reestrs, 'group': group, 'info': info, 'department': department,
+                           'reviewer_sended': reviewer_sended, 'closed': closed, 'worked': len(reestrs)-reviewer_sended-closed})
+        elif request.POST.get('causes_downloader'):
+            begin_date = request.POST.get("begin_date")
+            end_date = request.POST.get("end_date")
+            if begin_date != "" and end_date != "":
+                name = xlslxCauseCreate(request, begin_date, end_date)
+                file_path = MEDIA_ROOT + "\\Tables" + name
+                response = FileResponse(open(file_path, 'rb'), as_attachment=True)
+                return response
+            else:
+                return render(request, 'index.html',
+                              {'reestrs': reestrs, 'group': group, 'info': info, 'department': department,
+                               'reviewer_sended': reviewer_sended, 'closed': closed, 'worked': len(reestrs)-reviewer_sended-closed})
+        else:
+            name = xlslxCreate(request)
+            file_path = MEDIA_ROOT + "\\Tables" + name
+            response = FileResponse(open(file_path, 'rb'), as_attachment=True)
+            return response
+    else:
+        return render(request, 'index.html',
+                      {'reestrs': reestrs, 'group': group, 'info': info, 'department': department,
+                       'reviewer_sended': reviewer_sended, 'closed': closed, 'worked': len(reestrs)-reviewer_sended-closed})
