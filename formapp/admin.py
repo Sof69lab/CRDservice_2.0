@@ -1,11 +1,12 @@
 from django.contrib import admin
 from formapp.models import reestr, reestInfo, files, contracts, customers, reviewers, departments, aiChatSession, aiChatMessage
 from django.contrib.admin.widgets import FilteredSelectMultiple
+
 class reestrAdmin(admin.ModelAdmin):
-    search_fields = ('num_reestr', 'num_remark', 'remark_v', 'project_dogovor__number')
-    list_filter = ('reestrID', 'project_dogovor')
+    search_fields = ('num_reestr', 'num_remark', 'remark_v', 'remark_index')
+    list_filter = ('reestrID', 'status')
 class reestInfoAdmin(admin.ModelAdmin):
-    search_fields = ('num_reestr',)
+    search_fields = ('num_reestr', 'reestr_index')
     list_filter = ('project_dogovor', 'customer', 'project_reviewer',)
 class contractsAdmin(admin.ModelAdmin):
     search_fields = ('number',)

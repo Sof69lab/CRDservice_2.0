@@ -26,6 +26,8 @@ SECRET_KEY = "django-insecure-$qxi(xzc%0iv5!aplszt58h_7p^cty#zc7jshtfr&%yu*7^(q4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 30*1024*1024
+
 #CSRF_TRUSTED_ORIGINS = ["https://crds.vnipipt.ru", "http://crds.vnipipt.ru"]
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']

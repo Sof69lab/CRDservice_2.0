@@ -465,6 +465,7 @@
                                     <li class="alert danger"> {{error}} </li>
                                 {% endfor %}
                             {% endif %}<br/>
+                            <li id="tooLarge" hidden class="alert danger"></li>
                             <p id="cause_file2" hidden>
                                 Наименование документов<br/>
                             </p>
@@ -1403,9 +1404,30 @@
 									document.getElementById("total_imp").style.background = img_background;
                                 }
                             }
+                            function validatedUpload(e) {
+                                const fileInput = document.querySelector('input[type="file"]');
+                                const errorDiv = document.getElementById("tooLarge");
+                                const maxSize = 30 * 1024 * 1024;
+                                let fileSize = 0;
+                                for (let i=0; i < fileInput.files.length; i++) {
+                                    fileSize += fileInput.files[i].size;
+                                }
+                                if (fileSize > maxSize) {
+                                    let suffixes = [' Б', ' КБ', ' МБ', ' ГБ', ' ТБ'];
+                                    let suffixIndex = 0;
+                                    while (fileSize > 1024) {
+                                        suffixIndex += 1;
+                                        fileSize = fileSize/1024.0;
+                                    }
+                                    errorDiv.innerHTML = 'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + Number((fileSize).toFixed(2)).toString() + ' ' + suffixes[suffixIndex];
+                                    errorDiv.removeAttribute("hidden");
+                                } else {
+                                    document.forms['employee'].submit();
+                                }
+                            }
                         </script>
                     </form>
-                    <button class="blue-button" onclick="document.forms['employee'].submit();">Отправить форму</button>
+                    <button class="blue-button" onclick="validatedUpload()">Отправить форму</button>
                     <button class="blue-button"><a style="color:white" href="{% url 'home' %}">Вернуться в профиль</a></button>
                     <button class="blue-button"><a href="{% url 'homeGIP' id=reestrID %}" style="color:white">Вернуться в реестр</a></button>
                 </div>

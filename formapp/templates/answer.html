@@ -414,6 +414,7 @@
                                     <li class="alert danger"> {{error}} </li>
                                 {% endfor %}
                             {% endif %}<br/>
+                            <li id="tooLarge" hidden class="alert danger"></li>
                             <p id="cause_file2" hidden>
                                 Наименование документов<br/>
                             </p>
@@ -440,11 +441,11 @@
                             <h4 id="group" hidden>{{ group }}</h4>
                         </p>
                     </form>
-                    <button class="blue-button" onclick="document.forms['answer'].submit();" >Сохранить изменения</button>
+                    <button class="blue-button" onclick="saveForm()" >Сохранить изменения</button>
                     <button class="blue-button"><a href="{% url 'home'%}" style="color:white">Вернуться в профиль</a></button>
                     <button class="blue-button"><a href="{% url 'homeGIP' id=reestrID %}" style="color:white">Вернуться в реестр</a></button>
-                    <button class="green-button" id="approve" onclick="approve()">Согласовать замечание</button>
-                    <button class="red-button" id="cancel" onclick="cancel()">Отклонить замечание</button>
+                    <button class="green-button" id="approve" onclick="approve()">Согласовать ответ</button>
+                    <button class="red-button" id="cancel" onclick="cancel()">Отклонить ответ</button>
                     <script>
                         let lbls = [];
                         let er_mes = document.getElementsByClassName("alert-danger");
@@ -1012,27 +1013,84 @@
                             button.innerHTML = "Согласовать замечание";
                             document.getElementById("cancel").removeAttribute("hidden");
                         }
+                        function saveForm(e) {
+                            const fileInput = document.querySelector('input[type="file"]');
+                            const errorDiv = document.getElementById("tooLarge");
+                            const maxSize = 30 * 1024 * 1024;
+                            let fileSize = 0;
+                            for (let i=0; i < fileInput.files.length; i++) {
+                                fileSize += fileInput.files[i].size;
+                            }
+                            if (fileSize > maxSize) {
+                                let suffixes = [' Б', ' КБ', ' МБ', ' ГБ', ' ТБ'];
+                                let suffixIndex = 0;
+                                while (fileSize > 1024) {
+                                    suffixIndex += 1;
+                                    fileSize = fileSize/1024.0;
+                                }
+                                errorDiv.innerHTML = 'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + Number((fileSize).toFixed(2)).toString() + ' ' + suffixes[suffixIndex];
+                                errorDiv.removeAttribute("hidden");
+                            } else {
+                                document.forms['answer'].submit();
+                            }
+                        }
                         function approve(e) {
-                            if (status.value == "На согласовании ГИПом") {
-                                status.value = "Принято ГИПом";
+                            const fileInput = document.querySelector('input[type="file"]');
+                            const errorDiv = document.getElementById("tooLarge");
+                            const maxSize = 30 * 1024 * 1024;
+                            let fileSize = 0;
+                            for (let i=0; i < fileInput.files.length; i++) {
+                                fileSize += fileInput.files[i].size;
                             }
-                            if (status.value == "На согласовании руководителем") {
-                                status.value = "На согласовании ГИПом";
+                            if (fileSize > maxSize) {
+                                let suffixes = [' Б', ' КБ', ' МБ', ' ГБ', ' ТБ'];
+                                let suffixIndex = 0;
+                                while (fileSize > 1024) {
+                                    suffixIndex += 1;
+                                    fileSize = fileSize/1024.0;
+                                }
+                                errorDiv.innerHTML = 'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + Number((fileSize).toFixed(2)).toString() + ' ' + suffixes[suffixIndex];
+                                errorDiv.removeAttribute("hidden");
+                            } else {
+                                if (status.value == "На согласовании ГИПом") {
+                                    status.value = "Принято ГИПом";
+                                }
+                                if (status.value == "На согласовании руководителем") {
+                                    status.value = "На согласовании ГИПом";
+                                }
+                                let button = document.getElementById("approve");
+                                button.setAttribute("disabled","");
+                                button.innerHTML = "Замечание согласовано";
+                                document.getElementById("cancel").setAttribute("hidden", "");
+                                document.forms['answer'].submit();
                             }
-                            let button = document.getElementById("approve");
-                            button.setAttribute("disabled","");
-                            button.innerHTML = "Замечание согласовано";
-                            document.getElementById("cancel").setAttribute("hidden", "");
-                            document.forms['answer'].submit();
                         }
                         function cancel(e) {
-                            if (status.value == "На согласовании ГИПом") {
-                                status.value = "На доработке руководителем";
+                            const fileInput = document.querySelector('input[type="file"]');
+                            const errorDiv = document.getElementById("tooLarge");
+                            const maxSize = 30 * 1024 * 1024;
+                            let fileSize = 0;
+                            for (let i=0; i < fileInput.files.length; i++) {
+                                fileSize += fileInput.files[i].size;
                             }
-                            if (status.value == "На согласовании руководителем") {
-                                status.value = "На доработке исполнителем";
+                            if (fileSize > maxSize) {
+                                let suffixes = [' Б', ' КБ', ' МБ', ' ГБ', ' ТБ'];
+                                let suffixIndex = 0;
+                                while (fileSize > 1024) {
+                                    suffixIndex += 1;
+                                    fileSize = fileSize/1024.0;
+                                }
+                                errorDiv.innerHTML = 'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + Number((fileSize).toFixed(2)).toString() + ' ' + suffixes[suffixIndex];
+                                errorDiv.removeAttribute("hidden");
+                            } else {
+                                if (status.value == "На согласовании ГИПом") {
+                                    status.value = "На доработке руководителем";
+                                }
+                                if (status.value == "На согласовании руководителем") {
+                                    status.value = "На доработке исполнителем";
+                                }
+                                document.forms['answer'].submit();
                             }
-                            document.forms['answer'].submit();
                         }
                     </script>
                 </div>

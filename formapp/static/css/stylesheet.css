@@ -460,3 +460,17 @@ summary {
     text-align: right;
     cursor: auto;
 }
+.dual-select-container {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+}
+.select-box {
+    flex: 1;
+}
+.select-box select {
+    width: 100%;
+}
+.original-select {
+    display: none;
+}

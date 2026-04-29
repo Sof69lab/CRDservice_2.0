@@ -371,8 +371,11 @@ def xlslxCauseCreate(request, begin_date, end_date):
     worksheet.write(0, 1, "Формулировка коренной причины", cell_format2)
     worksheet.write(0, 2, "Рецензент", cell_format2)
     worksheet.write(0, 3, "Подразделение", cell_format2)
-    worksheet.write(0, 4, "Наименование замечания", cell_format2)
-    remarks = reestr.objects.filter((Q(in_mail_date__gte=begin_date) & Q(in_mail_date__lte=end_date) & Q(root_cause_list__icontains='0.')))
+    worksheet.write(0, 4, "ГИП", cell_format2)
+    worksheet.write(0, 5, "Ответственный", cell_format2)
+    worksheet.write(0, 6, "Исполнитель", cell_format2)
+    worksheet.write(0, 7, "Наименование замечания", cell_format2)
+    remarks = reestr.objects.filter((Q(in_mail_date__gte=begin_date) & Q(in_mail_date__lte=end_date) & Q(root_cause_list__icontains='0.') & Q(actuality=True)))
     l = 1
     for i in remarks:
         remark_number = i.remark_index[4:i.remark_index.find("-")]+i.remark_index[i.remark_index.find("Д")+1:i.remark_index.rfind("_")]
@@ -380,7 +383,10 @@ def xlslxCauseCreate(request, begin_date, end_date):
         worksheet.write(l, 1, i.root_cause_text, cell_format4wrap)
         worksheet.write(l, 2, reviewers.objects.get(id=i.project_reviewer.id).name, cell_format4wrap)
         worksheet.write(l, 3, i.department, cell_format4wrap)
-        worksheet.write(l, 4, i.remark_name, cell_format4wrap)
+        worksheet.write(l, 4, i.gip.last_name+' '+i.gip.first_name, cell_format4wrap)
+        worksheet.write(l, 5, i.responsibleTrouble_name.last_name+' '+i.responsibleTrouble_name.first_name, cell_format4wrap)
+        worksheet.write(l, 6, i.executor_name.last_name+' '+i.executor_name.first_name, cell_format4wrap)
+        worksheet.write(l, 7, i.remark_name, cell_format4wrap)
         l += 1
     #worksheet.autofit()
     workbook.close()

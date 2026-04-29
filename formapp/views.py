@@ -97,7 +97,7 @@ MAX_FILE_UPLOAD = 30 * 1024 * 1024
 
 def home(request):
     info = []
-    excluded_status = ["Доработан", "Закрыт", "Формирование", "Скрыт"]
+    excluded_status = ["Формирование", "Скрыт"]
     try:
         department = departments.objects.get(user=request.user.id).department
         subs = departments.objects.get(user=request.user.id).substitute.all()
@@ -116,7 +116,6 @@ def home(request):
         reestrs = reestInfo.objects.filter(q1 | q2).exclude(status="Скрыт").annotate(
             reestr_priority_order=reestr_priority_order).order_by('reestr_priority_order', 'project_dogovor',
                                                                   'num_reestr')
-        #reviewer_sended = len(reestInfo.objects.filter(((q1 | q2) & Q(status="На согласовании Рецензентом"))))
         reviewer_sended_reestNum = []
         closed = len(reestInfo.objects.filter(((q1 | q2) & Q(status="Закрыт"))))
         #статистика
@@ -232,7 +231,6 @@ def home(request):
         group = 'Администратор'
         reestrs = reestInfo.objects.all().annotate(reestr_priority_order=reestr_priority_order).order_by(
             'reestr_priority_order', 'project_dogovor', 'num_reestr')
-        #reviewer_sended = len(reestInfo.objects.filter(Q(status="На согласовании Рецензентом")))
         reviewer_sended_reestNum = []
         closed = len(reestInfo.objects.filter(status__in=["Закрыт", "Скрыт"]))
         for r in reestrs:
@@ -359,8 +357,7 @@ def home(request):
                                                                   'num_reestr')
         #reviewer_sended = len(reestInfo.objects.filter((Q(id__in=IDlist) & Q(status="На согласовании Рецензентом"))))
         reviewer_sended_reestNum = []
-        #closed = len(reestInfo.objects.filter((Q(id__in=IDlist) & Q(status="Закрыт"))))
-        closed = 0
+        closed = len(reestInfo.objects.filter((Q(id__in=IDlist) & Q(status="Закрыт"))))
         for r in reestrs:
             remarks_all = []
             for i in reestr.objects.filter((Q(reestrID=r.id) & (Q(responsibleTrouble_name=request.user) | Q(executor_name=request.user) | Q(responsibleTrouble_name__in=subs) | Q(executor_name__in=subs)) & Q(actuality=True))):
@@ -486,10 +483,8 @@ def home(request):
         reestrs = reestInfo.objects.filter(id__in=IDlist).exclude(status__in=excluded_status).annotate(
             reestr_priority_order=reestr_priority_order).order_by('reestr_priority_order', 'project_dogovor',
                                                                   'num_reestr')
-        #reviewer_sended = len(reestInfo.objects.filter((Q(id__in=IDlist) & Q(status="На согласовании Рецензентом"))))
         reviewer_sended_reestNum = []
-        #closed = len(reestInfo.objects.filter((Q(id__in=IDlist) & Q(status="Закрыт"))))
-        closed = 0
+        closed = len(reestInfo.objects.filter((Q(id__in=IDlist) & Q(status="Закрыт"))))
         for r in reestrs:
             remarks_all = []
             for i in reestr.objects.filter((Q(reestrID=r.id) & (Q(executor_name=request.user) | Q(responsibleTrouble_name__in=subs) | Q(executor_name__in=subs)) & Q(actuality=True))):
@@ -611,7 +606,6 @@ def home(request):
         reestrs = reestInfo.objects.all().exclude(status="Скрыт").annotate(
             reestr_priority_order=reestr_priority_order).order_by('reestr_priority_order', 'project_dogovor',
                                                                   'num_reestr')
-        #reviewer_sended = len(reestInfo.objects.filter(Q(status="На согласовании Рецензентом")))
         reviewer_sended_reestNum = []
         closed = len(reestInfo.objects.filter(Q(status="Закрыт")))
         for r in reestrs:
@@ -755,7 +749,6 @@ def home(request):
                       {'reestrs': reestrs, 'group': group, 'info': info, 'department': department,
                        'reviewer_sended': reviewer_sended, 'closed': closed, 'worked': len(reestrs)-reviewer_sended-closed, 'reviewer_sended_reestNum': reviewer_sended_reestNum})
 
-
 def newReestr(request):
     if request.user.groups.filter(name='ГИП').exists() or request.user.groups.filter(
             name='Наблюдатель').exists() or request.user.is_superuser:
@@ -767,13 +760,10 @@ def newReestr(request):
             form = ReestrForm(request.POST, request.FILES or None)
             if form.is_valid():
                 form.save(commit=False)
-                sum = 0
-                for upload in form.files.getlist("add_files"):
-                    sum += upload.size
                 if reestInfo.objects.filter((Q(project_dogovor=form.cleaned_data.get("project_dogovor")) & Q(
                         num_reestr=form.cleaned_data.get("num_reestr")))):
                     messages.error(request, "Реестр с таким номером уже существует")
-                elif sum <= MAX_FILE_UPLOAD:
+                else:
                     try:
                         new = form.save(commit=True)
                         new.reestr_index = new.project_dogovor.number + '_' + new.num_reestr
@@ -788,10 +778,6 @@ def newReestr(request):
                     except Exception as error:
                         print(error)
                         messages.error(request, "Возникла ошибка")
-                else:
-                    messages.error(request,
-                                   'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                       sum))
         else:
             form = ReestrForm()
         return render(request, 'newReestr.html', {'form': form, 'dogovors': dogovors, 'gip': request.user.id})
@@ -1677,19 +1663,11 @@ def upload_file(request, id):
             form.save(commit=False)
             name = form.cleaned_data.get("file_name")
             comment = form.cleaned_data.get("comment")
-            sum = 0
-            for upload in form.files.getlist("file"):
-                sum += upload.size
-            if sum > MAX_FILE_UPLOAD:
-                messages.error(request,
-                               'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                   sum))
-            else:
-                try:
-                    form.save_files(reestr, name, comment)
-                    messages.success(request, 'Файлы успешно загружены')
-                except Exception:
-                    messages.error(request, 'Возникла ошибка')
+            try:
+                form.save_files(reestr, name, comment)
+                messages.success(request, 'Файлы успешно загружены')
+            except Exception:
+                messages.error(request, 'Возникла ошибка')
     else:
         form = FileForm()
     return render(request, 'uploadFile.html', {'form': form, 'reestr': reestr, 'group': group})
@@ -1708,9 +1686,6 @@ def gip(request, id):
             form = GIPform(reest, request.POST, request.FILES or None)
             if form.is_valid():
                 respons2 = request.POST.getlist('responsibleTrouble_name')
-                sum = 0
-                for upload in form.files.getlist("add_files"):
-                    sum += upload.size
                 if len(respons2) > 1:
                     respons = []
                     for i in range(len(respons2)):
@@ -1719,11 +1694,7 @@ def gip(request, id):
                     if len(respons) < len(respons2):
                         form.add_error('responsibleTrouble_name',
                                        'Ответственные за устранение замечаний не должны повторяться')
-                    if sum > MAX_FILE_UPLOAD:
-                        messages.error(request,
-                                       'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                           sum))
-                    if len(respons) == len(respons2) and sum <= MAX_FILE_UPLOAD:
+                    if len(respons) == len(respons2):
                         try:
                             for i in range(len(respons)):
                                 if reestr.objects.filter((Q(responsibleTrouble_name=User.objects.get(id=respons[i])) &
@@ -1783,11 +1754,7 @@ def gip(request, id):
                             if role != "viewer" and respons is None:
                                 form.add_error('responsibleTrouble_name',
                                                'Пожалуйста, внесите данные')
-                            if sum > MAX_FILE_UPLOAD:
-                                messages.error(request,
-                                               'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                                   sum))
-                            if sum <= MAX_FILE_UPLOAD and (respons is not None or role == "viewer"):
+                            if respons is not None or role == "viewer":
                                 new = form.save(commit=False)
                                 if form.cleaned_data.get("comment") != "":
                                     d = datetime.now()
@@ -1856,9 +1823,6 @@ def gip1(request, id):
                 form = GIPform1(remark, request.POST, request.FILES or None)
                 if form.is_valid():
                     respons2 = request.POST.getlist('responsibleTrouble_name')
-                    sum = 0
-                    for upload in form.files.getlist("add_files"):
-                        sum += upload.size
                     if len(respons2) > 1:
                         respons = []
                         for i in range(len(respons2)):
@@ -1876,14 +1840,10 @@ def gip1(request, id):
                         if len(respons) < len(respons2):
                             form.add_error('responsibleTrouble_name',
                                            'Ответственные за устранение замечаний не должны повторяться')
-                        if sum > MAX_FILE_UPLOAD:
-                            messages.error(request,
-                                           'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                               sum))
                         if check_boss > 0:
                             messages.error(request,
                                            'Данное замечание уже назначено одному из выбранных исполнителей, выберите другого ответственного или удалите замечание кнопкой внизу страницы.')
-                        if len(respons) == len(respons2) and sum <= MAX_FILE_UPLOAD and check_boss == 0:
+                        if len(respons) == len(respons2) and check_boss == 0:
                             try:
                                 for i in range(len(respons)):
                                     if i > 0:
@@ -1961,7 +1921,7 @@ def gip1(request, id):
                             check_boss = 0
                         if check_boss > 0:
                             messages.error(request, 'Данное замечание уже назначено выбранному исполнителю, выберите другого ответственного или удалите замечание кнопкой внизу страницы.')
-                        if sum <= MAX_FILE_UPLOAD and check_boss == 0:
+                        if check_boss == 0:
                             try:
                                 remark.responsibleTrouble_name = respons
                                 remark.department = departments.objects.get(user=respons).department
@@ -1994,10 +1954,6 @@ def gip1(request, id):
                                 messages.success(request, "Замечание создано")
                             except Exception:
                                 messages.error(request, "Возникла ошибка")
-                        if sum > MAX_FILE_UPLOAD:
-                            messages.error(request,
-                                           'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                               sum))
         else:
             form = GIPform1(remark)
         return render(request, 'GIP1.html', {'form': form,
@@ -2086,7 +2042,10 @@ def boss(request, id):
                                     str(d.second) + ' ' + str(d.day) + '.' + str(d.month) + '.' + str(
                                 d.year) + ' ' + shortName(request.user) + ")")
                         db_form.status = "На доработке ГИПом"
-                        db_form.save(update_fields=['comment', 'status'])
+                        db_form.responsibleTrouble_name = None
+                        db_form.remark_index = None
+                        db_form.department = None
+                        db_form.save(update_fields=['comment', 'status', 'responsibleTrouble_name', 'remark_index', 'department'])
                         form = BossForm1(reest=db_form)
                         messages.success(request, "Изменения сохранены")
                     else:
@@ -2101,7 +2060,7 @@ def boss(request, id):
             next_step_key = False
         return render(request, 'boss.html', {'form': form,
                                              'gipcontext': db_form.gip.last_name + ' ' + db_form.gip.first_name,
-                                             'rescontext': db_form.responsibleTrouble_name.last_name + ' ' + db_form.responsibleTrouble_name.first_name,
+                                             'rescontext': db_form.responsibleTrouble_name.last_name + ' ' + db_form.responsibleTrouble_name.first_name if db_form.responsibleTrouble_name is not None else '',
                                              'reestrID': db_form.reestrID,
                                              'remarkID': id,
                                              'customer': db_form.customer.name,
@@ -2174,15 +2133,12 @@ def employee(request, id):
                 if importance7 and (imp7_comment is None or imp7_comment == ""):
                     importance_test = False
                     form.add_error('imp7_comment', 'Пожалуйста, внесите данные')
-                sum = 0
-                for upload in form.files.getlist("cause_add_files"):
-                    sum += upload.size
                 print(root_cause_list)
                 if (answer_date and answer_deadline and labor_costs_plan and comment and total_importance and
                         (root_cause_list is None or root_cause_list == "" or root_cause_list and
                         ("0." not in root_cause_list or ("0." in root_cause_list and root_cause_text != "")) and
                         (all(x not in root_cause_list for x in rcc_list) or (
-                                any(x in root_cause_list for x in rcc_list) and root_cause_comment != ""))) and importance_test and sum <= MAX_FILE_UPLOAD):
+                                any(x in root_cause_list for x in rcc_list) and root_cause_comment != ""))) and importance_test):
                     try:
                         db_form.answer_date_plan = answer_date
                         db_form.answer_deadline_correct_plan = answer_deadline
@@ -2258,10 +2214,6 @@ def employee(request, id):
                         messages.success(request, "Изменения сохранены")
                     except Exception:
                         messages.error(request, "Возникла ошибка")
-                if sum > MAX_FILE_UPLOAD:
-                    messages.error(request,
-                                   'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                       sum))
                 if answer_date is None:
                     form.add_error('answer_date_plan', 'Пожалуйста, внесите данные')
                 if answer_deadline is None:
@@ -2382,15 +2334,12 @@ def boss2(request, id):
                 if importance7 and (imp7_comment is None or imp7_comment == ""):
                     importance_test = False
                     form.add_error('imp7_comment', 'Пожалуйста, внесите данные')
-                sum = 0
-                for upload in form.files.getlist("cause_add_files"):
-                    sum += upload.size
                 if (((
                              executor_fail_name is not None and executor_fail_name.id == emptyUserID and executor_fail_text != "") or executor_fail_name is None or (
                              executor_fail_name.id != emptyUserID)) and (
                         "0." not in root_cause_list or ("0." in root_cause_list and root_cause_text != "")) and
                         (all(x not in root_cause_list for x in rcc_list) or (
-                                any(x in root_cause_list for x in rcc_list) and root_cause_comment != "")) and importance_test and sum <= MAX_FILE_UPLOAD):
+                                any(x in root_cause_list for x in rcc_list) and root_cause_comment != "")) and importance_test):
                     form.save(commit=False)
                     old_status = db_form.status
                     new_status = form.cleaned_data.get('status')
@@ -2519,10 +2468,6 @@ def boss2(request, id):
                     except Exception:
                         messages.error(request, "Возникла ошибка")
                 else:
-                    if sum > MAX_FILE_UPLOAD:
-                        messages.error(request,
-                                       'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                           sum))
                     if "0." in root_cause_list and root_cause_text == "":
                         form.add_error('root_cause_text', 'Пожалуйста, внесите данные')
                     if executor_fail_name and executor_fail_name.id == emptyUserID and executor_fail_text == "":
@@ -2608,9 +2553,6 @@ def gip2(request, id):
                             '4.5.1.', '4.5.2.', '4.6.1.', '5.3.1.', '5.3.2.']
                 executor_fail_name = form.cleaned_data.get('executor_fail_name')
                 executor_fail_text = form.cleaned_data.get('executor_fail_text')
-                sum = 0
-                for upload in form.files.getlist('cause_add_files'):
-                    sum += upload.size
                 if importance3 and (imp3_comment is None or imp3_comment == ""):
                     importance_test = False
                     form.add_error('imp3_comment', 'Пожалуйста, внесите данные')
@@ -2626,7 +2568,7 @@ def gip2(request, id):
                         "0." not in root_cause_list or ("0." in root_cause_list and root_cause_text != "")) and
                         (all(x not in root_cause_list for x in rcc_list) or (
                                 any(x in root_cause_list for x in rcc_list) and root_cause_comment != ""))
-                        and importance_test and sum <= MAX_FILE_UPLOAD):
+                        and importance_test):
                     form.save(commit=False)
                     old_status = db_form.status
                     new_status = form.cleaned_data.get('status')
@@ -2804,10 +2746,6 @@ def gip2(request, id):
                         exc_type, exc_obj, exc_tb = sys.exc_info()
                         messages.error(request, "Возникла ошибка " + str(e) + " " + str(exc_tb.tb_lineno))
                 else:
-                    if sum > MAX_FILE_UPLOAD:
-                        messages.error(request,
-                                       'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                           sum))
                     if "0." in root_cause_list and root_cause_text == "":
                         form.add_error('root_cause_text', 'Пожалуйста, внесите данные')
                     if any(x in root_cause_list for x in rcc_list) and root_cause_comment == "":
@@ -2902,12 +2840,8 @@ def answer(request, id):
                 file_comment = form.cleaned_data.get("cause_file_comment")
                 remark = form.cleaned_data.get("num_remark")
                 try:
-                    sum2 = 0
-                    for upload in form.files.getlist("cause_add_files"):
-                        sum2 += upload.size
                     if root_cause_list and ("0." not in root_cause_list or ("0." in root_cause_list and root_cause_text != "")) and ((all(x not in root_cause_list for x in rcc_list) or (
-                                    any(x in root_cause_list for x in rcc_list) and root_cause_comment != "")) and
-                             sum2 <= MAX_FILE_UPLOAD):
+                                    any(x in root_cause_list for x in rcc_list) and root_cause_comment != ""))):
                         try:
                             next = True
                             remarks = reestr.objects.filter((Q(reestrID=db_form.reestrID) & Q(actuality=True)))
@@ -2987,10 +2921,6 @@ def answer(request, id):
                                                                    db_form.executor_name.first_name if db_form.executor_name else '',
                                                                'group': group,
                                                                'reestrID': db_form.reestrID.id})
-                    if sum2 > MAX_FILE_UPLOAD:
-                        messages.error(request,
-                                       'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                           sum))
                     if "0." in root_cause_list and root_cause_text == "":
                         form.add_error('root_cause_text', 'Пожалуйста, внесите данные')
                     if any(x in root_cause_list for x in rcc_list) and root_cause_comment == "":
@@ -3070,17 +3000,10 @@ def final(request, id):
                     root_cause_list = form.cleaned_data.get('root_cause_list')
                     root_cause_text = form.cleaned_data.get('root_cause_text')
                     root_cause_comment = form.cleaned_data.get('root_cause_comment')
-                    sum = 0
-                    for upload in form.files.getlist("add_files"):
-                        sum += upload.size
-                    sum2 = 0
-                    for upload in form.files.getlist("cause_add_files"):
-                        sum2 += upload.size
                     if (answer_date and answer_deadline and labor_costs_fact and answer_remark != "" and link_tech_name != "" and root_cause_list and
                             ("0." not in root_cause_list or ("0." in root_cause_list and root_cause_text != "")) and
                             (all(x not in root_cause_list for x in rcc_list) or (
-                                    any(x in root_cause_list for x in rcc_list) and root_cause_comment != "")) and
-                             sum <= MAX_FILE_UPLOAD and sum2 <= MAX_FILE_UPLOAD):
+                                    any(x in root_cause_list for x in rcc_list) and root_cause_comment != ""))):
                         try:
                             db_form.answer_date_fact = answer_date
                             db_form.answer_deadline_correct_fact = answer_deadline
@@ -3133,14 +3056,6 @@ def final(request, id):
                             messages.success(request, "Изменения сохранены")
                         except Exception as e:
                             messages.error(request, "Возникла ошибка " + str(e))
-                    if sum > MAX_FILE_UPLOAD:
-                        messages.error(request,
-                                       'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                           sum))
-                    if sum2 > MAX_FILE_UPLOAD:
-                        messages.error(request,
-                                       'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                           sum))
                     if answer_date is None:
                         form.add_error('answer_date_fact', 'Пожалуйста, внесите данные')
                     if answer_deadline is None:
@@ -3258,15 +3173,27 @@ def final(request, id):
 
 def remark(request, id):
     if request.user.is_authenticated:
-        form = RemarkForm(reestr.objects.get(id=id))
+        db_form = reestr.objects.get(id=id)
+        form = RemarkForm(db_form)
         if request.user.groups.filter(name='Руководитель').exists():
             role = "Руководитель"
         elif request.user.groups.filter(name='Исполнитель').exists():
             role = "Исполнитель"
-        elif request.user.groups.filter(name='Наблюдатель').exists():
-            role = "Наблюдатель"
-        else:
+        elif request.user.groups.filter(name='ГИП').exists() or request.user.is_superuser:
             role = "ГИП"
+        else:
+            role = "Наблюдатель"
+        if request.method == 'POST':
+            comment = request.POST.get("edit_comment")
+            print(comment)
+            if comment is not None and db_form.comment != comment and comment != "":
+                d = datetime.now()
+                db_form.comment = comment + " (" + str(d.hour) + ':' + str(d.minute) + ':' + str(
+                    d.second) + ' ' + str(d.day) + '.' + str(d.month) + '.' + str(d.year) + ' ' + shortName(
+                    request.user) + ")"
+                db_form.save(update_fields=['comment'])
+            else:
+                print(form.errors)
         return render(request, 'remark.html', {'form': form,
                                                'gipcontext':
                                                    reestr.objects.get(id=id).gip.last_name + ' ' +
@@ -3290,7 +3217,8 @@ def remark(request, id):
                                                'remarkID': id,
                                                'status': reestr.objects.get(id=id).status,
                                                'role': role,
-                                               'reestrID': reestr.objects.get(id=id).reestrID.id})
+                                               'reestrID': reestr.objects.get(id=id).reestrID.id,
+                                               'comment_value': db_form.comment})
     else:
         return redirect("accounts/login/?next=/")
 
@@ -3308,16 +3236,9 @@ def close_remarks(request, id):
                 closed_remarks = form.cleaned_data['closed_remarks']
                 cancel_remark_date = form.cleaned_data['cancel_remark_date']
                 cancel_remark = form.cleaned_data['cancel_remark']
-                sum = 0
-                for upload in form.files.getlist("add_files"):
-                    sum += upload.size
                 if cancel_remark_date is None or cancel_remark == "":
                     form.add_error('cancel_remark_date', 'Пожалуйста, внесите данные')
-                if sum > MAX_FILE_UPLOAD:
-                    messages.error(request,
-                                   'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                       sum))
-                if cancel_remark_date is not None and cancel_remark != "" and sum <= MAX_FILE_UPLOAD:
+                if cancel_remark_date is not None and cancel_remark != "":
                     try:
                         i = 0
                         IDnumber = ""
@@ -3370,69 +3291,61 @@ def return_remarks(request, id):
             if form.is_valid():
                 # form.save(commit=False)
                 returned_remarks = form.cleaned_data['returned_remarks']
-                sum = 0
-                for upload in form.files.getlist("add_files"):
-                    sum += upload.size
-                if sum <= MAX_FILE_UPLOAD:
-                    try:
-                        i = 0
-                        IDnumber = ""
-                        forClose = []
-                        while i < len(returned_remarks):
-                            if returned_remarks[i] not in ', ':
-                                IDnumber += returned_remarks[i]
-                            else:
-                                if IDnumber != "":
-                                    forClose.append(int(IDnumber))
-                                IDnumber = ""
-                            i += 1
-                        if IDnumber != "":
-                            forClose.append(int(IDnumber))
-                        step = 0
-                        for r in remarks:
-                            if r.id in forClose:
-                                r.actuality = False
-                                r.save(update_fields=['actuality'])
-                                reestr.objects.create(reestrID=r.reestrID,
-                                                      customer=r.customer,
-                                                      project_dogovor=r.project_dogovor,
-                                                      project_date_contract=r.project_date_contract,
-                                                      project_name=r.project_name,
-                                                      gip=r.gip,
-                                                      project_reviewer=r.project_reviewer,
-                                                      out_mail_num=r.out_mail_num,
-                                                      out_mail_date=r.out_mail_date,
-                                                      in_mail_num=r.in_mail_num,
-                                                      in_mail_date=r.in_mail_date,
-                                                      num_reestr=r.num_reestr,
-                                                      num_remark=r.num_remark,
-                                                      designation_name=r.designation_name,
-                                                      section_name=r.section_name,
-                                                      remark_name=r.remark_name,
-                                                      rational=r.rational,
-                                                      status="На заполнении ГИПом",
-                                                      remark_v=r.remark_v + 1,
-                                                      answer_remark=r.answer_remark,
-                                                      comment=r.comment)
-                                step += 1
-                            elif r.status != "На согласовании Рецензентом":
-                                step += 1
-                        if step == len(remarks):
-                            reest.status = "На доработке"
-                        reest.save(update_fields=['status'])
-                        name = form.cleaned_data.get("file_name")
-                        comment = form.cleaned_data.get("file_comment")
-                        dateValue = form.cleaned_data.get("date_field")
-                        reest.end_date = workDays(dateValue, 9)
-                        reest.save(update_fields=['end_date'])
-                        form.save_files(reest, name, comment, dateValue)
-                        messages.success(request, "Изменения сохранены")
-                    except Exception:
-                        messages.error(request, "Возникла ошибка ")
-                else:
-                    messages.error(request,
-                                   'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + getHumanReadable(
-                                       sum))
+                try:
+                    i = 0
+                    IDnumber = ""
+                    forClose = []
+                    while i < len(returned_remarks):
+                        if returned_remarks[i] not in ', ':
+                            IDnumber += returned_remarks[i]
+                        else:
+                            if IDnumber != "":
+                                forClose.append(int(IDnumber))
+                            IDnumber = ""
+                        i += 1
+                    if IDnumber != "":
+                        forClose.append(int(IDnumber))
+                    step = 0
+                    for r in remarks:
+                        if r.id in forClose:
+                            r.actuality = False
+                            r.save(update_fields=['actuality'])
+                            reestr.objects.create(reestrID=r.reestrID,
+                                                  customer=r.customer,
+                                                  project_dogovor=r.project_dogovor,
+                                                  project_date_contract=r.project_date_contract,
+                                                  project_name=r.project_name,
+                                                  gip=r.gip,
+                                                  project_reviewer=r.project_reviewer,
+                                                  out_mail_num=r.out_mail_num,
+                                                  out_mail_date=r.out_mail_date,
+                                                  in_mail_num=r.in_mail_num,
+                                                  in_mail_date=r.in_mail_date,
+                                                  num_reestr=r.num_reestr,
+                                                  num_remark=r.num_remark,
+                                                  designation_name=r.designation_name,
+                                                  section_name=r.section_name,
+                                                  remark_name=r.remark_name,
+                                                  rational=r.rational,
+                                                  status="На заполнении ГИПом",
+                                                  remark_v=r.remark_v + 1,
+                                                  answer_remark=r.answer_remark,
+                                                  comment=r.comment)
+                            step += 1
+                        elif r.status != "На согласовании Рецензентом":
+                            step += 1
+                    if step == len(remarks):
+                        reest.status = "На доработке"
+                    reest.save(update_fields=['status'])
+                    name = form.cleaned_data.get("file_name")
+                    comment = form.cleaned_data.get("file_comment")
+                    dateValue = form.cleaned_data.get("date_field")
+                    reest.end_date = workDays(dateValue, 9)
+                    reest.save(update_fields=['end_date'])
+                    form.save_files(reest, name, comment, dateValue)
+                    messages.success(request, "Изменения сохранены")
+                except Exception:
+                    messages.error(request, "Возникла ошибка ")
         return render(request, 'return_remarks.html', {'remarks': remarks, 'reest': reest, 'form': form})
     else:
         return render(request, 'log_error.html',
@@ -3742,3 +3655,27 @@ def status(request, id):
     else:
         return render(request, 'log_error.html',
                       {'text': "Пожалуйста, авторизируйтесь в качестве ГИПа, чтобы увидеть эту страницу."})
+
+def subtitute(request, id):
+    current_user = User.objects.get(id=id)
+    try:
+        department_name = current_user.departments.department
+        department_users = User.objects.filter(departments__department=department_name).exclude(id=id)
+        current_substituter = User.objects.filter(departments__substitute=current_user)
+    except Exception:
+        return render(request, 'log_error.html',
+                      {'text': "Функция доступна только пользователям, включённым в штатную расстановку предприятия."})
+    form = SubtituteForm(id, current_substituter)
+    if request.method == 'POST':
+        form = SubtituteForm(id, current_substituter, request.POST or None)
+        if form.is_valid():
+            selected_items = form.cleaned_data['subtituter']
+            for u in department_users:
+                if u in selected_items and current_user not in u.departments.substitute.all():
+                    u.departments.substitute.add(current_user)
+                elif u not in selected_items and current_user in u.departments.substitute.all():
+                    u.departments.substitute.remove(current_user)
+    return render(request, 'subtitute.html', {'current_user': current_user,
+                                                                   'department_name': department_name,
+                                                                   'department_users': department_users,
+                                                                   'form': form})

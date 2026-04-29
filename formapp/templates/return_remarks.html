@@ -82,6 +82,7 @@
                 {% endfor %}
             {% endif %}
         </p>
+        <li id="tooLarge" hidden class="alert danger"></li>
         <p>
             Наименование документа<br/>
             {{ form.file_name }}
@@ -103,7 +104,7 @@
         {{form.returned_remarks}}
     </form>
     <button class="blue-button" id="back2"><a style="color:white" href="{% url 'homeGIP' id=reest.id %}">К реестру</a></button>
-    <button class="red-button" onclick="document.forms['return_form'].submit();">Отправить на доработку выбранные замечания</button>
+    <button class="red-button" onclick="validatedUpload()">Отправить на доработку выбранные замечания</button>
     {% else %}
     <p>Вы не авторизованы</p>
     <button class="blue-button"><a style="color:white" href="{% url 'login'%}?next={{request.path}}">Вход</a></button>
@@ -206,6 +207,27 @@
             }
             counter.innerHTML = String(forClose.length)+"/"+String(remarks.length)+counterString;
         });
+        function validatedUpload(e) {
+            const fileInput = document.querySelector('input[type="file"]');
+            const errorDiv = document.getElementById("tooLarge");
+            const maxSize = 30 * 1024 * 1024;
+            let fileSize = 0;
+            for (let i=0; i < fileInput.files.length; i++) {
+                fileSize += fileInput.files[i].size;
+            }
+            if (fileSize > maxSize) {
+                let suffixes = [' Б', ' КБ', ' МБ', ' ГБ', ' ТБ'];
+                let suffixIndex = 0;
+                while (fileSize > 1024) {
+                    suffixIndex += 1;
+                    fileSize = fileSize/1024.0;
+                }
+                errorDiv.innerHTML = 'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + Number((fileSize).toFixed(2)).toString() + ' ' + suffixes[suffixIndex];
+                errorDiv.removeAttribute("hidden");
+            } else {
+                document.forms['return_form'].submit();
+            }
+        }
     </script>
 </body>
 </html>

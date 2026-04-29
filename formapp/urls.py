@@ -29,4 +29,5 @@ urlpatterns = [
     path("dynamic/<int:id>/", views.dynamic, name='dynamic'),
     path("aiGIP/<str:sessionKey>/", views.aiGIP, name='aiGIP'),
     path("status/<int:id>/", views.status, name='status'),
+    path("subtitute/<int:id>/", views.subtitute, name='subtitute'),
 ]

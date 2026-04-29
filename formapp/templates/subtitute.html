@@ -1,10 +1,130 @@
 <!DOCTYPE html>
-<html lang="en">
+{% load static %}
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Назначение ответственных</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
 </head>
-<body>
-
+<body class="container custom">
+    {% load verbose_names %}
+    {% if user.is_authenticated %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <div class="{{ message.tags }}">
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <h3 id="user">{{ current_user }}</h3>
+    <h3 id="department">{{ department_name }}</h3>
+    <form novalidate method="post" id="change_form" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% load verbose_names %}
+        {{ form.subtituter }}
+    </form>
+    для множественного выбора нажмите и удерживайте Ctrl
+    <br/><br/>
+    <button class="blue-button" id="back2"><a style="color:white" href="{% url 'home' %}">К реестрам</a></button>
+    <button class="blue-button" onclick="document.forms['change_form'].submit();">Сохранить</button>
+    {% else %}
+    <p>Вы не авторизованы</p>
+    <button class="blue-button"><a style="color:white" href="{% url 'login' %}?next={{request.path}}">Вход</a></button>
+    {% endif %}
+    <script>
+        function selectBox(selectElement) {
+            const container = document.createElement('div');
+            selectElement.parentNode.insertBefore(container, selectElement);
+            container.appendChild(selectElement);
+            container.classList.add('dual-select-container');
+            selectElement.classList.add('original-select');
+            const availableBox = createSelectBox(selectElement, 'Моё подразделение');
+            const selectedBox = createSelectBox(selectElement, 'Мои заместители');
+            container.appendChild(availableBox.wrapper);
+            container.appendChild(selectedBox.wrapper);
+            function updateBoxes() {
+                const selectedValues = Array.from(selectElement.selectedOptions).map(function(opt) {return opt.value});
+                const availableFragment = document.createDocumentFragment();
+                const availableSelect = availableBox.select;
+                availableSelect.innerHTML = '';
+                Array.from(selectElement.options).forEach(function(opt) {
+                    if (!selectedValues.includes(opt.value)) {
+                        availableSelect.appendChild(opt.cloneNode(true));
+                    }
+                });
+                const selectedFragment = document.createDocumentFragment();
+                const selectedSelect = selectedBox.select;
+                selectedSelect.innerHTML = '';
+                Array.from(selectElement.selectedOptions).forEach(function(opt) {
+                    selectedSelect.appendChild(opt.cloneNode(true));
+                });
+            }
+            availableBox.btnRight.addEventListener('click', function() {
+                Array.from(availableBox.select.selectedOptions).forEach(function(opt) {
+                    const optionToSelect = Array.from(selectElement.options).find(function(o) { return o.value === opt.value });
+                    if (optionToSelect) optionToSelect.selected = true;
+                });
+                updateBoxes();
+            });
+            selectedBox.btnLeft.addEventListener('click', () => {
+                Array.from(selectedBox.select.selectedOptions).forEach(function(opt) {
+                    const optionToDeselect = Array.from(selectElement.options).find(function(o) { return o.value === opt.value });
+                    if (optionToDeselect) optionToDeselect.selected = false;
+                });
+                updateBoxes();
+            });
+            updateBoxes();
+        }
+        function createSelectBox(originalSelect, title) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'select-box';
+            const label = document.createElement('label');
+            label.textContent = title;
+            wrapper.appendChild(label);
+            const select = document.createElement('select');
+            select.multiple = true;
+            select.className = 'form-textinput';
+            select.style.height = '200px';
+            wrapper.appendChild(select);
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'btn-group';
+            btnGroup.style.display = "flex";
+            btnGroup.style.justifyContent = "center";
+            btnGroup.style.alignItems = "center";
+            if (title == 'Моё подразделение') {
+                const btnRight = document.createElement('button');
+                btnRight.type = 'button';
+                btnRight.className = 'green-button';
+                btnRight.innerHTML = 'Назначить';
+                btnRight.style.margin ="10px";
+                btnGroup.appendChild(btnRight);
+                wrapper.appendChild(btnGroup);
+                return {
+                    wrapper: wrapper,
+                    select: select,
+                    btnRight: btnRight
+                };
+            }
+            else {
+                const btnLeft = document.createElement('button');
+                btnLeft.type = 'button';
+                btnLeft.className = 'red-button';
+                btnLeft.innerHTML = 'Удалить';
+                btnLeft.style.margin ="10px";
+                btnGroup.appendChild(btnLeft);
+                wrapper.appendChild(btnGroup);
+                return {
+                    wrapper: wrapper,
+                    select: select,
+                    btnLeft: btnLeft
+                };
+            }
+        }
+        const selector = document.getElementById('id_subtituter');
+        if (selector) selectBox(selector);
+    </script>
 </body>
 </html>

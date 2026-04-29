@@ -63,12 +63,15 @@
                 <h5 id="group" style="margin-bottom: 10px; margin-top: 5px">{{ group }}</h5>
             </td>
         </tr>
+        <tr>
+            <td class="head-block-right" style="width: 5%;" colspan="3"><button class="blue-button"><a style="color:white" class="text" href="{% url 'subtitute' id=user.id %}">Мои заместители</a></button></td>
+        </tr>
     </table>
 	<h4 id="reviewer_sended" hidden>{{ reviewer_sended }}</h4>
     <h4 id="closed" hidden>{{ closed }}</h4>
     <h4 id="worked" hidden>{{ worked }}</h4>
     <h4 id="userID" hidden>{{ user.id }}</h4>
-	<h4 hidden id="department">{{ department }}</h4>
+    <h4 hidden id="department">{{ department }}</h4>
     <table id="table2" border="1" cellspacing="0">
         <tr>
             <th class="main">Реестр №</th>
@@ -100,7 +103,7 @@
                 {% endfor %}
                 <td style="background: #ededed">
                     <button hidden class="info" onclick="event.stopPropagation()" style="background: #ededed; border: none;"><a href="{% url 'reestInfo' id=r.id %}">Подробнее</a></button>
-                    <button onclick="event.stopPropagation()" style="background: #ededed; border: none;"><a href="{% url 'homeGIP' id=r.id %}">К замечаниям</a></button>
+                    <button class="info" onclick="event.stopPropagation(); remarksInfo(this);" style="background: #ededed; border: none; color: var(--blue); cursor: pointer;">Статистика</button>
                     <form novalidate method="post" id="{{ r.id }}" onsubmit="return false;" enctype="multipart/form-data">
                         {% csrf_token %}
                         <input name="id" hidden value="{{ r.id }}">
@@ -134,7 +137,7 @@
                 {% endfor %}
                 <td style="background: #e5f3ff">
                     <button hidden class="info" onclick="event.stopPropagation()" style="background: #e5f3ff; border: none;"><a href="{% url 'reestInfo' id=r.id %}">Подробнее</a></button>
-                    <button onclick="event.stopPropagation()" style="background: #e5f3ff; border: none;"><a href="{% url 'homeGIP' id=r.id %}">К замечаниям</a></button>
+                    <button class="info" onclick="event.stopPropagation(); remarksInfo(this);" style="background: #e5f3ff; border: none; color: var(--blue); cursor: pointer;">Статистика</button>
                     <form novalidate method="post" id="{{ r.id }}" onsubmit="return false;" enctype="multipart/form-data">
                         {% csrf_token %}
                         <input name="id" hidden value="{{ r.id }}">
@@ -168,7 +171,7 @@
                 {% endfor %}
                 <td>
                     <button hidden class="info" onclick="event.stopPropagation()" style="background: white; border: none;"><a href="{% url 'reestInfo' id=r.id %}">Подробнее</a></button>
-                    <button onclick="event.stopPropagation()" style="background: white; border: none;"><a href="{% url 'homeGIP' id=r.id %}">К замечаниям</a></button>
+                    <button class="info" onclick="event.stopPropagation(); remarksInfo(this);" style="background: white; border: none; color: var(--blue); cursor: pointer;">Статистика</button>
                     <form novalidate method="post" id="{{ r.id }}" onsubmit="return false;" enctype="multipart/form-data">
                         {% csrf_token %}
                         <input name="id" hidden value="{{ r.id }}">
@@ -285,6 +288,7 @@
     </div>
     <script>
         let hrefS = "http://127.0.0.1:8000/aiGIP/";
+        let hrefR = "http://127.0.0.1:8000/reestr/";
         function aiGIPlink() {
             let s = hrefS;
             s = s.concat(document.getElementById("userID").innerHTML);
@@ -370,7 +374,7 @@
         }
 
         function remarksInfo(e) {
-            let sibling = this.nextSibling.nextSibling;
+            let sibling = e.parentElement.parentElement.nextSibling.nextSibling;
             if (sibling.hasAttribute('hidden')) {
                 sibling.removeAttribute('hidden');
             } else {
@@ -382,9 +386,14 @@
             }
         }
 
+        function openRemarks(e) {
+            window.location.href = hrefR+String(this.children[9].children[2].id.value);
+            return false;
+        }
+
         let reestrs = document.getElementsByClassName("reestr");
         for (let i=0; i<reestrs.length; i++) {
-            reestrs[i].addEventListener("click", remarksInfo);
+            reestrs[i].addEventListener("click", openRemarks);
         }
 
         function addInfo(e) {

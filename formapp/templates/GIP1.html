@@ -216,6 +216,7 @@
                                     {% endfor %}
                                 {% endif %}
                             </p>
+                            <li id="tooLarge" hidden class="alert danger"></li>
                             <p>
                                 Наименование документов<br/>
                                 {{ form.file_name }}
@@ -370,13 +371,34 @@
                                 let res = document.getElementsByName("responsibleTrouble_name");
                                 valIndex(res);
                             }
+                            function validatedUpload(e) {
+                                const fileInput = document.querySelector('input[type="file"]');
+                                const errorDiv = document.getElementById("tooLarge");
+                                const maxSize = 30 * 1024 * 1024;
+                                let fileSize = 0;
+                                for (let i=0; i < fileInput.files.length; i++) {
+                                    fileSize += fileInput.files[i].size;
+                                }
+                                if (fileSize > maxSize) {
+                                    let suffixes = [' Б', ' КБ', ' МБ', ' ГБ', ' ТБ'];
+                                    let suffixIndex = 0;
+                                    while (fileSize > 1024) {
+                                        suffixIndex += 1;
+                                        fileSize = fileSize/1024.0;
+                                    }
+                                    errorDiv.innerHTML = 'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + Number((fileSize).toFixed(2)).toString() + ' ' + suffixes[suffixIndex];
+                                    errorDiv.removeAttribute("hidden");
+                                } else {
+                                    document.forms['GIPform'].submit();
+                                }
+                            }
                         </script>
                     </form>
                     <form novalidate method="post" id="DeleteForm" onsubmit="return false;" enctype="multipart/form-data">
                         {% csrf_token %}
                         <input name="remove_remark" value="true" hidden>
                     </form>
-                    <button class="blue-button" onclick="document.forms['GIPform'].submit();">Отправить форму</button>
+                    <button class="blue-button" onclick="validatedUpload()">Отправить форму</button>
                     <button class="red-button" onclick="document.forms['DeleteForm'].submit();" id="delete_button" hidden>Удалить замечание</button>
                     <button class="blue-button"><a href="{% url 'GIP1' id=next_remark %}" style="color:white">Следующее замечание</a></button>
                     <button class="blue-button"><a href="{% url 'home'%}" style="color:white">Вернуться в профиль</a></button>

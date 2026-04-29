@@ -488,6 +488,7 @@
                                     <li class="alert danger"> {{error}} </li>
                                 {% endfor %}
                             {% endif %}<br/>
+                            <li id="tooLarge" hidden class="alert danger"></li>
                             <p id="cause_file2" hidden>
                                 Наименование документов<br/>
                             </p>
@@ -510,7 +511,7 @@
                         </details>
                         <br/>
                     </form>
-                    <button class="blue-button" onclick="document.forms['GIP2'].submit();" >Сохранить изменения</button>
+                    <button class="blue-button" onclick="validatedUpload()" >Сохранить изменения</button>
                     <button class="blue-button"><a href="{% url 'home'%}" style="color:white">Вернуться в профиль</a></button>
                     <button class="blue-button"><a href="{% url 'homeGIP' id=reestrID %}" style="color:white">Вернуться в реестр</a></button>
                     <button class="green-button" id="approve" onclick="approve()">Согласовать замечание</button>
@@ -1372,15 +1373,72 @@
             cancelBtn.innerHTML = "Отклонить замечание";
         }
         function approve(e) {
-            step.value = "Согласовано ГИПом";
-            approveBtn.setAttribute("disabled","");
-            approveBtn.innerHTML = "Замечание согласовано";
-            cancelBtn.setAttribute("hidden", "");
-            document.forms['GIP2'].submit();
+            const fileInput = document.querySelector('input[type="file"]');
+            const errorDiv = document.getElementById("tooLarge");
+            const maxSize = 30 * 1024 * 1024;
+            let fileSize = 0;
+            for (let i=0; i < fileInput.files.length; i++) {
+                fileSize += fileInput.files[i].size;
+            }
+            if (fileSize > maxSize) {
+                let suffixes = [' Б', ' КБ', ' МБ', ' ГБ', ' ТБ'];
+                let suffixIndex = 0;
+                while (fileSize > 1024) {
+                    suffixIndex += 1;
+                    fileSize = fileSize/1024.0;
+                }
+                errorDiv.innerHTML = 'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + Number((fileSize).toFixed(2)).toString() + ' ' + suffixes[suffixIndex];
+                errorDiv.removeAttribute("hidden");
+            } else {
+                step.value = "Согласовано ГИПом";
+                approveBtn.setAttribute("disabled","");
+                approveBtn.innerHTML = "Замечание согласовано";
+                cancelBtn.setAttribute("hidden", "");
+                document.forms['GIP2'].submit();
+            }
         }
         function cancel(e) {
-            step.value = "На доработке";
-            document.forms['GIP2'].submit();
+            const fileInput = document.querySelector('input[type="file"]');
+            const errorDiv = document.getElementById("tooLarge");
+            const maxSize = 30 * 1024 * 1024;
+            let fileSize = 0;
+            for (let i=0; i < fileInput.files.length; i++) {
+                fileSize += fileInput.files[i].size;
+            }
+            if (fileSize > maxSize) {
+                let suffixes = [' Б', ' КБ', ' МБ', ' ГБ', ' ТБ'];
+                let suffixIndex = 0;
+                while (fileSize > 1024) {
+                    suffixIndex += 1;
+                    fileSize = fileSize/1024.0;
+                }
+                errorDiv.innerHTML = 'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + Number((fileSize).toFixed(2)).toString() + ' ' + suffixes[suffixIndex];
+                errorDiv.removeAttribute("hidden");
+            } else {
+                step.value = "На доработке";
+                document.forms['GIP2'].submit();
+            }
+        }
+        function validatedUpload(e) {
+            const fileInput = document.querySelector('input[type="file"]');
+            const errorDiv = document.getElementById("tooLarge");
+            const maxSize = 30 * 1024 * 1024;
+            let fileSize = 0;
+            for (let i=0; i < fileInput.files.length; i++) {
+                fileSize += fileInput.files[i].size;
+            }
+            if (fileSize > maxSize) {
+                let suffixes = [' Б', ' КБ', ' МБ', ' ГБ', ' ТБ'];
+                let suffixIndex = 0;
+                while (fileSize > 1024) {
+                    suffixIndex += 1;
+                    fileSize = fileSize/1024.0;
+                }
+                errorDiv.innerHTML = 'Объём загружаемых файлов не должен превышать 30 МБ, объём Ваших файлов составляет ' + Number((fileSize).toFixed(2)).toString() + ' ' + suffixes[suffixIndex];
+                errorDiv.removeAttribute("hidden");
+            } else {
+                document.forms['GIP2'].submit();
+            }
         }
     </script>
 </body>

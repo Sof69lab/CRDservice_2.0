@@ -190,7 +190,7 @@ class RemarkForm(forms.ModelForm):
             'labor_costs_fact': forms.NumberInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'comment': forms.Textarea(
                 attrs={'class': 'form-readonly', 'title': 'Указывается информация о статусе замечания',
-                       'readonly': 'readonly'}),
+                       'readonly': 'readonly', 'hidden': 'hidden'}),
             'answer_remark': forms.Textarea(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'link_tech_name': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'cancel_remark': forms.Textarea(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
@@ -543,8 +543,14 @@ class BossForm1(forms.ModelForm):
                 id=reest.reestrID.id).status == "На доработке":
             self.fields['answer_remark'].initial = reest.answer_remark
 
-        q1 = (Q(groups=1) | Q(groups=2) | Q(groups=3)) & Q(
-            departments__department=reest.responsibleTrouble_name.departments.department)
+        if reest.responsibleTrouble_name is not None:
+            if reest.responsibleTrouble_name.departments.department == "Дирекция":
+                q1 = (Q(groups=1) | Q(groups=2) | Q(groups=3))
+            else:
+                q1 = (Q(groups=1) | Q(groups=2) | Q(groups=3)) & Q(
+                    departments__department=reest.responsibleTrouble_name.departments.department)
+        else:
+            q1 = (Q(groups=1) | Q(groups=2) | Q(groups=3))
         q2 = Q(groups=4)
         q3 = Q(username="emptyUSER")
         qs = User.objects.filter(q1 | q2 | q3).annotate(
@@ -1433,6 +1439,15 @@ class AnswerForm(forms.ModelForm):
                              belong_to=reestr.project_dogovor.number[4:9] + reestr.num_reestr + "/" + remark)
             add_file.save()
 
+class SubtituteForm(forms.Form):
+    grouped_users = []
+    subtituter = forms.ModelMultipleChoiceField(queryset=User.objects.none(), widget=forms.SelectMultiple(attrs={'class': 'form-textinput'}), required=False)
+    def __init__(self, user_id, current_substituter, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        department_name = User.objects.get(id=user_id).departments.department
+        self.fields['subtituter'].queryset = User.objects.filter(departments__department=department_name).exclude(id=user_id)
+        if current_substituter is not None:
+            self.fields['subtituter'].initial = current_substituter
 # class DashboardForm(forms.Form):
 # years = forms.ChoiceField(choices=CHOICES_YEARS, widget=forms.Select(attrs={"multiple": "multiple", "class": "form-dashboard", "id": "var-Year"}))
 # gips = forms.ChoiceField(choices=CHOICES_GIPS, widget=forms.Select(attrs={"multiple": "multiple", "class": "form-dashboard", "id": "var-GIP"}))

@@ -23,6 +23,16 @@
         <div class="py-5">
             <div class="row">
                 <div class="col-12">
+                    {% if messages %}
+                        <ul class="messages">
+                            {% for message in messages %}
+                            <div class="{{ message.tags }}">
+                              <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                              {{ message }}
+                            </div>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                     {% load verbose_names %}
                     <p hidden id="role">{{ role }}</p>
                     <details>
@@ -143,6 +153,10 @@
                             <b>{% get_verbose_field_name "comment" %}</b><br />
                             {{ form.comment }}
                         </p>
+                        <form novalidate method="POST" id="change_comment" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <textarea class="form-textinput" name="edit_comment" id="edit_comment" style="min-height: 160px;">{{ comment_value }}</textarea>
+                        </form>
                         <p>
                             {% get_verbose_field_name "answer_remark" %}<br />
                             {{ form.answer_remark }}
@@ -243,6 +257,7 @@
                     <button class="turquoise-button" id="employee" hidden><a href="{% url 'employee' id=remarkID %}" style="color:white">Заполнить за исполнителя</a></button>
                     <button class="turquoise-button" id="boss" hidden><a href="{% url 'boss' id=remarkID %}" style="color:white">Заполнить за руководителя</a></button>
                     <button class="turquoise-button" id="answer" hidden><a href="{% url 'final' id=remarkID %}" style="color:white">Внести ответ за исполнителя</a></button>
+                    <button class="blue-button" id='submit_comment' onclick="document.forms['change_comment'].submit();">Сохранить изменения</button>
                     <button class="blue-button"><a href="{% url 'home'%}" style="color:white">Вернуться в профиль</a></button>
                     <button class="blue-button"><a href="{% url 'homeGIP' id=reestrID %}" style="color:white">Вернуться в реестр</a></button>
                     <script>
@@ -423,6 +438,11 @@
                             if (status == "Подготовка ответов исполнителем" || (status == "На доработке исполнителем" && document.getElementById("id_labor_costs_fact").value != "")) {
                                 document.getElementById("answer").removeAttribute("hidden");
                             }
+                        }
+                        if (document.getElementById("role").innerHTML != "ГИП" && document.getElementById("role").innerHTML != "Руководитель" && document.getElementById("role").innerHTML != "Исполнитель") {
+                            document.getElementById('submit_comment').setAttribute("hidden", "hidden");
+                            document.getElementById('change_comment').setAttribute("hidden", "hidden");
+                            document.getElementById('id_comment').removeAttribute("hidden");
                         }
                     </script>
                 </div>
