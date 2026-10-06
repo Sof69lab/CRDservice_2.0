@@ -84,7 +84,7 @@
                     </details>
                     <br />
                     <details open>
-                        <summary id="remark_summary">Информация о несоответствии</summary>
+                        <summary id="remark_summary">Информация о замечании</summary>
                         <p>
                             {% get_verbose_field_name "num_remark" %}<br />
                             {{ form.num_remark }}
@@ -173,6 +173,15 @@
                             <tr>
                                 <td>{% get_verbose_field_name "importance1" %}</td>
                                 <td>{{ form.importance1 }}</td>
+                                <td id="imp1_critical" style="color: red;"><b></b></td>
+                            </tr>
+                            <tr class="imp1" hidden>
+                                <td>{% get_verbose_field_name "imp1_comment_znp" %}</td>
+                                <td>{{ form.imp1_comment_znp }}</td>
+                            </tr>
+                            <tr class="imp1" hidden>
+                                <td>{% get_verbose_field_name "imp1_comment_nd" %}</td>
+                                <td>{{ form.imp1_comment_nd }}</td>
                             </tr>
                             <tr id="imp2" hidden>
                                 <td>Корректировка документации (свой раздел, глава, том, книга, др. док.)</td>
@@ -221,6 +230,7 @@
                             <tr id="imp7" hidden>
                                 <td>Получение дополнительных исходных данных от Заказчика</td>
                                 <td>{{ form.importance7 }}</td>
+                                <td id="imp7_critical" style="color: red;"><b></b></td>
                             </tr>
                             <tr class="imp7" hidden>
                                 <td colspan="2">{% get_verbose_field_name "imp7_comment" %}</td>
@@ -271,9 +281,12 @@
                         let imp5 = document.getElementById("imp5");
                         let imp6 = document.getElementById("imp6");
                         let imp7 = document.getElementById("imp7");
+                        let imps1 = document.getElementsByClassName("imp1");
                         let imps3 = document.getElementsByClassName("imp3");
                         let imps4 = document.getElementsByClassName("imp4");
                         let imps7 = document.getElementsByClassName("imp7");
+                        let imp1_critical = document.getElementById("imp1_critical").firstChild;
+                        let imp7_critical = document.getElementById("imp7_critical").firstChild;
                         const radioButtons1 = document.querySelectorAll('input[name="importance1"]');
                         for (const i of radioButtons1) {
                             i.disabled = true;
@@ -304,6 +317,9 @@
                         }
                         for(const i of radioButtons1) {
                             if (i.checked && i.value=="True") {
+                                imp1_critical.innerHTML = '!';
+                                imps1[0].removeAttribute("hidden");
+                                imps1[1].removeAttribute("hidden");
                                 imp4.removeAttribute("hidden");
                                 for (const j of radioButtons4) {
                                     if (j.checked) {
@@ -314,6 +330,7 @@
                                         }
                                         for (const k of radioButtons7) {
                                             if (k.checked && k.value=="True") {
+                                                imp7_critical.innerHTML = '!';
                                                 imps7[0].removeAttribute("hidden");
                                                 imps7[1].removeAttribute("hidden");
                                             }
@@ -348,6 +365,7 @@
                                                                             imp7.removeAttribute("hidden");
                                                                             for (const q of radioButtons7) {
                                                                                 if (q.checked && q.value == "True") {
+                                                                                    imp7_critical.innerHTML = '!';
                                                                                     imps7[0].removeAttribute("hidden");
                                                                                     imps7[1].removeAttribute("hidden");
                                                                                 }
@@ -358,6 +376,7 @@
                                                                     imp7.removeAttribute("hidden");
                                                                     for (const m of radioButtons7) {
                                                                         if (m.checked && m.value == "True") {
+                                                                            imp7_critical.innerHTML = '!';
                                                                             imps7[0].removeAttribute("hidden");
                                                                             imps7[1].removeAttribute("hidden");
                                                                         }

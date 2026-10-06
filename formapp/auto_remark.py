@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import openpyxl
 from openpyxl import load_workbook
 from formapp.models import reestr
 from django.db.models import Q
@@ -14,11 +15,11 @@ def auto_import(file, reest):
     for i, row in db.iterrows():
         status_in_file = row['Статус'].replace("_x000D_", "\n")
         if status_in_file == "Устранено":
-            closed.append(row['Номер замечания в проекте'].replace("_x000D_", "\n") + '[' + str(row['ID замечания']) + ']')
+            closed.append(row['Номер замечания в проекте'].replace("_x000D_", "\n") + '[' + str(row['ID замечания'][:-3]) + ']')
         elif status_in_file == "Повторно":
-            returned[row['Номер замечания в проекте'].replace("_x000D_", "\n") + '[' + str(row['ID замечания']) + ']'] = row['Причина повторного направления'].replace("_x000D_", "\n")
+            returned[row['Номер замечания в проекте'].replace("_x000D_", "\n") + '[' + str(row['ID замечания'][:-3]) + ']'] = row['Причина повторного направления'].replace("_x000D_", "\n")
         elif status_in_file in ["Ответ не предоставлен", "Устраняется"]:
-            created_remarks = reestr.objects.filter((Q(num_remark=row['Номер замечания в проекте'].replace("_x000D_", "\n") + '[' + str(row['ID замечания']) + ']') & Q(actuality=True) & Q(reestrID=reest.id)))
+            created_remarks = reestr.objects.filter((Q(num_remark=row['Номер замечания в проекте'].replace("_x000D_", "\n") + '[' + str(row['ID замечания'][:-3]) + ']') & Q(actuality=True) & Q(reestrID=reest.id)))
             if len(created_remarks) == 0:
                 reestr.objects.create(reestrID=reest,
                                       customer=reest.customer,
@@ -33,7 +34,7 @@ def auto_import(file, reest):
                                       in_mail_date=reest.in_mail_date,
                                       num_reestr=reest.num_reestr,
                                       num_remark=row['Номер замечания в проекте'].replace("_x000D_", "\n") + '[' + str(
-                                          row['ID замечания']) + ']',
+                                          row['ID замечания'][:-3]) + ']',
                                       designation_name=row['Ссылка на материалы'].replace("_x000D_", "\n"),
                                       section_name=row['Раздел документации'].replace("_x000D_", "\n"),
                                       remark_name=row['Вывод о несоответствии'].replace("_x000D_", "\n"),
@@ -82,12 +83,12 @@ def auto_export(file, reest):
         db = pd.read_excel(file_path, header=0, converters={'Номер замечания в проекте': str})
         remark_ids = np.array(db.loc[:, 'ID замечания'])
         remark_nums = np.array(db.loc[:, 'Номер замечания в проекте'])
-        # remark_text = np.array(db.loc[:, 'Вывод о несоответствии'])
-        # remark_link = np.array(db.loc[:, 'Раздел документации'])
+        remark_text = np.array(db.loc[:, 'Вывод о несоответствии'])
+        remark_link = np.array(db.loc[:, 'Раздел документации'])
         lens = []
         for i in range(len(remark_nums)):
             #remarks = reestr.objects.filter((Q(actuality=True) & Q(status="Принято ГИПом") & Q(reestrID=reest.id) & Q(remark_name=remark_text[i].replace("_x000D_", "\n")) & Q(section_name=remark_link[i].replace("_x000D_", "\n"))))
-            remarks = reestr.objects.filter((Q(actuality=True) & Q(status="Принято ГИПом") & Q(reestrID=reest.id) & Q(num_remark=remark_nums[i].replace("_x000D", "\n")+'['+remark_ids[i]+']')))
+            remarks = reestr.objects.filter((Q(actuality=True) & Q(status="Принято ГИПом") & Q(reestrID=reest.id) & Q(num_remark=remark_nums[i].replace("_x000D_", "\n")+'['+remark_ids[i][:-3]+']')))
             lens.append(len(remarks))
             if len(remarks) > 0:
                 str_answer = ''
@@ -95,10 +96,8 @@ def auto_export(file, reest):
                     if r.num_remark[:r.num_remark.find('[')] == remark_nums[i]:
                         if r.answer_remark is not None:
                             str_answer += r.answer_remark + "\n\n"
-                        if r.link_tech_name is not None:
+                        if r.link_tech_name is not None and 'Изменения не вносились' not in r.link_tech_name and 'Изменения вносились в XML файл(ы)' not in r.link_tech_name:
                             str_answer += r.link_tech_name + "\n\n"
-                        r.status = "На согласовании Рецензентом"
-                        r.save(update_fields=['status'])
                 sheet.cell(row=i + 2, column=15).value = str_answer
         workbook.save(file_path)
     except Exception as e:

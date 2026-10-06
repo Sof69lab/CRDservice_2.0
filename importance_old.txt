@@ -1,0 +1,135 @@
+function select1(e) {
+if (this.checked) {
+    if (this.value=="True") {
+        imp[0] = 1;
+        imps1[0].removeAttribute("hidden");
+        imps1[1].removeAttribute("hidden");
+        imps1[0].children[1].firstChild.setAttribute("required", "");
+        imps1[1].children[1].firstChild.setAttribute("required", "");
+        imp1_critical.innerHTML = '!';
+    }
+    else {
+        imp[0] = 0;
+        imp1_critical.innerHTML = '';
+    }
+} else {
+    imp[0] = -1;
+}
+answer();
+}
+function select2(e) {
+if (this.checked) {
+    if (this.value=="True") {
+        imp[1] = 1;
+    }
+    else {
+        imp[1] = 0;
+    }
+} else {
+    imp[1] = -1;
+}
+answer();
+}
+function select3(e) {
+let imps3 = document.getElementsByClassName("imp3");
+if (this.checked) {
+    if (this.value=="True") {
+        imp[2] = 1;
+        imps3[0].removeAttribute("hidden");
+        imps3[1].removeAttribute("hidden");
+        imps3[1].children[0].firstChild.setAttribute("required", "");
+    }
+    else {
+        imp[2] = 0;
+        imps3[0].setAttribute("hidden", "");
+        imps3[1].setAttribute("hidden", "");
+        imps3[1].children[0].firstChild.removeAttribute("required");
+    }
+} else {
+    imp[2] = -1;
+    imps3[0].setAttribute("hidden", "");
+    imps3[1].setAttribute("hidden", "");
+    imps3[1].children[0].firstChild.removeAttribute("required");
+}
+answer();
+}
+function select4(e) {
+let imps4 = document.getElementsByClassName("imp4");
+if (this.checked) {
+    if (imp[0] == 1) {
+        imp7.removeAttribute("hidden");
+    }
+    if (this.value=="True") {
+        imp[3] = 1;
+        imps4[0].removeAttribute("hidden");
+        imps4[1].removeAttribute("hidden");
+        imps4[1].children[0].firstChild.setAttribute("required", "");
+    }
+    else {
+        imp[3] = 0;
+        imps4[0].setAttribute("hidden", "");
+        imps4[1].setAttribute("hidden", "");
+        imps4[1].children[0].firstChild.removeAttribute("required");
+    }
+} else {
+    imp[3] = -1;
+    imps4[0].setAttribute("hidden", "");
+    imps4[1].setAttribute("hidden", "");
+    imps4[1].children[0].firstChild.removeAttribute("required");
+}
+answer();
+}
+function select5(e) {
+if (this.checked) {
+    if (this.value=="True") {
+        imp[4] = 1;
+        document.getElementById("imp6").removeAttribute("hidden");
+    }
+    else {
+        imp[4] = 0;
+        document.getElementById("imp6").setAttribute("hidden", "");
+    }
+} else {
+    imp[4] = -1;
+    document.getElementById("imp6").setAttribute("hidden", "");
+}
+answer();
+}
+function select6(e) {
+if (this.checked) {
+    if (this.value=="True") {
+        imp[5] = 1;
+    }
+    else {
+        imp[5] = 0;
+    }
+} else {
+    imp[5] = -1;
+}
+answer();
+}
+function select7(e) {
+let imps7 = document.getElementsByClassName("imp7");
+if (this.checked) {
+    if (this.value=="True") {
+        imp[6] = 1;
+        imps7[0].removeAttribute("hidden");
+        imps7[1].removeAttribute("hidden");
+        imps7[1].children[0].firstChild.setAttribute("required", "");
+        imp7_critical.innerHTML = '!';
+    }
+    else {
+        imp[6] = 0;
+        imps7[0].setAttribute("hidden", "");
+        imps7[1].setAttribute("hidden", "");
+        imps7[1].children[0].firstChild.removeAttribute("required");
+        imp7_critical.innerHTML = '';
+    }
+} else {
+    imp[6] = -1;
+    imps7[0].setAttribute("hidden", "");
+    imps7[1].setAttribute("hidden", "");
+    imps7[1].children[0].firstChild.removeAttribute("required");
+}
+answer();
+}

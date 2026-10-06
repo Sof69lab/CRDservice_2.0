@@ -180,7 +180,9 @@
                                 {% endfor %}
                             {% endif %}<br />
                             {% get_verbose_field_name "link_tech_name" %}<br />
-                            {{ form.link_tech_name }}<br />
+                            <h4 id="id_custom_link_form" hidden>{{ custom_link_value }}</h4>
+                            <h4 id="id_xml_link_form" hidden>{{ xml_link_value }}</h4>
+                            {{ form.link_tech_name }}
                             {% if form.link_tech_name.errors %}
                                 {% for error in form.link_tech_name.errors %}
                                     <li class="alert danger"> {{error}} </li>
@@ -190,6 +192,15 @@
                                 <tr>
                                     <td>{% get_verbose_field_name "importance1" %}</td>
                                     <td>{{ form.importance1 }}</td>
+                                    <td id="imp1_critical" style="color: red;"><b></b></td>
+                                </tr>
+                                <tr class="imp1" hidden>
+                                    <td>{% get_verbose_field_name "imp1_comment_znp" %}</td>
+                                    <td>{{ form.imp1_comment_znp }}</td>
+                                </tr>
+                                <tr class="imp1" hidden>
+                                    <td>{% get_verbose_field_name "imp1_comment_nd" %}</td>
+                                    <td>{{ form.imp1_comment_nd }}</td>
                                 </tr>
                                 <tr id="imp2" hidden>
                                     <td>Корректировка документации (свой раздел, глава, том, книга, др. док.)</td>
@@ -238,6 +249,7 @@
                                 <tr id="imp7" hidden>
                                     <td>Получение дополнительных исходных данных от Заказчика</td>
                                     <td>{{ form.importance7 }}</td>
+                                    <td id="imp7_critical" style="color: red;"><b></b></td>
                                 </tr>
                                 <tr class="imp7" hidden>
                                     <td colspan="2">{% get_verbose_field_name "imp7_comment" %}</td>
@@ -438,7 +450,7 @@
                                 {% endfor %}
                             {% endif %}
                             <p hidden id="role">{{ role }}</p>
-                            <summary id="remark_summary">Информация о несоответствии</summary>
+                            <summary id="remark_summary">Информация о замечании</summary>
                         </details>
                         <br/>
                         <input name="receiving" hidden value="true">
@@ -509,9 +521,27 @@
                 document.getElementById('final').submit();
             }
         }
+        function preventInput(event) {
+            event.preventDefault();
+            return false;
+        }
+        let cause_input = document.getElementById("root_cause")
+        cause_input.addEventListener('keydown', (e) => {
+            const allowedKeys = ['Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'];
+            if (!allowedKeys.includes(e.key) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                e.preventDefault();
+            }
+        });
+        cause_input.addEventListener('paste', preventInput);
+        cause_input.addEventListener('cut', preventInput);
+        cause_input.addEventListener('drop', preventInput);
+        cause_input.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
 
         let s = document.getElementById("header").innerHTML;
         let lbls = [];
+        let lbl = document.getElementById("cause_label");
         s = s.substring(0,35).concat(s.substring(39,43),s.substring(45,47));
         document.getElementById("header").innerHTML = s;
         let causes1 = document.getElementById("causes1");
@@ -523,6 +553,7 @@
         let cause_name = document.getElementById("id_cause_file_name");
         let cause_comment = document.getElementById("id_cause_file_comment");
         let cause = document.getElementById("root_cause").value;
+
         let causes = [];
         let txt = document.getElementById("id_root_cause_comment");
         let j = 0;
@@ -705,6 +736,58 @@
                 }
             }
         }
+
+        const custom_link_script = `<input id='custom_link' name='custom_link' class='form-textinput' type='text' disabled autocomplete='off' style='width: 88%;' placeholder='Том Х, ХХХ, изм. Х, Раздел ХХ'>`;
+        document.getElementById('id_link_tech_name_1').parentElement.insertAdjacentHTML('afterend', custom_link_script);
+        const xml_link_script = `  <input id='xml_link' name='xml_link' class='form-textinput' type='text' disabled autocomplete='off' style='width: 25%;'>`;
+        document.getElementById('id_link_tech_name_2').parentElement.insertAdjacentHTML('afterend', xml_link_script);
+        let custom_link = document.getElementById('custom_link');
+        custom_link.value = document.getElementById('id_custom_link_form').innerHTML;
+        let xml_link = document.getElementById('xml_link');
+        xml_link.value = document.getElementById('id_xml_link_form').innerHTML;
+        function selectLink(e) {
+            if (this.checked) {
+                if (this.value == 'Изменения вносились') {
+                    custom_link.removeAttribute('disabled');
+                    custom_link.setAttribute('required', 'required');
+                    xml_link.removeAttribute('required');
+                    xml_link.setAttribute('disabled', 'disabled');
+                } else if (this.value == 'XML файл(ы)') {
+                    xml_link.removeAttribute('disabled');
+                    xml_link.setAttribute('required', 'required');
+                    custom_link.removeAttribute('required');
+                    custom_link.setAttribute('disabled', 'disabled');
+                } else {
+                    custom_link.removeAttribute('required');
+                    custom_link.setAttribute('disabled', 'disabled');
+                    xml_link.removeAttribute('required');
+                    xml_link.setAttribute('disabled', 'disabled');
+                }
+            }
+        }
+        const radioButtonsLink = document.querySelectorAll('input[name="link_tech_name"]');
+        for(const radioButton of radioButtonsLink){
+            radioButton.addEventListener('change', selectLink);
+            if (radioButton.checked) {
+                if (radioButton.value == 'Изменения вносились') {
+                    custom_link.removeAttribute('disabled');
+                    custom_link.setAttribute('required', 'required');
+                    xml_link.removeAttribute('required');
+                    xml_link.setAttribute('disabled', 'disabled');
+                } else if (radioButton.value == 'XML файл(ы)') {
+                    xml_link.removeAttribute('disabled');
+                    xml_link.setAttribute('required', 'required');
+                    custom_link.removeAttribute('required');
+                    custom_link.setAttribute('disabled', 'disabled');
+                } else {
+                    custom_link.removeAttribute('required');
+                    custom_link.setAttribute('disabled', 'disabled');
+                    xml_link.removeAttribute('required');
+                    xml_link.setAttribute('disabled', 'disabled');
+                }
+            }
+        }
+
         function selectCause(e) {
             let lbl = document.getElementById("cause_label");
             let txt = document.getElementById("id_root_cause_comment");
@@ -944,9 +1027,12 @@
         let imp5 = document.getElementById("imp5");
         let imp6 = document.getElementById("imp6");
         let imp7 = document.getElementById("imp7");
+        let imps1 = document.getElementsByClassName("imp1");
         let imps3 = document.getElementsByClassName("imp3");
         let imps4 = document.getElementsByClassName("imp4");
         let imps7 = document.getElementsByClassName("imp7");
+        let imp1_critical = document.getElementById("imp1_critical").firstChild;
+        let imp7_critical = document.getElementById("imp7_critical").firstChild;
         const radioButtons1 = document.querySelectorAll('input[name="importance1"]');
         for (const i of radioButtons1) {
             i.disabled = true;
@@ -977,6 +1063,9 @@
         }
         for(const i of radioButtons1) {
             if (i.checked && i.value=="True") {
+                imp1_critical.innerHTML = '!';
+                imps1[0].removeAttribute("hidden");
+                imps1[1].removeAttribute("hidden");
                 imp4.removeAttribute("hidden");
                 for (const j of radioButtons4) {
                     if (j.checked) {
@@ -987,6 +1076,7 @@
                         }
                         for (const k of radioButtons7) {
                             if (k.checked && k.value=="True") {
+                                imp7_critical.innerHTML = '!';
                                 imps7[0].removeAttribute("hidden");
                                 imps7[1].removeAttribute("hidden");
                             }
@@ -1021,6 +1111,7 @@
                                                             imp7.removeAttribute("hidden");
                                                             for (const q of radioButtons7) {
                                                                 if (q.checked && q.value == "True") {
+                                                                    imp7_critical.innerHTML = '!';
                                                                     imps7[0].removeAttribute("hidden");
                                                                     imps7[1].removeAttribute("hidden");
                                                                 }
@@ -1031,6 +1122,7 @@
                                                     imp7.removeAttribute("hidden");
                                                     for (const m of radioButtons7) {
                                                         if (m.checked && m.value == "True") {
+                                                            imp7_critical.innerHTML = '!';
                                                             imps7[0].removeAttribute("hidden");
                                                             imps7[1].removeAttribute("hidden");
                                                         }

@@ -68,15 +68,28 @@
                     <button class="btn btn-primary" id="send-button" disabled></button>
                 </div>
                 <br/>
-                <div id="group1">
-                    <button class="suggestion-button" id="b1_1">Найди записи похожие на замечания из реестра ...</button>
-                    <button class="suggestion-button" id="b1_2">Найди записи похожие на замечания ... из реестра ...</button>
-                </div>
-                <div id="group2-1" hidden>
-                    <button class="suggestion-button" id="b2_1">Выгрузи ... первых записей для всех замечаний, которые ты нашёл</button>
-                    <button class="suggestion-button" id="b2_2">Выгрузи замечания из реестров ...</button>
-                    <button class="suggestion-button" id="b2_3">Выгрузи всё что нашёл</button>
-                    <button class="suggestion-button" id="b2_4">Выгрузи всё что нашлось для замечаний ...</button>
+                <div>
+                    <p id="queryReest" hidden>{{ queryReest }}</p>
+                    <details id="group1" style="display: inline-block; vertical-align: top;">
+                        <summary class="AI-tracks">
+                            Поиск схожих замечаний
+                        </summary>
+                        <div>
+                            <button class="suggestion-button" id="b1_1">Найди записи похожие на замечания из реестра ...</button>
+                            <button class="suggestion-button" id="b1_2">Найди записи похожие на замечания ... из реестра ...</button>
+                        </div>
+                    </details>
+                    <details id="group2-1" style="display: inline-block; vertical-align: top;">
+                        <summary class="AI-tracks">
+                            Выгрузка результатов
+                        </summary>
+                        <div>
+                            <button class="suggestion-button" id="b2_1">Выгрузи ... первых записей для всех замечаний, которые ты нашёл</button>
+                            <button class="suggestion-button" id="b2_2">Выгрузи замечания из реестров ...</button>
+                            <button class="suggestion-button" id="b2_3">Выгрузи всё что нашёл</button>
+                            <button class="suggestion-button" id="b2_4">Выгрузи всё что нашлось для замечаний ...</button>
+                        </div>
+                    </details>
                 </div>
             </div>
         </div>
@@ -102,12 +115,7 @@
         function standardQ(e) {
             let customText = this.innerHTML;
             if (this.id.indexOf("b1") > -1) {
-                document.getElementById("group1").setAttribute("hidden", "");
-                document.getElementById("group2-1").removeAttribute("hidden");
-            }
-            if (this.id.indexOf("b2") > -1) {
-                document.getElementById("group1").removeAttribute("hidden");
-                document.getElementById("group2-1").setAttribute("hidden", "");
+                document.getElementById("group2-1").style.display = 'inline-block';
             }
             let textIdx = customText.indexOf("реестра ...");
             if (textIdx > -1) {
@@ -196,6 +204,9 @@
             sendToBackend(message);
         }
         send_button.addEventListener("click", () => {sendMessage();});
+        if (document.getElementById('queryReest').innerHTML == '') {
+            document.getElementById("group2-1").style.display = 'none';
+        }
     </script>
 </body>
 </html>

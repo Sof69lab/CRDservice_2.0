@@ -77,7 +77,7 @@ nil11 = "НИЛ-11"
 nio28 = "НИО-28"
 nil25 = "НИЛ-25"
 nil34 = "НИЛ-34"
-niokps = "НИО КПС"
+niokps = "НИО-32"
 fhg = "Гр. ФХГ"
 nil31 = "НИЛ-31"
 io = "Гр. ИО"
@@ -112,12 +112,14 @@ igdi = "Гр. ИГДИ"
 iei = "Гр. ИЭИ"
 igmi = "Гр. ИГМИ"
 igfi = "Гр.ИГФИ"
+urtdippi = "УРТДиППИ"
 sub = "Субподряд"
 DEPARTMENT_CHOICES = [
     (direkciya, "Дирекция"),
     (uniid, "Управление по научной и инновационной деятельности ("+uniid+")"),
+    (urtdippi, "Управление по развитию технологий добычи и переработки полезных ископаемых ("+urtdippi+")"),
     (ag, "Аналитическая группа ("+ag+")"),
-    (nil5, "Комплексная научно-исследовательская лаборатория глубинного захоронения жидких радиоактивных и промышленных отходов ("+nil5+")"),
+    (nil5, "Научно-исследовательский отдел гидрогеологического моделирования и глубинного захоронения жидких отходов ("+nil5+")"),
     (nil11, "Научно-исследовательская лаборатория радиационной безопасности ("+nil11+")"),
     (nio28, "Научно-исследовательский отдел горных работ ("+nio28+")"),
     (nil25, "Научно-исследовательская лаборатория горнотехнического моделирования ("+nil25+")"),
@@ -152,7 +154,7 @@ DEPARTMENT_CHOICES = [
     (uprirp, "Управление перспективного развития и реализации проектов ("+uprirp+")"),
     (opr, "Отдел перспективного развития ("+opr+")"),
     (osukil, "Отдел стандартизации, управления качеством и лицензирования ("+osukil+")"),
-    (igi, "Группа инженерно-геологических изыскани ("+igi+")"),
+    (igi, "Группа инженерно-геологических изысканий ("+igi+")"),
     (igdi, "Группа инженерно-геодезических изысканий ("+igdi+")"),
     (iei, "Группа инженерно-экологических изысканий ("+iei+")"),
     (igmi, "Группа инженерно-гидрометеорологических изысканий ("+igmi+")"),
@@ -271,9 +273,12 @@ class reestr(ChangeloggableMixin, models.Model):
     comment = models.TextField(verbose_name="10.3. Комментарии", blank=True, null=True)
     answer_remark = models.TextField(verbose_name="11. Ответы на замечания", blank=True, null=True)
     importance1 = models.BooleanField(verbose_name="Нарушены требования ЗНП и (или) обязательные требования нормативных документов", blank=True, null=True, default=None)
+    imp1_comment_znp = models.TextField(verbose_name="ЗНП:", blank=True, null=True)
+    imp1_comment_nd = models.TextField(verbose_name="НД:", blank=True, null=True)
     importance2 = models.BooleanField(verbose_name="Требуется корректировка документации (свой раздел, глава, том, книга, др. док.)", blank=True, null=True, default=None)
     importance3 = models.BooleanField(verbose_name="Требуется корректировка смежных разделов (глав, томов, др. док.)", blank=True, null=True, default=None)
     imp3_comment = models.TextField(verbose_name="Укажите разделы (главы, тома, др. док.)", blank=True, null=True)
+    imp3_dep = models.TextField(verbose_name="Укажите соответствующие разделам смежные подразделения", choices=DEPARTMENT_CHOICES, blank=True, null=True)
     importance4 = models.BooleanField(verbose_name="Требуется выдача задания смежным подразделениям (без учёта ОКиВД) и (или) получение исходных данных от них", blank=True, null=True, default=None)
     imp4_comment = models.TextField(verbose_name="Укажите подразделения", blank=True, null=True)
     importance5 = models.BooleanField(verbose_name="Требуется корректировка принятых проектных решений", blank=True, null=True, default=None)

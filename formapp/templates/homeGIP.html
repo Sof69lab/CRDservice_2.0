@@ -128,21 +128,100 @@
         {% endif %}
         <tr>
             <td class="timeline-date">ПЛАН</td>
-            <td class="timeline-date">{{ plan.0 }}</td>
-            <td class="timeline-date">{{ plan.1 }}</td>
-            <td class="timeline-date">{{ plan.2 }}</td>
-            <td class="timeline-date">{{ plan.3 }}</td>
+
+            {% if reest.status == "Формирование" %}
+                <td title="1 день" class="timeline-date" style=
+                        "background-image: url('../../static/point_blue.png');
+                        background-repeat: no-repeat;
+                        background-size: 7px 7px;
+                        background-position: bottom left;">{{ plan.0 }}</td>
+            {% else %}
+                <td title="1 день"  class="timeline-date" style=
+                        "background-image: url('../../static/point_grey.png');
+                        background-repeat: no-repeat;
+                        background-size: 7px 7px;
+                        background-position: bottom left;">{{ plan.0 }}</td>
+            {% endif %}
+
+            {% if reest.status == "Формирование" %}
+                <td title="2 дня" class="timeline-date" style=
+                        "background-image: url('../../static/point_light_blue.png'), url('../../static/point_light_blue.png');
+                        background-repeat: no-repeat;
+                        background-size: 7px 7px;
+                        background-position: bottom left, bottom left 8px;">{{ plan.1 }}</td>
+            {% elif reest.status == "На заполнении" or reest.status == "На доработке" %}
+                <td title="2 дня" class="timeline-date" style=
+                        "background-image: url('../../static/point_blue.png'), url('../../static/point_blue.png');
+                        background-repeat: no-repeat;
+                        background-size: 7px 7px;
+                        background-position: bottom left, bottom left 8px;">{{ plan.1 }}</td>
+            {% else %}
+                <td title="2 дня" class="timeline-date" style=
+                        "background-image: url('../../static/point_grey.png'), url('../../static/point_grey.png');
+                        background-repeat: no-repeat;
+                        background-size: 7px 7px;
+                        background-position: bottom left, bottom left 8px;">{{ plan.1 }}</td>
+            {% endif %}
+
+            {% if reest.status == "Формирование" or reest.status == "На заполнении" or reest.status == "На доработке" %}
+                <td title="2 дня" class="timeline-date" style=
+                        "background-image: url('../../static/point_light_blue.png'), url('../../static/point_light_blue.png');
+                        background-repeat: no-repeat;
+                        background-size: 7px 7px;
+                        background-position: bottom left, bottom left 8px;">{{ plan.2 }}</td>
+            {% elif reest.status == "На согласовании" or reest.status == "Согласовано ГИПом" %}
+                <td title="2 дня" class="timeline-date" style=
+                        "background-image: url('../../static/point_blue.png'), url('../../static/point_blue.png');
+                        background-repeat: no-repeat;
+                        background-size: 7px 7px;
+                        background-position: bottom left, bottom left 8px;">{{ plan.2 }}</td>
+            {% else %}
+                <td title="2 дня" class="timeline-date" style=
+                        "background-image: url('../../static/point_grey.png'), url('../../static/point_grey.png');
+                        background-repeat: no-repeat;
+                        background-size: 7px 7px;
+                        background-position: bottom left, bottom left 8px;">{{ plan.2 }}</td>
+            {% endif %}
+
+            {% if reest.status == "Формирование" or reest.status == "На заполнении" or reest.status == "На доработке" or reest.status == "На согласовании" or reest.status == "Согласовано ГИПом"%}
+                <td title="5 дней" class="timeline-date" style=
+                        "background-image: url('../../static/point_light_blue.png'), url('../../static/point_light_blue.png'), url('../../static/point_light_blue.png'), url('../../static/point_light_blue.png'), url('../../static/point_light_blue.png');
+                        background-repeat: no-repeat;
+                        background-size: 7px 7px;
+                        background-position: bottom left, bottom left 8px, bottom left 16px, bottom left 24px, bottom left 32px;">{{ plan.3 }}</td>
+            {% elif reest.status == "Подготовка ответов" %}
+                <td title="5 дней" class="timeline-date" style=
+                        "background-image: url('../../static/point_blue.png'), url('../../static/point_blue.png'), url('../../static/point_blue.png'), url('../../static/point_blue.png'), url('../../static/point_blue.png');
+                        background-repeat: no-repeat;
+                        background-size: 7px 7px;
+                        background-position: bottom left, bottom left 8px, bottom left 16px, bottom left 24px, bottom left 32px;">{{ plan.3 }}</td>
+            {% else %}
+                <td title="5 дней" class="timeline-date" style=
+                        "background-image: url('../../static/point_grey.png'), url('../../static/point_grey.png'), url('../../static/point_grey.png'), url('../../static/point_grey.png'), url('../../static/point_grey.png');
+                        background-repeat: no-repeat;
+                        background-size: 7px 7px;
+                        background-position: bottom left, bottom left 8px, bottom left 16px, bottom left 24px, bottom left 32px;">{{ plan.3 }}</td>
+            {% endif %}
             <td class="timeline-date"></td>
             <td class="timeline-date"></td>
         </tr>
         <tr>
             <td class="timeline-date">ФАКТ</td>
-            <td class="timeline-date">{{ fact.0 }}</td>
-            <td class="timeline-date">{{ fact.1 }}</td>
-            <td class="timeline-date">{{ fact.2 }}</td>
-            <td class="timeline-date">{{ fact.3 }}</td>
+            <td class="timeline-date" title="{{ duration.0 }} дней">{{ fact.0 }}</td>
+            <td class="timeline-date" title="{{ duration.1 }} дней">{{ fact.1 }}</td>
+            <td class="timeline-date" title="{{ duration.2 }} дней">{{ fact.2 }}</td>
+            <td class="timeline-date" title="{{ duration.3 }} дней">{{ fact.3 }}</td>
             <td class="timeline-date">{{ fact.4 }}</td>
             <td class="timeline-date">{{ fact.5 }}</td>
+        </tr>
+        <tr hidden>
+            <td>...</td>
+            <td id="duration0">{{ duration.0 }}</td>
+            <td id="duration1">{{ duration.1 }}</td>
+            <td id="duration2">{{ duration.2 }}</td>
+            <td id="duration3">{{ duration.3 }}</td>
+            <td>...</td>
+            <td>...</td>
         </tr>
     </table>
     <br/>
@@ -156,13 +235,18 @@
                 </div>
             </th>
             <th>
+                <div style="flex: 4;">Версия замечания</div>
+            </th>
+            <th>
                 <div style="display: flex;">
-                    <div style="flex: 4;">Версия замечания</div>
-                    <button hidden id="sort_version" class="navy-button" style="padding: 2px 3px; flex: 1;" value="0">&#9650;<br>&#9660;</button>
+                    <div style="display: flex; align-items: center; flex: 4;"><img src="../../static/attention.png" width="20"></div>
+                    <button id="sort_critical" class="navy-button" style="padding: 2px 3px; flex: 1;" value="0">&#9650;<br>&#9660;</button>
                 </div>
             </th>
             <th>Обозначение раздела в проекте</th>
-            <th>Наименование замечания</th>
+            <th style="min-width: 269.85px;">Наименование замечания</th>
+            <th style="min-width: 269.85px;">Ответ на замечание</th>
+            <th style="min-width: 269.85px;">Комментарии</th>
             <th>
                 <div style="display: flex;">
                     {% if group == "Руководитель" or group == "Исполнитель"%}
@@ -186,8 +270,23 @@
             {% if r.status == 'Замечание снято' %}
                 <td align="center" name="remark_numbers" style="background: #ededed">{{ r.num_remark }}</td>
                 <td align="center" style="background: #ededed">{{ r.remark_v }}</td>
+                {% if r.importance1 or r.importance7 %}
+                    <td align="center" style="background: #ededed; color: red;"><b>!</b></td>
+                {% else %}
+                    <td align="center" style="background: #ededed; color: red;"><b> </b></td>
+                {% endif %}
                 <td style="background: #ededed">{{ r.designation_name }}</td>
                 <td style="background: #ededed">{{ r.remark_name }}</td>
+                {% if r.answer_remark is none %}
+                    <td style="background: #ededed"> </td>
+                {% else %}
+                    <td style="background: #ededed">{{ r.answer_remark }}</td>
+                {% endif %}
+                {% if r.comment is none %}
+                    <td style="background: #ededed"> </td>
+                {% else %}
+                    <td style="background: #ededed">{{ r.comment }}</td>
+                {% endif %}
                 {% if group == "Руководитель" or group == "Исполнитель"%}
                     {% if r.executor_name.first_name != " " %}
                     <td align="center" class="names" style="background: #ededed">{{ r.executor_name }}</td>
@@ -229,8 +328,23 @@
             {% elif r.status == 'Принято ГИПом' %}
                 <td align="center" name="remark_numbers" style="background: #edffe6">{{ r.num_remark }}</td>
                 <td align="center" style="background: #edffe6">{{ r.remark_v }}</td>
+                {% if r.importance1 or r.importance7 %}
+                    <td align="center" style="background: #edffe6; color: red;"><b>!</b></td>
+                {% else %}
+                    <td align="center" style="background: #edffe6; color: red;"><b> </b></td>
+                {% endif %}
                 <td style="background: #edffe6">{{ r.designation_name }}</td>
                 <td style="background: #edffe6">{{ r.remark_name }}</td>
+                {% if r.answer_remark is none %}
+                    <td style="background: #edffe6"> </td>
+                {% else %}
+                    <td style="background: #edffe6">{{ r.answer_remark }}</td>
+                {% endif %}
+                {% if r.comment is none %}
+                    <td style="background: #edffe6"> </td>
+                {% else %}
+                    <td style="background: #edffe6">{{ r.comment }}</td>
+                {% endif %}
                 {% if group == "Руководитель" or group == "Исполнитель"%}
                     {% if r.executor_name.first_name != " " %}
                     <td align="center" class="names" style="background: #edffe6">{{ r.executor_name }}</td>
@@ -272,8 +386,23 @@
             {% elif r.status == 'На согласовании Рецензентом' %}
                 <td align="center" name="remark_numbers" style="background: #e5f3ff">{{ r.num_remark }}</td>
                 <td align="center" style="background: #e5f3ff">{{ r.remark_v }}</td>
+                {% if r.importance1 or r.importance7 %}
+                    <td align="center" style="background: #e5f3ff; color: red;"><b>!</b></td>
+                {% else %}
+                    <td align="center" style="background: #e5f3ff; color: red;"><b> </b></td>
+                {% endif %}
                 <td style="background: #e5f3ff">{{ r.designation_name }}</td>
                 <td style="background: #e5f3ff">{{ r.remark_name }}</td>
+                {% if r.answer_remark is none %}
+                    <td style="background: #e5f3ff"> </td>
+                {% else %}
+                    <td style="background: #e5f3ff">{{ r.answer_remark }}</td>
+                {% endif %}
+                {% if r.comment is none %}
+                    <td style="background: #e5f3ff"> </td>
+                {% else %}
+                    <td style="background: #e5f3ff">{{ r.comment }}</td>
+                {% endif %}
                 {% if group == "Руководитель" or group == "Исполнитель"%}
                     {% if r.executor_name.first_name != " " %}
                     <td align="center" class="names" style="background: #e5f3ff">{{ r.executor_name }}</td>
@@ -315,8 +444,23 @@
             {% else %}
                 <td align="center" name="remark_numbers">{{ r.num_remark }}</td>
                 <td align="center">{{ r.remark_v }}</td>
+                {% if r.importance1 or r.importance7 %}
+                    <td align="center" style="color: red;"><b>!</b></td>
+                {% else %}
+                    <td align="center" style="color: red;"><b> </b></td>
+                {% endif %}
                 <td>{{ r.designation_name }}</td>
                 <td>{{ r.remark_name }}</td>
+                {% if r.answer_remark is none %}
+                    <td> </td>
+                {% else %}
+                    <td>{{ r.answer_remark }}</td>
+                {% endif %}
+                {% if r.comment is none %}
+                    <td> </td>
+                {% else %}
+                    <td>{{ r.comment }}</td>
+                {% endif %}
                 {% if group == "Руководитель" or group == "Исполнитель"%}
                     {% if r.executor_name.first_name != " " %}
                     <td align="center" class="names">{{ r.executor_name }}</td>
@@ -423,6 +567,10 @@
         {% csrf_token %}
         <input name="plannerCheck" hidden value="true">
     </form>
+    <form hidden novalidate method="post" id="timeline_data" onsubmit="return false;" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input name="timelineData" hidden value="true">
+    </form>
     <button id="actuality" onclick="event.stopPropagation(); document.getElementById('r').submit();" class="blue-button">Выгрузить актуальный реестр</button>
     <button id="history" onclick="event.stopPropagation(); document.getElementById('actual').submit();" class="blue-button">Выгрузить историю реестра</button>
     <button id="plannerCheck" hidden onclick="event.stopPropagation(); document.getElementById('planner').submit();" class="blue-button">Выгрузить файл для сверки трудозатрат</button>
@@ -437,6 +585,7 @@
     <button class="turquoise-button" id="formed" onclick="event.stopPropagation(); document.getElementById('change').submit();" hidden>Сформировать реестр</button>
     <button class="turquoise-button" id="answers" hidden>Загрузить подписанный реестр</button>
     <button class="turquoise-button" id="planner_export" hidden><a style="color:white" class="text" href="{% url 'planner_link' id=reest.id %}">Сформировать файл для синхронизации с Planner</a></button>
+	<button class="turquoise-button" id="timeline_export" onclick="event.stopPropagation(); document.getElementById('timeline_data').submit();">Выгрузить хронику реестра</button>
 	<button class="turquoise-button" id="auto_export" hidden><a style="color:white" class="text" href="{% url 'export_remark' id=reest.id %}">Выгрузить ответы в формате ФАУ "Главгосэкспертиза России"</a></button>
 	<button class="turquoise-button" id="viewer_report" onclick="event.stopPropagation(); document.getElementById('report').submit();" hidden>Выгрузить реестр в форме для отчёта</button>
     <button class="turquoise-button" id="dynamic_report" hidden><a style="color:white" class="text" href="{% url 'dynamic' id=reest.id %}">Динамика замечаний</a></button>
@@ -501,12 +650,18 @@
                 }
                 if (first_dubl_array.includes(tbl.children[i].id)) {
                     for (let j=1; j<tbl.children[i].cells.length; j++) {
-                        tbl.children[i].cells[j].setAttribute("style","background: #F9692566;");
+                        if (j == 2) {
+                            tbl.children[i].cells[j].setAttribute("style","background: #F9692566; color: red;");
+                        } else {
+                            tbl.children[i].cells[j].setAttribute("style","background: #F9692566;");
+                        }
                     }
                 }
             }
         }
         let timeline_date = document.getElementsByClassName("timeline-date");
+        let durations_fact = [Number(document.getElementById("duration0").innerHTML), Number(document.getElementById("duration1").innerHTML), Number(document.getElementById("duration2").innerHTML), Number(document.getElementById("duration3").innerHTML)];
+        let durations_plan = [1, 2, 2, 5];
         for (let i=0; i < timeline_date.length; i++) {
             if (timeline_date[i].innerHTML.includes('(-') || timeline_date[i].innerHTML.includes('задержано')) {
                 timeline_date[i].style.color = 'red';
@@ -516,6 +671,34 @@
             }
             if (timeline_date[i].innerHTML.includes('(+')) {
                 timeline_date[i].style.color = 'green';
+            }
+            if (i >= 8 && i <= 11 && durations_fact[i-8] != 0) {
+                let img_url = "url('../../static/point_green.png')";
+                if (durations_fact[i-8] > durations_plan[i-8]) {
+                    img_url = "url('../../static/point_red.png')";
+                }
+                let img_str = "";
+                let position_str = "";
+                let width = 8;
+                if (durations_fact[i-8] > 37) {
+                    width = Math.trunc(300.8/durations_fact[i-8]);
+                    if (width < 2) {
+                        width = 2;
+                    }
+                }
+                for (let j=0; j<durations_fact[i-8]; j++) {
+                    img_str += img_url;
+                    position_str += "bottom left "+String(width*j)+"px";
+                    if (j < durations_fact[i-8]-1) {
+                        img_str += ", ";
+                        position_str += ", ";
+                    }
+                }
+                console.log(img_str);
+                timeline_date[i].style.backgroundImage = img_str;
+                timeline_date[i].style.backgroundRepeat = 'no-repeat';
+                timeline_date[i].style.backgroundSize = String(width-1)+'px 7px';
+                timeline_date[i].style.backgroundPosition = position_str;
             }
         }
         let reviewer = document.getElementById("reviewer").innerHTML;
@@ -600,11 +783,11 @@
                 subcontracts_name[i] = subcontracts[i].innerHTML;
             }
             let labor_plan = "";
-            state = this.children[8].innerHTML;
-            labor = this.children[10].innerHTML;
-            responsible = this.children[12].innerHTML;
-            executor = this.children[13].innerHTML;
-            labor_plan = this.children[9].innerHTML;
+            state = this.children[11].innerHTML;
+            labor = this.children[13].innerHTML;
+            responsible = this.children[15].innerHTML;
+            executor = this.children[16].innerHTML;
+            labor_plan = this.children[12].innerHTML;
             if (role == "Наблюдатель" || role == "Администратор") {
                 s = s.concat("remark/");
                 s = s.concat(this.id);
@@ -808,7 +991,7 @@
         if ((step.value == "Принято ГИПом" || step.value == "На согласовании Рецензентом" || step.value == "Подготовка ответов") && role == "ГИП" && reviewer == "ФАУ «Главгосэкспертиза России»") {
             document.getElementById("auto_export").removeAttribute("hidden");
         }
-        if ((step.value == "Принято ГИПом" || step.value == "Подготовка ответов") && role == "ГИП") {
+        if ((step.value == "Принято ГИПом" || step.value == "Подготовка ответов" || step.value == "На доработке") && role == "ГИП") {
             mailButton.removeAttribute("hidden");
             mailButton.addEventListener("click", mailing);
         }
@@ -909,7 +1092,7 @@
         let reviewer_rows = Array();
         if (rows.length > 0) {
             let row = rows[rows.length-1];
-            while (row.cells[8].textContent.trim() == "Замечание снято") {
+            while (row.cells[11].textContent.trim() == "Замечание снято") {
                 closed_rows.push(rows.pop());
                 if (rows.length > 0) {
                     row = rows[rows.length-1];
@@ -917,7 +1100,7 @@
                     break;
                 }
             }
-            while (row.cells[8].textContent.trim() == "Принято ГИПом") {
+            while (row.cells[11].textContent.trim() == "Принято ГИПом") {
                 answered_rows.push(rows.pop());
                 if (rows.length > 0) {
                     row = rows[rows.length-1];
@@ -925,7 +1108,7 @@
                     break;
                 }
             }
-            while (row.cells[8].textContent.trim() == "На согласовании Рецензентом") {
+            while (row.cells[11].textContent.trim() == "На согласовании Рецензентом") {
                 reviewer_rows.push(rows.pop());
                 if (rows.length > 0) {
                     row = rows[rows.length-1];
@@ -958,7 +1141,7 @@
         for (let i=0; i<names.length; i++) {
             newRowAdding = false;
             rem_status = names[i].nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.innerHTML;
-            rem_verse = names[i].previousElementSibling.previousElementSibling.previousElementSibling.innerHTML;
+            rem_verse = names[i].previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.previousElementSibling.innerHTML;
             if (i == 0 && rem_status != "На согласовании Рецензентом" && rem_status != "Принято ГИПом" && rem_status != "Замечание снято") {
                 newRowAdding = true;
             }
@@ -976,7 +1159,7 @@
                 newRow.addEventListener("click", showHidden)
                 const cell1 = newRow.insertCell(0);
                 let cell2 = newRow.insertCell(1);
-                cell2.colSpan = 10;
+                cell2.colSpan = 13;
                 const cell3 = newRow.insertCell(2);
                 cell1.style.border = 0;
                 cell2.style.border = 0;
@@ -1097,18 +1280,20 @@
             "На доработке исполнителем": 3,
             "Подготовка ответов исполнителем": 4
         };
+		console.log(work_rows);
         if (work_rows.length > 1) {
             while (table.rows[2].className == 'reestr') {
+				console.log(table.rows[2]);
                 table.deleteRow(2);
             }
-            k = 2
+            k = 2;
             for (let i=0; i < work_rows.length; i++) {
                 if (role == "Руководитель") {
-                    work_rows[i].sort((a, b) => statusOrderBoss[a.cells[8].innerHTML] - statusOrderBoss[b.cells[8].innerHTML]);
+                    work_rows[i].sort((a, b) => statusOrderBoss[a.cells[11].innerHTML] - statusOrderBoss[b.cells[11].innerHTML]);
                 } else if (role == "Исполнитель") {
-                    work_rows[i].sort((a, b) => statusOrderEmployee[a.cells[8].innerHTML] - statusOrderEmployee[b.cells[8].innerHTML]);
+                    work_rows[i].sort((a, b) => statusOrderEmployee[a.cells[11].innerHTML] - statusOrderEmployee[b.cells[11].innerHTML]);
                 } else {
-                    work_rows[i].sort((a, b) => statusOrderGIP[a.cells[8].innerHTML] - statusOrderGIP[b.cells[8].innerHTML]);
+                    work_rows[i].sort((a, b) => statusOrderGIP[a.cells[11].innerHTML] - statusOrderGIP[b.cells[11].innerHTML]);
                 }
                 const chosenRow = table.rows[k];
                 const chosenRowIdx = chosenRow.rowIndex;
@@ -1117,7 +1302,7 @@
                 newRow.addEventListener("click", showHidden);
                 const cell1 = newRow.insertCell(0);
                 let cell2 = newRow.insertCell(1);
-                cell2.colSpan = 10;
+                cell2.colSpan = 13;
                 const cell3 = newRow.insertCell(2);
                 cell1.style.border = 0;
                 cell2.style.border = 0;
@@ -1147,6 +1332,13 @@
                 }
             }
         }
+        function compareRowsCritical(a, b) {
+            let strA = a.cells[2].textContent.trim();
+            let strB = b.cells[2].textContent.trim();
+            if (strA != strB) {
+                return strA.localeCompare(strB);
+            }
+        }
         function compareRowsVersions(a, b) {
             let strA = a.cells[1].textContent.trim();
             let strB = b.cells[1].textContent.trim();
@@ -1155,8 +1347,8 @@
             }
         }
         function compareRowsRespons(a, b) {
-            let strA = a.cells[4].textContent.trim();
-            let strB = b.cells[4].textContent.trim();
+            let strA = a.cells[7].textContent.trim();
+            let strB = b.cells[7].textContent.trim();
             if (strA != strB) {
                 return strA.localeCompare(strB);
             } else {
@@ -1204,8 +1396,8 @@
             if (strA != strB) {
                 return strA.localeCompare(strB);
             } else {
-                strA = a.cells[4].textContent.trim();
-				strB = b.cells[4].textContent.trim();
+                strA = a.cells[7].textContent.trim();
+				strB = b.cells[7].textContent.trim();
 				return strA.localeCompare(strB);
             }
         }
@@ -1240,7 +1432,7 @@
                 newRow.addEventListener("click", showHidden)
                 const cell1 = newRow.insertCell(0);
                 let cell2 = newRow.insertCell(1);
-                cell2.colSpan = 10;
+                cell2.colSpan = 13;
                 const cell3 = newRow.insertCell(2);
                 cell1.style.border = 0;
                 cell2.style.border = 0;
@@ -1268,7 +1460,7 @@
                             newRow.addEventListener("click", showHidden)
                             const cell1 = newRow.insertCell(0);
                             let cell2 = newRow.insertCell(1);
-                            cell2.colSpan = 10;
+                            cell2.colSpan = 13;
                             const cell3 = newRow.insertCell(2);
                             cell1.style.border = 0;
                             cell2.style.border = 0;
@@ -1296,7 +1488,7 @@
                 newRow.addEventListener("click", showHidden)
                 const cell1 = newRow.insertCell(0);
                 let cell2 = newRow.insertCell(1);
-                cell2.colSpan = 10;
+                cell2.colSpan = 13;
                 const cell3 = newRow.insertCell(2);
                 cell1.style.border = 0;
                 cell2.style.border = 0;
@@ -1318,7 +1510,7 @@
                 newRow.addEventListener("click", showHidden)
                 const cell1 = newRow.insertCell(0);
                 let cell2 = newRow.insertCell(1);
-                cell2.colSpan = 10;
+                cell2.colSpan = 13;
                 const cell3 = newRow.insertCell(2);
                 cell1.style.border = 0;
                 cell2.style.border = 0;
@@ -1340,7 +1532,7 @@
                 newRow.addEventListener("click", showHidden)
                 const cell1 = newRow.insertCell(0);
                 let cell2 = newRow.insertCell(1);
-                cell2.colSpan = 10;
+                cell2.colSpan = 13;
                 const cell3 = newRow.insertCell(2);
                 cell1.style.border = 0;
                 cell2.style.border = 0;
@@ -1510,19 +1702,19 @@
                 this.value = "0";
             }
         }
-        function sortByVersion(e) {
+        function sortByCritical(e) {
             if (this.value == "0") {
                 for (let i=0; i < work_rows.length; i++) {
-                    work_rows[i] = work_rows[i].sort(compareRowsVersions);
+                    work_rows[i] = work_rows[i].sort(compareRowsCritical).reverse();
                 }
-                sorting(work_rows, reviewer_rows.sort(compareRowsVersions), answered_rows.sort(compareRowsVersions), closed_rows.sort(compareRowsVersions));
+                sorting(work_rows, reviewer_rows.sort(compareRowsCritical).reverse(), answered_rows.sort(compareRowsCritical).reverse(), closed_rows.sort(compareRowsCritical).reverse());
                 this.innerHTML = "&#9660;";
                 this.value = "1";
             } else if (this.value == "1") {
             for (let i=0; i < work_rows.length; i++) {
-                    work_rows[i] = work_rows[i].sort(compareRowsVersions).reverse();
+                    work_rows[i] = work_rows[i].sort(compareRowsCritical);
                 }
-                sorting(work_rows, reviewer_rows.sort(compareRowsVersions).reverse(), answered_rows.sort(compareRowsVersions).reverse(), closed_rows.sort(compareRowsVersions).reverse());
+                sorting(work_rows, reviewer_rows.sort(compareRowsCritical), answered_rows.sort(compareRowsCritical), closed_rows.sort(compareRowsCritical));
                 this.innerHTML = "&#9650;";
                 this.value = "2";
             } else {
@@ -1548,7 +1740,7 @@
         }
         document.getElementById("sort_resp").addEventListener("click", sortByResp);
         document.getElementById("sort_number").addEventListener("click", sortByNumber);
-        document.getElementById("sort_version").addEventListener("click", sortByVersion);
+        document.getElementById("sort_critical").addEventListener("click", sortByCritical);
         buf_inner = document.getElementById("sort_resp").innerHTML;
     </script>
 </body>

@@ -15,9 +15,10 @@ from django.contrib import messages
 from django.http import FileResponse, JsonResponse
 import json
 from django.contrib.auth.models import User
-from datetime import date, timedelta, datetime
+from datetime import date, timedelta, datetime, time
 import numpy as np
 import matplotlib.pyplot as plt
+from collections import defaultdict
 from io import StringIO
 
 emptyUserID = User.objects.filter(last_name="1. Сотрудник больше не работает")[0].id
@@ -944,6 +945,48 @@ def dynamic(request, id):
     else:
         return render(request, 'log_error.html', {'text': "Пожалуйста, авторизируйтесь."})
 
+def chronicle(request, id):
+    d1 = date.min
+    d2 = date.min
+    d3 = date.min
+    reest = reestInfo.objects.get(id=id)
+    remarks = reestr.objects.filter(reestrID=id).order_by('num_remark', 'remark_v')
+    remarks_id = [i.id for i in remarks]
+    print(remarks_id)
+    reestr_logs = ChangeLog.objects.filter((Q(model="Реестры") & Q(object_id=id))).order_by('changed')
+    chronicle_table = []
+    #формирование
+    reest_forming = ChangeLog.objects.filter((Q(model="Реестры") & Q(object_id=id) & Q(action_on_model="создал(а)"))).order_by('changed')
+    print(reest_forming)
+    if len(reest_forming) > 0:
+        d1 = reest_forming[0].changed.date()
+        t1 = timezone.make_aware(datetime.combine(d1, time.min))
+    reest_filling = ChangeLog.objects.filter((Q(model="Реестры") & Q(object_id=id) & Q(data__Статус="На заполнении"))).order_by('changed')
+    print(reest_filling)
+    if len(reest_filling) > 0 and len(reest_forming) > 0:
+        d2 = reest_filling[0].changed.date()
+        t2 = timezone.make_aware(datetime.combine(d2, time.min))
+        if d1 != date.min: #НЕ НАХОДЯТСЯ ПОЧЕМУ???
+            remarks_forming = ChangeLog.objects.filter((Q(model="Замечания") & Q(object_id__in=remarks_id) & Q(action_on_model="создал(а)") & Q(changed__gte=t1) & Q(changed__lte=t2))).order_by('changed')
+            print(remarks_forming)
+            if d1 <= d2 and d2 != date.min:
+                chronicle_table.append(['Формирование', d1, d2, (workDelay(d1, d2) if d1<d2 else 1), len(remarks_forming)])
+        #заполнение плана
+        # remarks_gip_approving = ChangeLog.objects.filter((Q(model="Замечания") & Q(object_id__in=remarks_id) & Q(data__Статус="На согласовании ГИПом") & Q(changed__lt=t3) & Q(changed__gte=t2))).order_by('changed')
+        #     if d2 <= d3 and d2 != date.min and d3 != date.min:
+        #         grouped_filling = defaultdict(list)
+        #         for obj in remarks_gip_approving:
+        #             grouped_filling[obj.changed.date()].append(obj)
+        #         for day, items in grouped_filling.items():
+        #             chronicle_table.append(['Заполнение плана', d2, day, (workDelay(d2, day) if d2 < day else 1), len(items)])
+        #     #Согласование плана
+        #     remarks_gip_approved = ChangeLog.objects.filter((Q(model="Замечания") & Q(object_id__in=remarks_id) & Q(data__Статус="Согласовано ГИПом"))).order_by('changed')
+        #     grouped_approved = defaultdict(list)
+        #     for obj in remarks_gip_approved:
+        #         grouped_approved[obj.changed.date()].append(obj)
+        #     for day, items in grouped_approved.items():
+        #         chronicle_table.append(['Согласование плана', d2, d3, (workDelay(d2, d3) if d2 < d3 else 1), len(items)])
+    print(chronicle_table)
 def spec_length(string_num):
     l = 0
     for i in string_num:
@@ -972,6 +1015,7 @@ def homeGIP(request, id):
         subs = []
     subcontracts = User.objects.filter(groups__name='Субподрядчик')
     fact = ['', '', '', '', '', '']
+    duration = [0, 0, 0, 0]
     start_date = reestInfo.objects.get(id=id).start_date
     plan = [start_date, workDays(start_date, 2), workDays(start_date, 4), workDays(start_date, 9)]
     if reestInfo.objects.get(id=id).status == "Закрыт":
@@ -988,12 +1032,27 @@ def homeGIP(request, id):
         try:
             if i.data["Статус"] == "На заполнении":
                 fact[0] = i.changed.date()
+                if plan[0] <= fact[0]:
+                    duration[0] = workDelay(plan[0], fact[0])+1
             if i.data["old_Статус"] == "На заполнении":
                 fact[1] = i.changed.date()
-            if i.data["Статус"] == "Согласовано ГИПом":
+                if fact[0] < fact[1]:
+                    duration[1] = workDelay(fact[0], fact[1])
+                elif fact[0] == fact[1]:
+                    duration[1] = 1
+            # if i.data["Статус"] == "Согласовано ГИПом" or i.data["old_Статус"] == "Подготовка ответов":
+            if i.data["old_Статус"] == "Согласовано ГИПом" or i.data["Статус"] == "Подготовка ответов":
                 fact[2] = i.changed.date()
+                if fact[1] < fact[2]:
+                    duration[2] = workDelay(fact[1], fact[2])
+                elif fact[1] == fact[2]:
+                    duration[2] = 1
             if i.data["Статус"] == "На согласовании Рецензентом":
                 fact[3] = i.changed.date()
+                if fact[2] < fact[3]:
+                    duration[3] = workDelay(fact[2], fact[3])
+                elif fact[2] == fact[3]:
+                    duration[3] = 1
             if i.data["Статус"] == "Закрыт" and fact[4] == '':
                 fact[4] = i.changed.date()
         except Exception:
@@ -1092,6 +1151,12 @@ def homeGIP(request, id):
                 file_path = MEDIA_ROOT + "\\Tables" + name
                 response = FileResponse(open(file_path, 'rb'), as_attachment=True)
                 return response
+            elif request.POST.get('timelineData'):
+                chronicle(request, id)
+                # name = xlslxCreate(request, actual=False)
+                # file_path = MEDIA_ROOT + "\\Tables" + name
+                # response = FileResponse(open(file_path, 'rb'), as_attachment=True)
+                #return response
             else:
                 name = xlslxCreate(request)
                 file_path = MEDIA_ROOT + "\\Tables" + name
@@ -1283,7 +1348,8 @@ def homeGIP(request, id):
                         'max_remark_point_num': max_remark_point_num,
                         'subcontracts': subcontracts,
                         'fact': fact,
-                        'plan': plan})
+                        'plan': plan,
+                        'duration': duration})
                 mails = []
                 if request.POST.get("status") == "Формирование":
                     reest.status = "На заполнении"
@@ -1359,7 +1425,8 @@ def homeGIP(request, id):
                         'max_remark_point_num': max_remark_point_num,
                         'subcontracts': subcontracts,
                         'fact': fact,
-                        'plan': plan})
+                        'plan': plan,
+                        'duration': duration})
     elif request.user.groups.filter(name='Руководитель').exists():
         group = "Руководитель"
         remark_boss_priority_order = Case(
@@ -1512,7 +1579,8 @@ def homeGIP(request, id):
                                             'max_remark_point_num': max_remark_point_num,
                                             'subcontracts': subcontracts,
                                             'fact': fact,
-                                            'plan': plan})
+                                            'plan': plan,
+                                            'duration': duration})
 
 
 def fileManage(request, id):
@@ -2111,9 +2179,14 @@ def employee(request, id):
                 answer_deadline = form.cleaned_data.get('answer_deadline_correct_plan')
                 root_cause_comment = form.cleaned_data.get('root_cause_comment')
                 importance1 = form.cleaned_data.get('importance1')
+                imp1_comment_znp = form.cleaned_data.get('imp1_comment_znp')
+                imp1_comment_nd = form.cleaned_data.get('imp1_comment_nd')
                 importance2 = form.cleaned_data.get('importance2')
                 importance3 = form.cleaned_data.get('importance3')
                 imp3_comment = form.cleaned_data.get('imp3_comment')
+                imp3_dep = form.cleaned_data.get('imp3_dep')
+                # if imp3_dep != '[]':
+                #     imp3_dep = ','.join(imp3_dep)
                 importance4 = form.cleaned_data.get('importance4')
                 imp4_comment = form.cleaned_data.get('imp4_comment')
                 importance5 = form.cleaned_data.get('importance5')
@@ -2124,9 +2197,15 @@ def employee(request, id):
                 rcc_list = ['1.3.1.', '1.3.2.', '2.2.1.', '3.1.1.', '3.1.2.', '3.1.5.', '3.1.6.', '3.2.1.',
                             '3.2.3.', '3.3.1.', '4.1.1.', '4.1.2.', '4.2.1.', '4.2.2.', '4.3.1.', '4.4.1.',
                             '4.5.1.', '4.5.2.', '4.6.1.', '5.3.1.', '5.3.2.']
+                if importance1 and ((imp1_comment_znp is None or imp1_comment_znp == "") and (imp1_comment_nd is None or imp1_comment_nd == "")):
+                    importance_test = False
+                    form.add_error('importance1', 'Заполните хотя бы одно поле')
                 if importance3 and (imp3_comment is None or imp3_comment == ""):
                     importance_test = False
                     form.add_error('imp3_comment', 'Пожалуйста, внесите данные')
+                if importance3 and (imp3_dep is None or imp3_dep == ""):
+                    importance_test = False
+                    form.add_error('imp3_dep', 'Пожалуйста, внесите данные')
                 if importance4 and (imp4_comment is None or imp4_comment == ""):
                     importance_test = False
                     form.add_error('imp4_comment', 'Пожалуйста, внесите данные')
@@ -2156,7 +2235,10 @@ def employee(request, id):
                         db_form.importance5 = importance5
                         db_form.importance6 = importance6
                         db_form.importance7 = importance7
+                        db_form.imp1_comment_znp = imp1_comment_znp
+                        db_form.imp1_comment_nd = imp1_comment_nd
                         db_form.imp3_comment = imp3_comment
+                        db_form.imp3_dep = imp3_dep
                         db_form.imp4_comment = imp4_comment
                         db_form.imp7_comment = imp7_comment
                         if importance1:
@@ -2187,7 +2269,7 @@ def employee(request, id):
                                                     'root_cause_comment', 'root_cause_text', 'status', 'deadline',
                                                     'importance1', 'importance2', 'importance3',
                                                     'importance4', 'importance5', 'importance6',
-                                                    'importance7', 'imp3_comment', 'imp4_comment', 'imp7_comment'])
+                                                    'importance7', 'imp3_comment', 'imp4_comment', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep'])
                         form.save_files(reestr=reest,
                                         name=form.cleaned_data.get('cause_file_name'),
                                         comment=form.cleaned_data.get('cause_file_comment'),
@@ -2312,6 +2394,8 @@ def boss2(request, id):
                 executor_fail_name = form.cleaned_data.get('executor_fail_name')
                 executor_fail_text = form.cleaned_data.get('executor_fail_text')
                 importance1 = form.cleaned_data.get('importance1')
+                imp1_comment_znp = form.cleaned_data.get('imp1_comment_znp')
+                imp1_comment_nd = form.cleaned_data.get('imp1_comment_nd')
                 importance2 = form.cleaned_data.get('importance2')
                 importance3 = form.cleaned_data.get('importance3')
                 imp3_comment = form.cleaned_data.get('imp3_comment')
@@ -2325,6 +2409,9 @@ def boss2(request, id):
                 rcc_list = ['1.3.1.', '1.3.2.', '2.2.1.', '3.1.1.', '3.1.2.', '3.1.5.', '3.1.6.', '3.2.1.',
                             '3.2.3.', '3.3.1.', '4.1.1.', '4.1.2.', '4.2.1.', '4.2.2.', '4.3.1.', '4.4.1.',
                             '4.5.1.', '4.5.2.', '4.6.1.', '5.3.1.', '5.3.2.']
+                if importance1 and ((imp1_comment_znp is None or imp1_comment_znp == "") and (imp1_comment_nd is None or imp1_comment_nd == "")):
+                    importance_test = False
+                    form.add_error('importance1', 'Заполните хотя бы одно поле')
                 if importance3 and (imp3_comment is None or imp3_comment == ""):
                     importance_test = False
                     form.add_error('imp3_comment', 'Пожалуйста, внесите данные')
@@ -2380,6 +2467,8 @@ def boss2(request, id):
                         db_form.importance5 = importance5
                         db_form.importance6 = importance6
                         db_form.importance7 = importance7
+                        db_form.imp1_comment_znp = imp1_comment_znp
+                        db_form.imp1_comment_nd = imp1_comment_nd
                         db_form.imp3_comment = imp3_comment
                         db_form.imp4_comment = imp4_comment
                         db_form.imp7_comment = imp7_comment
@@ -2464,6 +2553,7 @@ def boss2(request, id):
                                                                   endDate.month) +
                                                                           ('-' if endDate.day > 9 else '-0') + str(
                                                                   endDate.day),
+                                                              'comment_buf': db_form.comment
                                                               })
                     except Exception:
                         messages.error(request, "Возникла ошибка")
@@ -2496,6 +2586,7 @@ def boss2(request, id):
                                                           '-' if endDate.month > 9 else '-0') + str(
                                                           endDate.month) + ('-' if endDate.day > 9 else '-0') + str(
                                                           endDate.day),
+                                                      'comment_buf': db_form.comment
                                                       })
         else:
             form = BossForm2(reestr.objects.get(id=id))
@@ -2520,6 +2611,7 @@ def boss2(request, id):
                                                   '-' if endDate.month > 9 else '-0') + str(
                                                   endDate.month) + ('-' if endDate.day > 9 else '-0') + str(
                                                   endDate.day),
+                                              'comment_buf': db_form.comment
                                               })
     else:
         return render(request, 'log_error.html',
@@ -2538,6 +2630,8 @@ def gip2(request, id):
                 root_cause_text = form.cleaned_data.get('root_cause_text')
                 root_cause_comment = form.cleaned_data.get('root_cause_comment')
                 importance1 = form.cleaned_data.get('importance1')
+                imp1_comment_znp = form.cleaned_data.get('imp1_comment_znp')
+                imp1_comment_nd = form.cleaned_data.get('imp1_comment_nd')
                 importance2 = form.cleaned_data.get('importance2')
                 importance3 = form.cleaned_data.get('importance3')
                 imp3_comment = form.cleaned_data.get('imp3_comment')
@@ -2553,6 +2647,9 @@ def gip2(request, id):
                             '4.5.1.', '4.5.2.', '4.6.1.', '5.3.1.', '5.3.2.']
                 executor_fail_name = form.cleaned_data.get('executor_fail_name')
                 executor_fail_text = form.cleaned_data.get('executor_fail_text')
+                if importance1 and ((imp1_comment_znp is None or imp1_comment_znp == "") and (imp1_comment_nd is None or imp1_comment_nd == "")):
+                    importance_test = False
+                    form.add_error('importance1', 'Заполните хотя бы одно поле')
                 if importance3 and (imp3_comment is None or imp3_comment == ""):
                     importance_test = False
                     form.add_error('imp3_comment', 'Пожалуйста, внесите данные')
@@ -2622,6 +2719,8 @@ def gip2(request, id):
                         db_form.importance5 = importance5
                         db_form.importance6 = importance6
                         db_form.importance7 = importance7
+                        db_form.imp1_comment_znp = imp1_comment_znp
+                        db_form.imp1_comment_nd = imp1_comment_nd
                         db_form.imp3_comment = imp3_comment
                         db_form.imp4_comment = imp4_comment
                         db_form.imp7_comment = imp7_comment
@@ -2740,7 +2839,20 @@ def gip2(request, id):
                                                                  db_form.responsibleTrouble_name.last_name + ' ' +
                                                                  db_form.responsibleTrouble_name.first_name,
                                                              'reestrID': reest.id,
+                                                             'customer': db_form.customer.name,
+                                                             'contract_number': db_form.project_dogovor.number,
+                                                             'reviewer': db_form.project_reviewer.name,
                                                              'emptyUserID': emptyUserID,
+                                                             'start_date': str(reest.start_date.year) + (
+                                                                 '-' if reest.start_date.month > 9 else '-0') + str(
+                                                                 reest.start_date.month) + (
+                                                                               '-' if reest.start_date.day > 9 else '-0') + str(
+                                                                 reest.start_date.day),
+                                                             'end_date': str(endDate.year) + (
+                                                                 '-' if endDate.month > 9 else '-0') + str(
+                                                                 endDate.month) + ('-' if endDate.day > 9 else '-0') + str(
+                                                                 endDate.day),
+                                                             'comment_buf': db_form.comment
                                                              })
                     except Exception as e:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -2774,6 +2886,7 @@ def gip2(request, id):
                                                          '-' if endDate.month > 9 else '-0') + str(
                                                          endDate.month) + ('-' if endDate.day > 9 else '-0') + str(
                                                          endDate.day),
+                                                     'comment_buf': db_form.comment
                                                      })
         else:
             form = GIPform2(reestr.objects.get(id=id))
@@ -2798,6 +2911,7 @@ def gip2(request, id):
                                                  '-' if endDate.month > 9 else '-0') + str(
                                                  endDate.month) + ('-' if endDate.day > 9 else '-0') + str(
                                                  endDate.day),
+                                             'comment_buf': db_form.comment
                                              })
     else:
         return render(request, 'log_error.html', {
@@ -2823,7 +2937,12 @@ def answer(request, id):
                 db_form.answer_deadline_correct_fact = form.cleaned_data.get('answer_deadline_correct_fact')
                 db_form.labor_costs_fact = form.cleaned_data.get('labor_costs_fact')
                 db_form.answer_remark = form.cleaned_data.get('answer_remark')
-                db_form.link_tech_name = form.cleaned_data.get('link_tech_name')
+                link_tech_name = form.cleaned_data.get('link_tech_name')
+                if link_tech_name == 'Изменения вносились':
+                    link_tech_name = request.POST.get('custom_link')
+                if link_tech_name == 'XML файл(ы)':
+                    link_tech_name = 'Изменения вносились в XML файл(ы) ' + request.POST.get('xml_link')
+                db_form.link_tech_name = link_tech_name
                 if db_form.comment != form.cleaned_data.get('comment') and form.cleaned_data.get('comment') != "":
                     d = datetime.now()
                     db_form.comment = form.cleaned_data.get('comment') + " (" + str(d.hour) + ':' + str(
@@ -2942,7 +3061,11 @@ def answer(request, id):
                                                            db_form.executor_name.last_name + ' ' +
                                                            db_form.executor_name.first_name if db_form.executor_name else '',
                                                        'group': group,
-                                                       'reestrID': db_form.reestrID.id})
+                                                       'reestrID': db_form.reestrID.id,
+                                                       'custom_link_value': db_form.link_tech_name if db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
+                                                       'xml_link_value': db_form.link_tech_name[
+                                                                         34:] if 'XML файл(ы)' in db_form.link_tech_name else ''
+                                                       })
         else:
             form = AnswerForm(reestr.objects.get(id=id))
         return render(request, 'answer.html', {'form': form,
@@ -2962,7 +3085,11 @@ def answer(request, id):
                                                'customer': db_form.customer.name,
                                                'contract_number': db_form.project_dogovor.number,
                                                'reviewer': db_form.project_reviewer.name,
-                                               'reestrID': db_form.reestrID.id})
+                                               'reestrID': db_form.reestrID.id,
+                                               'custom_link_value': db_form.link_tech_name if db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
+                                               'xml_link_value': db_form.link_tech_name[
+                                                                 34:] if 'XML файл(ы)' in db_form.link_tech_name else ''
+                                               })
     else:
         return render(request, 'log_error.html', {
             'text': "Пожалуйста, авторизируйтесь в качестве ГИПа, руководителя или администратора, чтобы увидеть эту страницу."})
@@ -2994,6 +3121,10 @@ def final(request, id):
                     labor_costs_fact = form.cleaned_data.get('labor_costs_fact')
                     answer_remark = form.cleaned_data.get('answer_remark')
                     link_tech_name = form.cleaned_data.get('link_tech_name')
+                    if link_tech_name == 'Изменения вносились':
+                        link_tech_name = request.POST.get('custom_link')
+                    if link_tech_name == 'XML файл(ы)':
+                        link_tech_name = 'Изменения вносились в XML файл(ы)' + request.POST.get('xml_link')
                     answer_date = form.cleaned_data.get('answer_date_fact')
                     answer_deadline = form.cleaned_data.get('answer_deadline_correct_fact')
                     comment = form.cleaned_data.get('comment')
@@ -3075,6 +3206,10 @@ def final(request, id):
                     labor_costs_fact = form.cleaned_data.get('labor_costs_fact')
                     answer_remark = form.cleaned_data.get('answer_remark')
                     link_tech_name = form.cleaned_data.get('link_tech_name')
+                    if link_tech_name == 'Изменения вносились':
+                        link_tech_name = request.POST.get('custom_link')
+                    if link_tech_name == 'XML файл(ы)':
+                        link_tech_name = 'Изменения вносились в XML файл(ы)' + request.POST.get('xml_link')
                     answer_date = form.cleaned_data.get('answer_date_fact')
                     answer_deadline = form.cleaned_data.get('answer_deadline_correct_fact')
                     root_cause_list = form.cleaned_data.get('root_cause_list')
@@ -3103,6 +3238,10 @@ def final(request, id):
                         labor_costs_fact = form.cleaned_data.get('labor_costs_fact')
                         answer_remark = form.cleaned_data.get('answer_remark')
                         link_tech_name = form.cleaned_data.get('link_tech_name')
+                        if link_tech_name == 'Изменения вносились':
+                            link_tech_name = request.POST.get('custom_link')
+                        if link_tech_name == 'XML файл(ы)':
+                            link_tech_name = 'Изменения вносились в XML файл(ы) ' + request.POST.get('xml_link')
                         answer_date = form.cleaned_data.get('answer_date_fact')
                         answer_deadline = form.cleaned_data.get('answer_deadline_correct_fact')
                         comment = form.cleaned_data.get('comment')
@@ -3166,7 +3305,9 @@ def final(request, id):
                                               'contract_number': db_form.project_dogovor.number,
                                               'reviewer': db_form.project_reviewer.name,
                                               'role': role,
-                                              'next_step_key': next_step_key})
+                                              'next_step_key': next_step_key,
+                                              'custom_link_value': db_form.link_tech_name if db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
+                                              'xml_link_value': db_form.link_tech_name[34:] if 'XML файл(ы)' in db_form.link_tech_name else ''})
     else:
         return render(request, 'log_error.html', {'text': "Пожалуйста, авторизируйтесь, чтобы увидеть эту страницу."})
 
@@ -3571,7 +3712,13 @@ def aiGIP(request, sessionKey):
                     'error': 'server',
                     'details': str(e)
                 }, status=500)
-        return render(request, 'AI_GIP.html', {'current_time': realtime, 'sessionKey': sessionKey, 'chat_messages': chat_messages})
+        try:
+            queryReest = aiChatSession.objects.get(session_key=sessionKey).context["запрошенный реестр"]
+        except Exception as e:
+            queryReest = ""
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            print("Ошибка ", e, exc_tb.tb_lineno)
+        return render(request, 'AI_GIP.html', {'current_time': realtime, 'sessionKey': sessionKey, 'chat_messages': chat_messages, 'queryReest': queryReest})
     else:
         return render(request, 'log_error.html',
                       {

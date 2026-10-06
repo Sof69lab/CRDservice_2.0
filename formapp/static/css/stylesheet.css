@@ -165,6 +165,49 @@ summary {
     padding: 10px;
     cursor: pointer;
 }
+.AI-tracks {
+    display:flex;
+    align-items: center;
+    list-style: none;
+    background-color: var(--white);
+    color: var(--grey);
+    border-radius: 5px;
+    cursor: pointer;
+}
+.AI-tracks:hover {
+    color: #55abe5;
+}
+.AI-tracks::-webkit-details-marker {
+    display: none;
+}
+.AI-tracks::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url('../plusAI.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 10px;
+    transition: transform 0.2s;
+}
+.AI-tracks:hover::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-image: url('../plusAI_hover.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin-right: 10px;
+    transition: transform 0.2s;
+}
+details[open] > .AI-tracks::before {
+    background-image: url('../minusAI.png');
+}
+details[open] > .AI-tracks:hover::before {
+    background-image: url('../minusAI_hover.png');
+}
 .form-textinput:valid ~ summary{
     background-color: var(--green);
 }
@@ -226,6 +269,11 @@ summary {
     width:100%;
     border: outset var(--green);
     border-radius: 5px
+}
+.form-textinput:disabled {
+    width:100%;
+    border: outset var(--grey);
+    border-radius: 5px;
 }
 .form-dateinput:invalid {
     border: outset var(--red);
