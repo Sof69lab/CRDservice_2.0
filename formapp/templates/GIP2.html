@@ -265,17 +265,155 @@
                                     <td>Корректировка документации (свой раздел, глава, том, книга, др. док.)</td>
                                     <td>{{ form.importance2 }}</td>
                                 </tr>
-                                <tr id="imp3" hidden>
+                                 <tr id="imp3" hidden>
                                     <td>Корректировка смежных разделов (глав, томов, др. док.)</td>
                                     <td>{{ form.importance3 }}</td>
                                 </tr>
                                 <tr class="imp3" hidden>
                                     <td colspan="2">{% get_verbose_field_name "imp3_comment" %}</td>
-                                </tr>
+                                </tr><br>
                                 <tr class="imp3" hidden>
                                     <td colspan="2">{{ form.imp3_comment }}
                                         {% if form.imp3_comment.errors %}
                                             {% for error in form.imp3_comment.errors %}
+                                                <li class="alert danger"> {{error}} </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr class="imp3" hidden>
+                                    <td colspan="2"></td>
+                                    <td hidden>{{ form.imp3_dep }}</td>
+                                </tr>
+                                <tr class="imp3" hidden>
+                                    <td colspan="2">
+                                        <fieldset>
+                                            <legend>{% get_verbose_field_name "imp3_dep" %}</legend>
+                                            Проектный блок
+                                            <br/>
+                                            <div>
+                                                <input type="checkbox" id="d1" class="imp3_dep"/>
+                                                <label for="d1">Гидротехнический отдел (ГТО)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d2" class="imp3_dep"/>
+                                                <label for="d2">Горный отдел (ГО)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d3" class="imp3_dep"/>
+                                                <label for="d3">Общестроительный отдел (ОСО)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d4" class="imp3_dep"/>
+                                                <label for="d4">Отдел генплана и транспорта (ОГиТ)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d5" class="imp3_dep"/>
+                                                <label for="d5">Отдел комплектации и выпуска документации (ОКиВД)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d6" class="imp3_dep"/>
+                                                <label for="d6">Отдел связи, сигнализации и спецразделов (ОССС)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d7" class="imp3_dep"/>
+                                                <label for="d7">Отдел тепловодоснабжения (ОТВС)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d8" class="imp3_dep"/>
+                                                <label for="d8">Отдел экологии и радиационной безопасности (ОЭиРБ)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d9" class="imp3_dep"/>
+                                                <label for="d9">Отдел экономического анализа (ОЭА)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d10" class="imp3_dep"/>
+                                                <label for="d10">Производственный отдел (ПО)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d11" class="imp3_dep"/>
+                                                <label for="d11">Сметный отдел (СО)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d12" class="imp3_dep"/>
+                                                <label for="d12">Технологический отдел (ТХО)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d13" class="imp3_dep"/>
+                                                <label for="d13">Электротехнический отдел (ЭО)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d14" class="imp3_dep"/>
+                                                <label for="d14">Отдел главных инженеров проекта (ОГИП)</label>
+                                            </div>
+                                            Блок инженерных изысканий
+                                            <br/>
+                                            <div>
+                                                <input type="checkbox" id="d15" class="imp3_dep"/>
+                                                <label for="d15">Группа инженерно-геодезических изысканий (Гр. ИГДИ)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d16" class="imp3_dep"/>
+                                                <label for="d16">Группа инженерно-геологических изысканий (Гр. ИГИ)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d17" class="imp3_dep"/>
+                                                <label for="d17">Группа инженерно-геофизических исследований (Гр. ИГФИ)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d18" class="imp3_dep"/>
+                                                <label for="d18">Группа инженерно-гидрометеорологических изысканий (Гр. ИГМИ)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d19" class="imp3_dep"/>
+                                                <label for="d19">Группа инженерно-экологических изысканий (Гр. ИЭИ)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d20" class="imp3_dep"/>
+                                                <label for="d20">Химико-грунтоведческая лаборатория (ХГЛ)</label>
+                                            </div>
+                                            Управление по научной и инновационной деятельности
+                                            <br/>
+                                            <div>
+                                                <input type="checkbox" id="d21" class="imp3_dep"/>
+                                                <label for="d21">Аналитическая группа (АГ)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d22" class="imp3_dep"/>
+                                                <label for="d22">Научно-исследовательская лаборатория радиационной безопасности (НИЛ-11)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d23" class="imp3_dep"/>
+                                                <label for="d23">Научно-исследовательский отдел горных работ (НИО-28)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d24" class="imp3_dep"/>
+                                                <label for="d24">Химико-аналитическая лаборатория (ХАЛ)</label>
+                                            </div>
+                                            Дирекция по развитию
+                                            <br/>
+                                            <div>
+                                                <input type="checkbox" id="d25" class="imp3_dep"/>
+                                                <label for="d25">Научно-исследовательская лаборатория технологии выщелачивания (НИЛ-35)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d26" class="imp3_dep"/>
+                                                <label for="d26">Научно-исследовательский отдел гидрогеологического моделирования и глубинного захоронения жидких отходов (НИЛ-5)</label>
+                                            </div>
+                                            <div>
+                                                <input type="checkbox" id="d27" class="imp3_dep"/>
+                                                <label for="d27">Научно-исследовательский отдел комплексной переработки сырья (НИО-32)</label>
+                                            </div>
+                                            Прочее
+                                            <br/>
+                                            <div>
+                                                <input type="checkbox" id="d28" class="imp3_dep"/>
+                                                <label for="d28">Субподряд</label>
+                                            </div>
+                                        </fieldset>
+                                        {% if form.imp3_dep.errors %}
+                                            {% for error in form.imp3_dep.errors %}
                                                 <li class="alert danger"> {{error}} </li>
                                             {% endfor %}
                                         {% endif %}
@@ -286,16 +424,179 @@
                                     <td>{{ form.importance4 }}</td>
                                 </tr>
                                 <tr class="imp4" hidden>
-                                    <td colspan="2">{% get_verbose_field_name "imp4_comment" %}</td>
-                                </tr>
-                                <tr class="imp4" hidden>
-                                    <td colspan="2">{{ form.imp4_comment }}
+                                    <td>
+                                        <table>
+                                            <tr>
+                                                <td><b>Укажите подразделение</b></td>
+                                                <td><b>Выдать задание</b></td>
+                                                <td><b>Получить исходные данные</b></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3"><b>Проектный блок</b></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Гидротехнический отдел (ГТО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Горный отдел (ГО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Общестроительный отдел (ОСО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел генплана и транспорта (ОГиТ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4" hidden>
+                                                <td>Отдел комплектации и выпуска документации (ОКиВД)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел связи, сигнализации и спецразделов (ОССС)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел тепловодоснабжения (ОТВС)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел экологии и радиационной безопасности (ОЭиРБ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел экономического анализа (ОЭА)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Производственный отдел (ПО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Сметный отдел (СО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Технологический отдел (ТХО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Электротехнический отдел (ЭО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел главных инженеров проекта (ОГИП)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3"><b>Блок инженерных изысканий</b></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Группа инженерно-геодезических изысканий (Гр. ИГДИ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Группа инженерно-геологических изысканий (Гр. ИГИ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Группа инженерно-геофизических исследований (Гр. ИГФИ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Группа инженерно-гидрометеорологических изысканий (Гр. ИГМИ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Группа инженерно-экологических изысканий (Гр. ИЭИ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Химико-грунтоведческая лаборатория (ХГЛ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3"><b>Управление по научной и инновационной деятельности</b></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Аналитическая группа (АГ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Научно-исследовательская лаборатория радиационной безопасности (НИЛ-11)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Научно-исследовательский отдел горных работ (НИО-28)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Химико-аналитическая лаборатория (ХАЛ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3"><b>Дирекция по развитию</b></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Научно-исследовательская лаборатория технологии выщелачивания (НИЛ-35)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Научно-исследовательский отдел гидрогеологического моделирования и глубинного захоронения жидких отходов (НИЛ-5)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Научно-исследовательский отдел комплексной переработки сырья (НИО-32)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3"><b>Прочее</b></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Субподряд</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                        </table>
                                         {% if form.imp4_comment.errors %}
                                             {% for error in form.imp4_comment.errors %}
                                                 <li class="alert danger"> {{error}} </li>
                                             {% endfor %}
                                         {% endif %}
                                     </td>
+                                </tr>
+                                <tr class="imp4" hidden>
+                                    <td colspan="2">{{ form.imp4_comment_in }}</td>
+                                    <td colspan="2">{{ form.imp4_comment }}</td>
                                 </tr>
                                 <tr id="imp5" hidden>
                                     <td>Корректировка принятых проектных решений</td>
@@ -721,8 +1022,132 @@
         let imp7 = document.getElementById("imp7");
         let imps1 = document.getElementsByClassName("imp1");
         let imps3 = document.getElementsByClassName("imp3");
+        let imp3_dep = document.getElementsByClassName("imp3_dep");
+        const depArray = ["ГТО", "ГО", "ОСО", "ОГиТ", "ОКиВД", "ОССС", "ОТВС", "ОЭиРБ", "ОЭА", "ПО", "СО", "ТХО", "ЭО", "ОГИП", "Гр. ИГДИ", "Гр. ИГИ", "Гр. ИГФИ", "Гр. ИГМИ", "Гр. ИЭИ", "ХГЛ", "АГ", "НИЛ-11", "НИО-28", "ХАЛ", "НИЛ-35", "НИЛ-5", "НИО-32", "Субподряд"];
         let imps4 = document.getElementsByClassName("imp4");
+        let imp4_in = document.getElementsByClassName("imp4_in");
+        let imp4_out = document.getElementsByClassName("imp4_out");
         let imps7 = document.getElementsByClassName("imp7");
+        let imp3_dep_text = document.getElementById("id_imp3_dep");
+        function imp3DepChanging(e) {
+            let eInd = Array.from(imp3_dep).indexOf(e.target);
+            if (this.checked) {
+                let bufS = imp3_dep_text.value;
+                if (bufS != "") {
+                    bufS += ", ";
+                }
+                imp3_dep_text.value = bufS + depArray[eInd];
+            } else {
+                let strInd = -1;
+                if (depArray[eInd] == "СО") {
+                    strInd = imp3_dep_text.value.search(re);
+                } else {
+                    strInd = imp3_dep_text.value.indexOf(depArray[eInd]);
+                }
+                let bufS = imp3_dep_text.value.slice(0, strInd) + imp3_dep_text.value.slice(strInd+depArray[eInd].length+2, imp3_dep_text.value.length);
+                if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
+                    bufS = bufS.slice(0, bufS.length-2);
+                }
+                imp3_dep_text.value = bufS;
+            }
+            addToComment();
+        }
+        for (const chb of imp3_dep) {
+            chb.addEventListener('change', imp3DepChanging);
+            let eInd = Array.from(imp3_dep).indexOf(chb);
+            if (eInd < depArray.length) {
+                let including = imp3_dep_text.value.indexOf(depArray[eInd])
+                if (including !== -1) {
+                    if (depArray[eInd] == "СО" && including != 0 && imp3_dep_text.value.slice(including-1, including) == "О") {
+                        chb.checked = false;
+                    } else {
+                        chb.checked = true;
+                    }
+                } else {
+                    chb.checked = false;
+                }
+            }
+        }
+        let imp4_in_text = document.getElementById("id_imp4_comment_in");
+        let imp4_out_text = document.getElementById("id_imp4_comment");
+        function imp4InChanging(e) {
+            let eInd = Array.from(imp4_in).indexOf(e.target);
+            if (this.checked) {
+                let bufS = imp4_in_text.value;
+                if (bufS != "") {
+                    bufS += ", ";
+                }
+                imp4_in_text.value = bufS + depArray[eInd];
+            } else {
+                let strInd = -1;
+                if (depArray[eInd] == "СО") {
+                    strInd = imp4_in_text.value.search(re);
+                } else {
+                    strInd = imp4_in_text.value.indexOf(depArray[eInd]);
+                }
+                let bufS = imp4_in_text.value.slice(0, strInd) + imp4_in_text.value.slice(strInd+depArray[eInd].length+2, imp4_in_text.value.length);
+                if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
+                    bufS = bufS.slice(0, bufS.length-2);
+                }
+                imp4_in_text.value = bufS;
+            }
+            addToComment();
+        }
+        for (const chb of imp4_in) {
+            chb.addEventListener('change', imp4InChanging);
+            let eInd = Array.from(imp4_in).indexOf(chb);
+            if (eInd < depArray.length) {
+                let including = imp4_in_text.value.indexOf(depArray[eInd])
+                if (including !== -1) {
+                    if (depArray[eInd] == "СО" && including != 0 && imp4_in_text.value.slice(including-1, including) == "О") {
+                        chb.checked = false;
+                    } else {
+                        chb.checked = true;
+                    }
+                } else {
+                    chb.checked = false;
+                }
+            }
+        }
+        function imp4OutChanging(e) {
+            let eInd = Array.from(imp4_out).indexOf(e.target);
+            if (this.checked) {
+                let bufS = imp4_out_text.value;
+                if (bufS != "") {
+                    bufS += ", ";
+                }
+                imp4_out_text.value = bufS + depArray[eInd];
+            } else {
+                let strInd = -1;
+                if (depArray[eInd] == "СО") {
+                    strInd = imp4_out_text.value.search(re);
+                } else {
+                    strInd = imp4_out_text.value.indexOf(depArray[eInd]);
+                }
+                let bufS = imp4_out_text.value.slice(0, strInd) + imp4_out_text.value.slice(strInd+depArray[eInd].length+2, imp4_out_text.value.length);
+                if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
+                    bufS = bufS.slice(0, bufS.length-2);
+                }
+                imp4_out_text.value = bufS;
+            }
+            addToComment();
+        }
+        for (const chb of imp4_out) {
+            chb.addEventListener('change', imp4OutChanging);
+            let eInd = Array.from(imp4_out).indexOf(chb);
+            if (eInd < depArray.length) {
+                let including = imp4_out_text.value.indexOf(depArray[eInd])
+                if (including !== -1) {
+                    if (depArray[eInd] == "СО" && including != 0 && imp4_out_text.value.slice(including-1, including) == "О") {
+                        chb.checked = false;
+                    } else {
+                        chb.checked = true;
+                    }
+                } else {
+                    chb.checked = false;
+                }
+            }
+        }
         const radioButtons1 = document.querySelectorAll('input[name="importance1"]');
         const radioButtons2 = document.querySelectorAll('input[name="importance2"]');
         const radioButtons3 = document.querySelectorAll('input[name="importance3"]');
@@ -768,7 +1193,7 @@
             if (radioButton.checked && radioButton.value=="True") {
                 imps4[0].removeAttribute("hidden");
                 imps4[1].removeAttribute("hidden");
-                imps4[1].children[0].firstChild.setAttribute("required", "");
+                imps4[2].removeAttribute("hidden");
                 imp[3] = 1;
             } else if (radioButton.checked && radioButton.value=="False") {
                 imp[3] = 0;
@@ -816,7 +1241,6 @@
         let imp_comment1_znp = document.getElementById("id_imp1_comment_znp");
         let imp_comment1_nd = document.getElementById("id_imp1_comment_nd");
         let imp_comm3 = document.getElementById("id_imp3_comment");
-        let imp_comm4 = document.getElementById("id_imp4_comment");
         let imp_comm7 = document.getElementById("id_imp7_comment");
         function addToComment(e) {
             let comment_content = document.getElementById("comment_buf").innerHTML;
@@ -842,11 +1266,20 @@
             if (imp_comm3.value != '') {
                 comment_content = comment_content.concat('Требуется корректировка смежных разделов (глав, томов, др. док.): ');
                 comment_content = comment_content.concat(imp_comm3.value);
+                if (imp3_dep_text.value != '') {
+                    comment_content = comment_content.concat('. Соответствующие подразделения: ');
+                    comment_content = comment_content.concat(imp3_dep_text.value);
+                }
                 comment_content = comment_content.concat("\n");
             }
-            if (imp_comm4.value != '') {
-                comment_content = comment_content.concat('Требуется выдача задания смежным подразделениям (без учёта ОКиВД) и (или) получение исходных данных от них: ');
-                comment_content = comment_content.concat(imp_comm4.value);
+            if (imp4_out_text.value != '') {
+                comment_content = comment_content.concat('Требуется выдача задания смежным подразделениям (без учёта ОКиВД): ');
+                comment_content = comment_content.concat(imp4_out_text.value);
+                comment_content = comment_content.concat("\n");
+            }
+            if (imp4_in_text.value != '') {
+                comment_content = comment_content.concat('Требуется получение исходных данных от смежных подразделений (без учёта ОКиВД): ');
+                comment_content = comment_content.concat(imp4_in_text.value);
                 comment_content = comment_content.concat("\n");
             }
             if (imp_comm7.value != '') {
@@ -859,7 +1292,6 @@
         imp_comment1_znp.addEventListener('change', addToComment);
         imp_comment1_nd.addEventListener('change', addToComment);
         imp_comm3.addEventListener('change', addToComment);
-        imp_comm4.addEventListener('change', addToComment);
         imp_comm7.addEventListener('change', addToComment);
         function select1(e) {
             if (this.checked) {
@@ -976,6 +1408,8 @@
                 imps3[0].setAttribute("hidden", "");
                 imps3[1].setAttribute("hidden", "");
                 imps3[1].children[0].firstChild.removeAttribute("required");
+                imps3[2].setAttribute("hidden", "");
+                imps3[3].setAttribute("hidden", "");
                 imp4.removeAttribute("hidden");
                 if (imp[3] != -1) {
                     imp7.removeAttribute("hidden");
@@ -993,12 +1427,12 @@
                 if (imp[3] == 1) {
                     imps4[0].removeAttribute("hidden");
                     imps4[1].removeAttribute("hidden");
-                    imps4[1].children[0].firstChild.setAttribute("required", "");
+                    imps4[2].removeAttribute("hidden");
                 }
                 else {
                     imps4[0].setAttribute("hidden", "");
                     imps4[1].setAttribute("hidden", "");
-                    imps4[1].children[0].firstChild.removeAttribute("required");
+                    imps4[2].setAttribute("hidden", "");
                 }
                 imp5.setAttribute("hidden","");
                 imp6.setAttribute("hidden","");
@@ -1018,9 +1452,11 @@
                 imps3[0].setAttribute("hidden", "");
                 imps3[1].setAttribute("hidden", "");
                 imps3[1].children[0].firstChild.removeAttribute("required");
+                imps3[2].setAttribute("hidden", "");
+                imps3[3].setAttribute("hidden", "");
                 imps4[0].setAttribute("hidden", "");
                 imps4[1].setAttribute("hidden", "");
-                imps4[1].children[0].firstChild.removeAttribute("required");
+                imps4[2].setAttribute("hidden", "");
                 imps7[0].setAttribute("hidden", "");
                 imps7[1].setAttribute("hidden", "");
                 imps7[1].children[0].firstChild.removeAttribute("required");
@@ -1036,9 +1472,11 @@
                     imps3[0].setAttribute("hidden", "");
                     imps3[1].setAttribute("hidden", "");
                     imps3[1].children[0].firstChild.removeAttribute("required");
+                    imps3[2].setAttribute("hidden", "");
+                    imps3[3].setAttribute("hidden", "");
                     imps4[0].setAttribute("hidden", "");
                     imps4[1].setAttribute("hidden", "");
-                    imps4[1].children[0].firstChild.removeAttribute("required");
+                    imps4[2].setAttribute("hidden", "");
                     imps7[0].setAttribute("hidden", "");
                     imps7[1].setAttribute("hidden", "");
                     imps7[1].children[0].firstChild.removeAttribute("required");
@@ -1049,13 +1487,15 @@
                             imps3[0].removeAttribute("hidden");
                             imps3[1].removeAttribute("hidden");
                             imps3[1].children[0].firstChild.setAttribute("required", "");
+                            imps3[2].removeAttribute("hidden");
+                            imps3[3].removeAttribute("hidden");
                         }
                         imp4.removeAttribute("hidden");
                         if (imp[3] != -1) {
                             if (imp[3] == 1) {
                                 imps4[0].removeAttribute("hidden");
                                 imps4[1].removeAttribute("hidden");
-                                imps4[1].children[0].firstChild.setAttribute("required", "");
+                                imps4[2].removeAttribute("hidden");
                             }
                             imp5.removeAttribute("hidden");
                             if (imp[4] == 1) {
@@ -1145,6 +1585,7 @@
                         if (j.value == "True") {
                             imps4[0].removeAttribute("hidden");
                             imps4[1].removeAttribute("hidden");
+                            imps4[2].removeAttribute("hidden");
                         }
                         for (const k of radioButtons7) {
                             if (k.checked && k.value=="True") {
@@ -1171,6 +1612,7 @@
                                         if (l.value == "True") {
                                             imps4[0].removeAttribute("hidden");
                                             imps4[1].removeAttribute("hidden");
+                                            imps4[2].removeAttribute("hidden");
                                         }
                                         imp5.removeAttribute("hidden");
                                         for (const n of radioButtons5) {

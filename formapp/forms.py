@@ -161,7 +161,7 @@ class RemarkForm(forms.ModelForm):
                   'labor_costs_fact', 'comment', 'answer_remark', 'link_tech_name', 'cancel_remark', 'total_importance',
                   'root_cause_list', 'root_cause_text', 'root_cause_comment', 'executor_fail_text', 'reestrID',
                   'importance1', 'importance2', 'importance3', 'importance4',
-                  'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd')
+                  'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep')
         widgets = {
             'customer': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'project_dogovor': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
@@ -210,7 +210,10 @@ class RemarkForm(forms.ModelForm):
                                              attrs={'readonly': 'readonly'}),
             'imp1_comment_znp': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp1_comment_nd': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
+            'imp3_dep': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
+            'imp3_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp4_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
+            'imp4_comment_in': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'total_importance': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly',
                                                        'placeholder': '', 'id': 'total_imp'}),
@@ -265,8 +268,10 @@ class RemarkForm(forms.ModelForm):
         self.fields['importance7'].initial = reest.importance7
         self.fields['imp1_comment_znp'].initial = reest.imp1_comment_znp
         self.fields['imp1_comment_nd'].initial = reest.imp1_comment_nd
+        self.fields['imp3_dep'].initial = reest.imp3_dep
         self.fields['imp3_comment'].initial = reest.imp3_comment
         self.fields['imp4_comment'].initial = reest.imp4_comment
+        self.fields['imp4_comment_in'].initial = reest.imp4_comment_in
         self.fields['imp7_comment'].initial = reest.imp7_comment
         if reest.cancel_remark:
             self.fields['cancel_remark'].initial = reest.cancel_remark + " от " + str(reest.cancel_remark_date)
@@ -594,7 +599,7 @@ class emplForm(forms.ModelForm):
         'answer_date_plan', 'answer_deadline_correct_plan', 'executor_fail_text',
         'labor_costs_plan', 'comment', 'answer_remark', 'total_importance', 'root_cause_list',
         'root_cause_comment', 'root_cause_text', 'status', 'importance1', 'importance2', 'importance3', 'importance4',
-        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep')
+        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep')
         error_messages = {
             'answer_date_plan': {'required': "Пожалуйста, внесите данные"},
             'answer_deadline_correct_plan': {'required': "Пожалуйста, внесите данные"},
@@ -647,8 +652,10 @@ class emplForm(forms.ModelForm):
             'importance7': forms.RadioSelect(choices=[(True, 'Требуется'), (False, 'Не требуется')]),
             'imp1_comment_znp': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'imp1_comment_nd': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
+            'imp3_dep': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'imp3_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
-            'imp4_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
+            'imp4_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
+            'imp4_comment_in': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'total_importance': forms.TextInput(
                 attrs={'required': 'required', 'class': 'form-importance', 'readonly': 'readonly', 'placeholder': '',
@@ -731,7 +738,7 @@ class GIPform2(forms.ModelForm):
         'executor_fail_name', 'executor_name', 'answer_date_plan', 'answer_deadline_correct_plan', 'executor_fail_text',
         'labor_costs_plan', 'comment', 'answer_remark', 'total_importance', 'root_cause_list', 'reestrID', 'gip',
         'root_cause_comment', 'root_cause_text', 'status', 'importance1', 'importance2', 'importance3', 'importance4',
-        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd')
+        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep')
         error_messages = {
             'remark_name': {'required': 'Пожалуйста, внесите данные', },
             'rational': {'required': 'Пожалуйста, внесите данные', },
@@ -788,8 +795,10 @@ class GIPform2(forms.ModelForm):
             'importance7': forms.RadioSelect(choices=[(True, 'Требуется'), (False, 'Не требуется')]),
             'imp1_comment_znp': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'imp1_comment_nd': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
+            'imp3_dep': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'imp3_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
-            'imp4_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
+            'imp4_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
+            'imp4_comment_in': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'total_importance': forms.TextInput(
                 attrs={'class': 'form-textinput', 'id': 'total_imp', 'autocomplete': 'off', 'required': 'required'}),
@@ -884,8 +893,10 @@ class GIPform2(forms.ModelForm):
         self.fields['importance7'].initial = reest.importance7
         self.fields['imp1_comment_znp'].initial = reest.imp1_comment_znp
         self.fields['imp1_comment_nd'].initial = reest.imp1_comment_nd
+        self.fields['imp3_dep'].initial = reest.imp3_dep
         self.fields['imp3_comment'].initial = reest.imp3_comment
         self.fields['imp4_comment'].initial = reest.imp4_comment
+        self.fields['imp4_comment_in'].initial = reest.imp4_comment_in
         self.fields['imp7_comment'].initial = reest.imp7_comment
 
         if reest.responsibleTrouble_name:
@@ -919,7 +930,7 @@ class BossForm2(forms.ModelForm):
         'labor_costs_plan', 'comment', 'answer_remark', 'total_importance', 'root_cause_list', 'root_cause_text',
         'root_cause_comment', 'responsibleTrouble_name', 'gip', 'reestrID', 'status', 'executor_fail_text',
         'importance1', 'importance2', 'importance3', 'importance4',
-        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd')
+        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep')
         error_messages = {
             'remark_name': {'required': 'Пожалуйста, внесите данные', },
             'rational': {'required': 'Пожалуйста, внесите данные', },
@@ -977,8 +988,10 @@ class BossForm2(forms.ModelForm):
             'importance7': forms.RadioSelect(choices=[(True, 'Требуется'), (False, 'Не требуется')]),
             'imp1_comment_znp': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'imp1_comment_nd': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
+            'imp3_dep': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'imp3_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
-            'imp4_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
+            'imp4_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
+            'imp4_comment_in': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'total_importance': forms.TextInput(attrs={'class': 'form-textinput',
                                                        'placeholder': '', 'id': 'total_imp', 'autocomplete': 'off',
@@ -1044,8 +1057,10 @@ class BossForm2(forms.ModelForm):
         self.fields['importance7'].initial = reest.importance7
         self.fields['imp1_comment_znp'].initial = reest.imp1_comment_znp
         self.fields['imp1_comment_nd'].initial = reest.imp1_comment_nd
+        self.fields['imp3_dep'].initial = reest.imp3_dep
         self.fields['imp3_comment'].initial = reest.imp3_comment
         self.fields['imp4_comment'].initial = reest.imp4_comment
+        self.fields['imp4_comment_in'].initial = reest.imp4_comment_in
         self.fields['imp7_comment'].initial = reest.imp7_comment
 
         q1 = (Q(groups=2) | Q(groups=3) | Q(groups=1)) & Q(
@@ -1097,7 +1112,7 @@ class FinalForm(forms.ModelForm):
         'labor_costs_plan', 'labor_costs_fact', 'comment', 'answer_remark', 'link_tech_name', 'total_importance',
         'root_cause_comment', 'root_cause_list', 'root_cause_text', 'importance1', 'importance2', 'importance3',
         'importance4',
-        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd')
+        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp3_dep', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd')
         error_messages = {
             'answer_date_plan': {'required': "Пожалуйста, внесите данные"},
             'answer_deadline_correct_plan': {'required': "Пожалуйста, внесите данные"},
@@ -1161,7 +1176,9 @@ class FinalForm(forms.ModelForm):
             'imp1_comment_znp': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp1_comment_nd': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp3_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
+            'imp3_dep': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp4_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
+            'imp4_comment_in': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'total_importance': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly',
                                                        'placeholder': '', 'id': 'total_imp'}),
@@ -1221,7 +1238,9 @@ class FinalForm(forms.ModelForm):
         self.fields['imp1_comment_znp'].initial = reest.imp1_comment_znp
         self.fields['imp1_comment_nd'].initial = reest.imp1_comment_nd
         self.fields['imp3_comment'].initial = reest.imp3_comment
+        self.fields['imp3_dep'].initial = reest.imp3_dep
         self.fields['imp4_comment'].initial = reest.imp4_comment
+        self.fields['imp4_comment_in'].initial = reest.imp4_comment_in
         self.fields['imp7_comment'].initial = reest.imp7_comment
         if reest.answer_date_fact:
             self.fields['answer_date_fact'].initial = str(reest.answer_date_fact)
@@ -1338,7 +1357,7 @@ class AnswerForm(forms.ModelForm):
         'labor_costs_plan', 'labor_costs_fact', 'comment', 'answer_remark', 'link_tech_name', 'total_importance',
         'root_cause_list',
         'root_cause_comment', 'root_cause_text', 'status', 'importance1', 'importance2', 'importance3', 'importance4',
-        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd')
+        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp3_dep', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd')
         widgets = {
             'project_date_contract': forms.DateInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'project_name': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
@@ -1390,7 +1409,9 @@ class AnswerForm(forms.ModelForm):
             'imp1_comment_znp': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp1_comment_nd': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp3_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
+            'imp3_dep': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp4_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
+            'imp4_comment_in': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'total_importance': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly',
                                                        'placeholder': '', 'id': 'total_imp'}),
@@ -1459,7 +1480,9 @@ class AnswerForm(forms.ModelForm):
         self.fields['imp1_comment_znp'].initial = reest.imp1_comment_znp
         self.fields['imp1_comment_nd'].initial = reest.imp1_comment_nd
         self.fields['imp3_comment'].initial = reest.imp3_comment
+        self.fields['imp3_dep'].initial = reest.imp3_dep
         self.fields['imp4_comment'].initial = reest.imp4_comment
+        self.fields['imp4_comment_in'].initial = reest.imp4_comment_in
         self.fields['imp7_comment'].initial = reest.imp7_comment
     def save_files(self, reestr, name, comment, remark):
         for upload in self.files.getlist("cause_add_files"):

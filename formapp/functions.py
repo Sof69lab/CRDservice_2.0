@@ -181,6 +181,7 @@ def workDelay(day1, day2):
     return delay
 
 subcontracts = Group.objects.get(name="Субподрядчик").user_set.all()
+subcontrancts = [1, 2, 3]
 def xlsxPlanner(file, reest):
     try:
         file_path = os.path.join(MEDIA_ROOT, str(file))

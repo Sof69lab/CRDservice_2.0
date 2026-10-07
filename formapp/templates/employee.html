@@ -400,16 +400,179 @@
                                     <td>{{ form.importance4 }}</td>
                                 </tr>
                                 <tr class="imp4" hidden>
-                                    <td colspan="2">{% get_verbose_field_name "imp4_comment" %}</td>
-                                </tr>
-                                <tr class="imp4" hidden>
-                                    <td colspan="2">{{ form.imp4_comment }}
+                                    <td>
+                                        <table>
+                                            <tr>
+                                                <td><b>Укажите подразделение</b></td>
+                                                <td><b>Выдать задание</b></td>
+                                                <td><b>Получить исходные данные</b></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3"><b>Проектный блок</b></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Гидротехнический отдел (ГТО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Горный отдел (ГО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Общестроительный отдел (ОСО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел генплана и транспорта (ОГиТ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4" hidden>
+                                                <td>Отдел комплектации и выпуска документации (ОКиВД)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел связи, сигнализации и спецразделов (ОССС)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел тепловодоснабжения (ОТВС)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел экологии и радиационной безопасности (ОЭиРБ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел экономического анализа (ОЭА)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Производственный отдел (ПО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Сметный отдел (СО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Технологический отдел (ТХО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Электротехнический отдел (ЭО)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Отдел главных инженеров проекта (ОГИП)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3"><b>Блок инженерных изысканий</b></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Группа инженерно-геодезических изысканий (Гр. ИГДИ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Группа инженерно-геологических изысканий (Гр. ИГИ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Группа инженерно-геофизических исследований (Гр. ИГФИ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Группа инженерно-гидрометеорологических изысканий (Гр. ИГМИ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Группа инженерно-экологических изысканий (Гр. ИЭИ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Химико-грунтоведческая лаборатория (ХГЛ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3"><b>Управление по научной и инновационной деятельности</b></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Аналитическая группа (АГ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Научно-исследовательская лаборатория радиационной безопасности (НИЛ-11)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Научно-исследовательский отдел горных работ (НИО-28)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Химико-аналитическая лаборатория (ХАЛ)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3"><b>Дирекция по развитию</b></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Научно-исследовательская лаборатория технологии выщелачивания (НИЛ-35)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Научно-исследовательский отдел гидрогеологического моделирования и глубинного захоронения жидких отходов (НИЛ-5)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Научно-исследовательский отдел комплексной переработки сырья (НИО-32)</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3"><b>Прочее</b></td>
+                                            </tr>
+                                            <tr class="imp4">
+                                                <td>Субподряд</td>
+                                                <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            </tr>
+                                        </table>
                                         {% if form.imp4_comment.errors %}
                                             {% for error in form.imp4_comment.errors %}
                                                 <li class="alert danger"> {{error}} </li>
                                             {% endfor %}
                                         {% endif %}
                                     </td>
+                                </tr>
+                                <tr class="imp4" hidden>
+                                    <td colspan="2">{{ form.imp4_comment_in }}</td>
+                                    <td colspan="2">{{ form.imp4_comment }}</td>
                                 </tr>
                                 <tr id="imp5" hidden>
                                     <td>Корректировка принятых проектных решений</td>
@@ -941,32 +1104,130 @@
                             let imps3 = document.getElementsByClassName("imp3");
                             let imp3_dep = document.getElementsByClassName("imp3_dep");
                             const depArray = ["ГТО", "ГО", "ОСО", "ОГиТ", "ОКиВД", "ОССС", "ОТВС", "ОЭиРБ", "ОЭА", "ПО", "СО", "ТХО", "ЭО", "ОГИП", "Гр. ИГДИ", "Гр. ИГИ", "Гр. ИГФИ", "Гр. ИГМИ", "Гр. ИЭИ", "ХГЛ", "АГ", "НИЛ-11", "НИО-28", "ХАЛ", "НИЛ-35", "НИЛ-5", "НИО-32", "Субподряд"];
-                            console.log(imp3_dep);
-                            console.log(depArray);
+                            const re = /(?<=^|, )СО/;
                             let imps4 = document.getElementsByClassName("imp4");
+                            let imp4_in = document.getElementsByClassName("imp4_in");
+                            let imp4_out = document.getElementsByClassName("imp4_out");
                             let imps7 = document.getElementsByClassName("imp7");
                             let imp3_dep_text = document.getElementById("id_imp3_dep");
                             function imp3DepChanging(e) {
-                                console.log(this);
-                                let eInd = Array.from(imp3_dep).indexOf(this.target);
-                                console.log(eInd);
+                                let eInd = Array.from(imp3_dep).indexOf(e.target);
                                 if (this.checked) {
-                                    console.log(imp3_dep_text.value);
                                     let bufS = imp3_dep_text.value;
                                     if (bufS != "") {
                                         bufS += ", ";
                                     }
                                     imp3_dep_text.value = bufS + depArray[eInd];
                                 } else {
-                                    let strInd = imp3_dep_text.value.indexOf(depArray[eInd]);
-                                    let bufS = imp3_dep_text.value.slice(0, strInd) + imp3_dep_text.value.slice(strInd+depArray[eInd].length+1, imp3_dep_text.value.length);
+                                    let strInd = -1;
+                                    if (depArray[eInd] == "СО") {
+                                        strInd = imp3_dep_text.value.search(re);
+                                    } else {
+                                        strInd = imp3_dep_text.value.indexOf(depArray[eInd]);
+                                    }
+                                    let bufS = imp3_dep_text.value.slice(0, strInd) + imp3_dep_text.value.slice(strInd+depArray[eInd].length+2, imp3_dep_text.value.length);
+                                    if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
+                                        bufS = bufS.slice(0, bufS.length-2);
+                                    }
                                     imp3_dep_text.value = bufS;
-                                    console.log("unchecked");
                                 }
-                                console.log(imp3_dep_text.value);
+                                addToComment();
                             }
                             for (const chb of imp3_dep) {
                                 chb.addEventListener('change', imp3DepChanging);
+                                let eInd = Array.from(imp3_dep).indexOf(chb);
+                                if (eInd < depArray.length) {
+                                    let including = imp3_dep_text.value.indexOf(depArray[eInd])
+                                    if (including !== -1) {
+                                        if (depArray[eInd] == "СО" && including != 0 && imp3_dep_text.value.slice(including-1, including) == "О") {
+                                            chb.checked = false;
+                                        } else {
+                                            chb.checked = true;
+                                        }
+                                    } else {
+                                        chb.checked = false;
+                                    }
+                                }
+                            }
+                            let imp4_in_text = document.getElementById("id_imp4_comment_in");
+                            let imp4_out_text = document.getElementById("id_imp4_comment");
+                            function imp4InChanging(e) {
+                                let eInd = Array.from(imp4_in).indexOf(e.target);
+                                if (this.checked) {
+                                    let bufS = imp4_in_text.value;
+                                    if (bufS != "") {
+                                        bufS += ", ";
+                                    }
+                                    imp4_in_text.value = bufS + depArray[eInd];
+                                } else {
+                                    let strInd = -1;
+                                    if (depArray[eInd] == "СО") {
+                                        strInd = imp4_in_text.value.search(re);
+                                    } else {
+                                        strInd = imp4_in_text.value.indexOf(depArray[eInd]);
+                                    }
+                                    let bufS = imp4_in_text.value.slice(0, strInd) + imp4_in_text.value.slice(strInd+depArray[eInd].length+2, imp4_in_text.value.length);
+                                    if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
+                                        bufS = bufS.slice(0, bufS.length-2);
+                                    }
+                                    imp4_in_text.value = bufS;
+                                }
+                                addToComment();
+                            }
+                            for (const chb of imp4_in) {
+                                chb.addEventListener('change', imp4InChanging);
+                                let eInd = Array.from(imp4_in).indexOf(chb);
+                                if (eInd < depArray.length) {
+                                    let including = imp4_in_text.value.indexOf(depArray[eInd])
+                                    if (including !== -1) {
+                                        if (depArray[eInd] == "СО" && including != 0 && imp4_in_text.value.slice(including-1, including) == "О") {
+                                            chb.checked = false;
+                                        } else {
+                                            chb.checked = true;
+                                        }
+                                    } else {
+                                        chb.checked = false;
+                                    }
+                                }
+                            }
+                            function imp4OutChanging(e) {
+                                let eInd = Array.from(imp4_out).indexOf(e.target);
+                                if (this.checked) {
+                                    let bufS = imp4_out_text.value;
+                                    if (bufS != "") {
+                                        bufS += ", ";
+                                    }
+                                    imp4_out_text.value = bufS + depArray[eInd];
+                                } else {
+                                    let strInd = -1;
+                                    if (depArray[eInd] == "СО") {
+                                        strInd = imp4_out_text.value.search(re);
+                                    } else {
+                                        strInd = imp4_out_text.value.indexOf(depArray[eInd]);
+                                    }
+                                    let bufS = imp4_out_text.value.slice(0, strInd) + imp4_out_text.value.slice(strInd+depArray[eInd].length+2, imp4_out_text.value.length);
+                                    if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
+                                        bufS = bufS.slice(0, bufS.length-2);
+                                    }
+                                    imp4_out_text.value = bufS;
+                                }
+                                addToComment();
+                            }
+                            for (const chb of imp4_out) {
+                                chb.addEventListener('change', imp4OutChanging);
+                                let eInd = Array.from(imp4_out).indexOf(chb);
+                                if (eInd < depArray.length) {
+                                    let including = imp4_out_text.value.indexOf(depArray[eInd])
+                                    if (including !== -1) {
+                                        if (depArray[eInd] == "СО" && including != 0 && imp4_out_text.value.slice(including-1, including) == "О") {
+                                            chb.checked = false;
+                                        } else {
+                                            chb.checked = true;
+                                        }
+                                    } else {
+                                        chb.checked = false;
+                                    }
+                                }
                             }
                             const radioButtons1 = document.querySelectorAll('input[name="importance1"]');
                             const radioButtons2 = document.querySelectorAll('input[name="importance2"]');
@@ -1293,7 +1554,6 @@
                             let imp_comment1_znp = document.getElementById("id_imp1_comment_znp");
                             let imp_comment1_nd = document.getElementById("id_imp1_comment_nd");
                             let imp_comm3 = document.getElementById("id_imp3_comment");
-                            let imp_comm4 = document.getElementById("id_imp4_comment");
                             let imp_comm7 = document.getElementById("id_imp7_comment");
                             function addToComment(e) {
                                 let comment_content = document.getElementById("comment_buf").innerHTML;
@@ -1319,11 +1579,20 @@
                                 if (imp_comm3.value != '') {
                                     comment_content = comment_content.concat('Требуется корректировка смежных разделов (глав, томов, др. док.): ');
                                     comment_content = comment_content.concat(imp_comm3.value);
+                                    if (imp3_dep_text.value != '') {
+                                        comment_content = comment_content.concat('. Соответствующие подразделения: ');
+                                        comment_content = comment_content.concat(imp3_dep_text.value);
+                                    }
                                     comment_content = comment_content.concat("\n");
                                 }
-                                if (imp_comm4.value != '') {
-                                    comment_content = comment_content.concat('Требуется выдача задания смежным подразделениям (без учёта ОКиВД) и (или) получение исходных данных от них: ');
-                                    comment_content = comment_content.concat(imp_comm4.value);
+                                if (imp4_out_text.value != '') {
+                                    comment_content = comment_content.concat('Требуется выдача задания смежным подразделениям (без учёта ОКиВД): ');
+                                    comment_content = comment_content.concat(imp4_out_text.value);
+                                    comment_content = comment_content.concat("\n");
+                                }
+                                if (imp4_in_text.value != '') {
+                                    comment_content = comment_content.concat('Требуется получение исходных данных от смежных подразделений (без учёта ОКиВД): ');
+                                    comment_content = comment_content.concat(imp4_in_text.value);
                                     comment_content = comment_content.concat("\n");
                                 }
                                 if (imp_comm7.value != '') {
@@ -1336,7 +1605,6 @@
                             imp_comment1_znp.addEventListener('change', addToComment);
                             imp_comment1_nd.addEventListener('change', addToComment);
                             imp_comm3.addEventListener('change', addToComment);
-                            imp_comm4.addEventListener('change', addToComment);
                             imp_comm7.addEventListener('change', addToComment);
 
                             function select1(e) {
@@ -1456,7 +1724,6 @@
                                     imps3[1].children[0].firstChild.removeAttribute("required");
                                     imps3[2].setAttribute("hidden", "");
                                     imps3[3].setAttribute("hidden", "");
-                                    imps3[3].children[0].firstChild.removeAttribute("required");
                                     imp4.removeAttribute("hidden");
                                     if (imp[3] != -1) {
                                         imp7.removeAttribute("hidden");
@@ -1474,12 +1741,12 @@
                                     if (imp[3] == 1) {
                                         imps4[0].removeAttribute("hidden");
                                         imps4[1].removeAttribute("hidden");
-                                        imps4[1].children[0].firstChild.setAttribute("required", "");
+                                        imps4[2].removeAttribute("hidden");
                                     }
                                     else {
                                         imps4[0].setAttribute("hidden", "");
                                         imps4[1].setAttribute("hidden", "");
-                                        imps4[1].children[0].firstChild.removeAttribute("required");
+                                        imps4[2].setAttribute("hidden", "");
                                     }
                                     imp5.setAttribute("hidden","");
                                     imp6.setAttribute("hidden","");
@@ -1504,7 +1771,7 @@
                                     imps3[3].setAttribute("hidden", "");
                                     imps4[0].setAttribute("hidden", "");
                                     imps4[1].setAttribute("hidden", "");
-                                    imps4[1].children[0].firstChild.removeAttribute("required");
+                                    imps4[2].setAttribute("hidden", "");
                                     imps7[0].setAttribute("hidden", "");
                                     imps7[1].setAttribute("hidden", "");
                                     imps7[1].children[0].firstChild.removeAttribute("required");
@@ -1525,7 +1792,7 @@
                                         imps3[3].setAttribute("hidden", "");
                                         imps4[0].setAttribute("hidden", "");
                                         imps4[1].setAttribute("hidden", "");
-                                        imps4[1].children[0].firstChild.removeAttribute("required");
+                                        imps4[2].setAttribute("hidden", "");
                                         imps7[0].setAttribute("hidden", "");
                                         imps7[1].setAttribute("hidden", "");
                                         imps7[1].children[0].firstChild.removeAttribute("required");
@@ -1545,7 +1812,7 @@
                                                 if (imp[3] == 1) {
                                                     imps4[0].removeAttribute("hidden");
                                                     imps4[1].removeAttribute("hidden");
-                                                    imps4[1].children[0].firstChild.setAttribute("required", "");
+                                                    imps4[2].removeAttribute("hidden");
                                                 }
                                                 imp5.removeAttribute("hidden");
                                                 if (imp[4] == 1) {

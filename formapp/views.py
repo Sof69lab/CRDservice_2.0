@@ -22,6 +22,7 @@ from collections import defaultdict
 from io import StringIO
 
 emptyUserID = User.objects.filter(last_name="1. Сотрудник больше не работает")[0].id
+emptyUserID = 1
 
 order_subquery = reestr.objects.filter(reestrID=OuterRef("pk")).exclude(status__in=["На согласовании Рецензентом", "Замечание снято"])
 
@@ -2185,10 +2186,9 @@ def employee(request, id):
                 importance3 = form.cleaned_data.get('importance3')
                 imp3_comment = form.cleaned_data.get('imp3_comment')
                 imp3_dep = form.cleaned_data.get('imp3_dep')
-                # if imp3_dep != '[]':
-                #     imp3_dep = ','.join(imp3_dep)
                 importance4 = form.cleaned_data.get('importance4')
                 imp4_comment = form.cleaned_data.get('imp4_comment')
+                imp4_comment_in = form.cleaned_data.get('imp4_comment_in')
                 importance5 = form.cleaned_data.get('importance5')
                 importance6 = form.cleaned_data.get('importance6')
                 importance7 = form.cleaned_data.get('importance7')
@@ -2206,7 +2206,7 @@ def employee(request, id):
                 if importance3 and (imp3_dep is None or imp3_dep == ""):
                     importance_test = False
                     form.add_error('imp3_dep', 'Пожалуйста, внесите данные')
-                if importance4 and (imp4_comment is None or imp4_comment == ""):
+                if importance4 and (imp4_comment is None or imp4_comment == "") and (imp4_comment_in is None or imp4_comment_in == ""):
                     importance_test = False
                     form.add_error('imp4_comment', 'Пожалуйста, внесите данные')
                 if importance7 and (imp7_comment is None or imp7_comment == ""):
@@ -2240,6 +2240,7 @@ def employee(request, id):
                         db_form.imp3_comment = imp3_comment
                         db_form.imp3_dep = imp3_dep
                         db_form.imp4_comment = imp4_comment
+                        db_form.imp4_comment_in = imp4_comment_in
                         db_form.imp7_comment = imp7_comment
                         if importance1:
                             db_form.importance2 = None
@@ -2269,7 +2270,7 @@ def employee(request, id):
                                                     'root_cause_comment', 'root_cause_text', 'status', 'deadline',
                                                     'importance1', 'importance2', 'importance3',
                                                     'importance4', 'importance5', 'importance6',
-                                                    'importance7', 'imp3_comment', 'imp4_comment', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep'])
+                                                    'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep'])
                         form.save_files(reestr=reest,
                                         name=form.cleaned_data.get('cause_file_name'),
                                         comment=form.cleaned_data.get('cause_file_comment'),
@@ -2398,9 +2399,11 @@ def boss2(request, id):
                 imp1_comment_nd = form.cleaned_data.get('imp1_comment_nd')
                 importance2 = form.cleaned_data.get('importance2')
                 importance3 = form.cleaned_data.get('importance3')
+                imp3_dep = form.cleaned_data.get('imp3_dep')
                 imp3_comment = form.cleaned_data.get('imp3_comment')
                 importance4 = form.cleaned_data.get('importance4')
                 imp4_comment = form.cleaned_data.get('imp4_comment')
+                imp4_comment_in = form.cleaned_data.get('imp4_comment_in')
                 importance5 = form.cleaned_data.get('importance5')
                 importance6 = form.cleaned_data.get('importance6')
                 importance7 = form.cleaned_data.get('importance7')
@@ -2415,7 +2418,10 @@ def boss2(request, id):
                 if importance3 and (imp3_comment is None or imp3_comment == ""):
                     importance_test = False
                     form.add_error('imp3_comment', 'Пожалуйста, внесите данные')
-                if importance4 and (imp4_comment is None or imp4_comment == ""):
+                if importance3 and (imp3_dep is None or imp3_dep == ""):
+                    importance_test = False
+                    form.add_error('imp3_dep', 'Пожалуйста, внесите данные')
+                if importance4 and (imp4_comment is None or imp4_comment == "")and (imp4_comment_in is None or imp4_comment_in == ""):
                     importance_test = False
                     form.add_error('imp4_comment', 'Пожалуйста, внесите данные')
                 if importance7 and (imp7_comment is None or imp7_comment == ""):
@@ -2470,7 +2476,9 @@ def boss2(request, id):
                         db_form.imp1_comment_znp = imp1_comment_znp
                         db_form.imp1_comment_nd = imp1_comment_nd
                         db_form.imp3_comment = imp3_comment
+                        db_form.imp3_dep = imp3_dep
                         db_form.imp4_comment = imp4_comment
+                        db_form.imp4_comment_in = imp4_comment_in
                         db_form.imp7_comment = imp7_comment
                         if db_form.comment != form.cleaned_data.get('comment') and form.cleaned_data.get(
                                 'comment') != "":
@@ -2634,9 +2642,11 @@ def gip2(request, id):
                 imp1_comment_nd = form.cleaned_data.get('imp1_comment_nd')
                 importance2 = form.cleaned_data.get('importance2')
                 importance3 = form.cleaned_data.get('importance3')
+                imp3_dep = form.cleaned_data.get('imp3_dep')
                 imp3_comment = form.cleaned_data.get('imp3_comment')
                 importance4 = form.cleaned_data.get('importance4')
                 imp4_comment = form.cleaned_data.get('imp4_comment')
+                imp4_comment_in = form.cleaned_data.get('imp4_comment_in')
                 importance5 = form.cleaned_data.get('importance5')
                 importance6 = form.cleaned_data.get('importance6')
                 importance7 = form.cleaned_data.get('importance7')
@@ -2653,7 +2663,10 @@ def gip2(request, id):
                 if importance3 and (imp3_comment is None or imp3_comment == ""):
                     importance_test = False
                     form.add_error('imp3_comment', 'Пожалуйста, внесите данные')
-                if importance4 and (imp4_comment is None or imp4_comment == ""):
+                if importance3 and (imp3_dep is None or imp3_dep == ""):
+                    importance_test = False
+                    form.add_error('imp3_comment', 'Пожалуйста, внесите данные')
+                if importance4 and (imp4_comment is None or imp4_comment == "") and (imp4_comment_in is None or imp4_comment_in == ""):
                     importance_test = False
                     form.add_error('imp4_comment', 'Пожалуйста, внесите данные')
                 if importance7 and (imp7_comment is None or imp7_comment == ""):
@@ -2721,8 +2734,10 @@ def gip2(request, id):
                         db_form.importance7 = importance7
                         db_form.imp1_comment_znp = imp1_comment_znp
                         db_form.imp1_comment_nd = imp1_comment_nd
+                        db_form.imp3_dep = imp3_dep
                         db_form.imp3_comment = imp3_comment
                         db_form.imp4_comment = imp4_comment
+                        db_form.imp4_comment_in = imp4_comment_in
                         db_form.imp7_comment = imp7_comment
                         if db_form.comment != form.cleaned_data.get('comment') and form.cleaned_data.get(
                                 'comment') != "":
@@ -3062,9 +3077,9 @@ def answer(request, id):
                                                            db_form.executor_name.first_name if db_form.executor_name else '',
                                                        'group': group,
                                                        'reestrID': db_form.reestrID.id,
-                                                       'custom_link_value': db_form.link_tech_name if db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
+                                                       'custom_link_value': db_form.link_tech_name if db_form.link_tech_name is not None and db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
                                                        'xml_link_value': db_form.link_tech_name[
-                                                                         34:] if 'XML файл(ы)' in db_form.link_tech_name else ''
+                                                                         34:] if db_form.link_tech_name is not None and 'XML файл(ы)' in db_form.link_tech_name else ''
                                                        })
         else:
             form = AnswerForm(reestr.objects.get(id=id))
@@ -3086,9 +3101,9 @@ def answer(request, id):
                                                'contract_number': db_form.project_dogovor.number,
                                                'reviewer': db_form.project_reviewer.name,
                                                'reestrID': db_form.reestrID.id,
-                                               'custom_link_value': db_form.link_tech_name if db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
+                                               'custom_link_value': db_form.link_tech_name if db_form.link_tech_name is not None and db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
                                                'xml_link_value': db_form.link_tech_name[
-                                                                 34:] if 'XML файл(ы)' in db_form.link_tech_name else ''
+                                                                 34:] if db_form.link_tech_name is not None and 'XML файл(ы)' in db_form.link_tech_name else ''
                                                })
     else:
         return render(request, 'log_error.html', {
@@ -3306,8 +3321,8 @@ def final(request, id):
                                               'reviewer': db_form.project_reviewer.name,
                                               'role': role,
                                               'next_step_key': next_step_key,
-                                              'custom_link_value': db_form.link_tech_name if db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
-                                              'xml_link_value': db_form.link_tech_name[34:] if 'XML файл(ы)' in db_form.link_tech_name else ''})
+                                              'custom_link_value': db_form.link_tech_name if db_form.link_tech_name is not None and db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
+                                              'xml_link_value': db_form.link_tech_name[34:] if db_form.link_tech_name is not None and 'XML файл(ы)' in db_form.link_tech_name else ''})
     else:
         return render(request, 'log_error.html', {'text': "Пожалуйста, авторизируйтесь, чтобы увидеть эту страницу."})
 

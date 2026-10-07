@@ -221,6 +221,18 @@
                                         {% endif %}
                                     </td>
                                 </tr>
+                                <tr class="imp3" hidden>
+                                    <td colspan="2">{% get_verbose_field_name "imp3_dep" %}</td>
+                                </tr>
+                                <tr class="imp3" hidden>
+                                    <td colspan="2">{{ form.imp3_dep }}
+                                        {% if form.imp3_comment.errors %}
+                                            {% for error in form.imp3_comment.errors %}
+                                                <li class="alert danger"> {{error}} </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
                                 <tr id="imp4" hidden>
                                     <td>Выдача задания смежным подразделениям (без учёта ОКиВД) и (или) получение исходных данных от них</td>
                                     <td>{{ form.importance4 }}</td>
@@ -230,6 +242,18 @@
                                 </tr>
                                 <tr class="imp4" hidden>
                                     <td colspan="2">{{ form.imp4_comment }}
+                                        {% if form.imp4_comment.errors %}
+                                            {% for error in form.imp4_comment.errors %}
+                                                <li class="alert danger"> {{error}} </li>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr class="imp4" hidden>
+                                    <td colspan="2">{% get_verbose_field_name "imp4_comment_in" %}</td>
+                                </tr>
+                                <tr class="imp4" hidden>
+                                    <td colspan="2">{{ form.imp4_comment_in }}
                                         {% if form.imp4_comment.errors %}
                                             {% for error in form.imp4_comment.errors %}
                                                 <li class="alert danger"> {{error}} </li>
@@ -1023,6 +1047,8 @@
                                         if (j.value == "True") {
                                             imps4[0].removeAttribute("hidden");
                                             imps4[1].removeAttribute("hidden");
+                                            imps4[2].removeAttribute("hidden");
+                                            imps4[3].removeAttribute("hidden");
                                         }
                                         for (const k of radioButtons7) {
                                             if (k.checked && k.value=="True") {
@@ -1043,6 +1069,8 @@
                                                 if (k.value == "True") {
                                                     imps3[0].removeAttribute("hidden");
                                                     imps3[1].removeAttribute("hidden");
+                                                    imps3[2].removeAttribute("hidden");
+                                                    imps3[3].removeAttribute("hidden");
                                                 }
                                                 imp4.removeAttribute("hidden");
                                                 for (const l of radioButtons4) {
@@ -1050,6 +1078,8 @@
                                                         if (l.value == "True") {
                                                             imps4[0].removeAttribute("hidden");
                                                             imps4[1].removeAttribute("hidden");
+                                                            imps4[2].removeAttribute("hidden");
+                                                            imps4[3].removeAttribute("hidden");
                                                         }
                                                         imp5.removeAttribute("hidden");
                                                         for (const n of radioButtons5) {
