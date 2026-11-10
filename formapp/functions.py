@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 import tkinter as tk
 from tkinter import filedialog
-from formapp.models import reestr, reestInfo, reviewers
+from formapp.models import reestr, reestInfo, reviewers, gipTask
 from changelog.models import ChangeLog
 from django.db.models import Q
 from formsite.settings import MEDIA_ROOT
@@ -105,14 +105,25 @@ def dateDBformat(d):
 
 
 def shortName(s):
-    if s.first_name != '(субподрядчик)':
-        i = 0
-        while s.first_name[i] != ' ':
-            i += 1
-        newS = s.last_name + ' ' + s.first_name[0] + '.' + s.first_name[i + 1] + '.'
-        return newS
-    else:
+    if isinstance(s, int):
+        try:
+            s = User.objects.get(id=s)
+        except Exception:
+            return s
+    if s.first_name == '(субподрядчик)' or s.last_name in ['Наблюдатель', '1. Сотрудник больше не работает', 'В компетенции заказчика']:
         return s.last_name
+    else:
+        try:
+            i = 0
+            while s.first_name[i] != ' ':
+                i += 1
+                if i == len(s.first_name)-1:
+                    newS = s.last_name + ' ' + s.first_name[0] + '.'
+                    return newS
+            newS = s.last_name + ' ' + s.first_name[0] + '.' + s.first_name[i+1] + '.'
+            return newS
+        except Exception:
+            return s.last_name + ' ' + s.first_name[0] + '.'
 
 
 def select_dir():
@@ -408,16 +419,17 @@ def xlslxStatusCreate(request, remarks):
                                         'align': 'center',
                                         'valign': 'vcenter',
                                         'border': 1,
-                                        'bg_color': '#DDEBF7'})
+                                        'bg_color': '#DDEBF7',
+                                        'text_wrap': True})
     cell_format4wrap = workbook.add_format({'font_size': 20,  # замечания c переносом
                                             'font_name': 'Times New Roman',
                                             'align': 'center',
                                             'valign': 'vcenter',
                                             'border': 1,
                                             'text_wrap': True})
-    worksheet.set_column('A:A', 5.32)
-    worksheet.set_column('B:C', 12.10)
-    worksheet.set_column('D:E', 5.32)
+    worksheet.set_column('A:A', 5.32*4.71)
+    worksheet.set_column('B:C', 12.10*4.71)
+    worksheet.set_column('D:I', 5.32*4.71)
     worksheet.write(0, 0, "Номер замечания", cell_format2)
     worksheet.write(0, 1, "Статус", cell_format2)
     worksheet.write(0, 2, "Ответственный за этап", cell_format2)
@@ -452,8 +464,134 @@ def xlslxStatusCreate(request, remarks):
                     k += 1
                 l += 1
             except Exception as e:
-                print("Статус не изменялся", e)
+                exc_type, exc_obj, exc_tb = sys.exc_info()
+                print("Ошибка", e, exc_tb.tb_lineno)
     # worksheet.autofit()
+    workbook.close()
+    return name
+
+def xlsxTasks(reestrs):
+    date = datetime.now()
+    name = "\задачи_"
+    for i, r in enumerate(reestrs):
+        if i > 0:
+            name += " "
+        name += r.reestr_index[4:]
+    name += "__" + str(date.hour) + '-' + str(date.minute) + '-' + str(date.second) + '_' + str(date.day) + '-' + str(date.month) + '-' + str(date.year) + '.xlsx'
+    workbook = xlsxwriter.Workbook(MEDIA_ROOT + "\\Tables" + name)
+    worksheet = workbook.add_worksheet()
+    worksheet.hide_gridlines(2)
+    cell_format2 = workbook.add_format({'bold': True,  # шапка таблицы
+                                        'font_size': 20,
+                                        'font_name': 'Times New Roman',
+                                        'align': 'center',
+                                        'valign': 'vcenter',
+                                        'border': 1,
+                                        'bg_color': '#DDEBF7'})
+    cell_format2wrap = workbook.add_format({'bold': True,  # шапка таблицы с переносом
+                                            'font_size': 20,
+                                            'font_name': 'Times New Roman',
+                                            'align': 'center',
+                                            'valign': 'vcenter',
+                                            'border': 1,
+                                            'bg_color': '#DDEBF7',
+                                            'text_wrap': True})
+    cell_format3 = workbook.add_format({'bold': True,  # шапка таблицы с номерами
+                                        'italic': True,
+                                        'font_size': 20,
+                                        'font_name': 'Times New Roman',
+                                        'align': 'center',
+                                        'valign': 'vcenter',
+                                        'border': 1})
+    cell_format4 = workbook.add_format({'font_size': 20,  # замечания
+                                        'font_name': 'Times New Roman',
+                                        'align': 'center',
+                                        'valign': 'vcenter',
+                                        'border': 1})
+    cell_format4left = workbook.add_format({'font_size': 20,  # замечания по левому краю
+                                            'font_name': 'Times New Roman',
+                                            'align': 'left',
+                                            'valign': 'vcenter',
+                                            'border': 1,
+                                            'text_wrap': True})
+    cell_format4wrap = workbook.add_format({'font_size': 20,  # замечания c переносом
+                                            'font_name': 'Times New Roman',
+                                            'align': 'center',
+                                            'valign': 'vcenter',
+                                            'border': 1,
+                                            'text_wrap': True})
+    # шапка
+    worksheet.set_column('A:A', 8.33)
+    worksheet.write(0, 0, "№", cell_format2)
+
+    worksheet.set_column('B:B', 5.26*4.71)
+    worksheet.write(0, 1, "Реестр", cell_format2)
+
+    worksheet.set_column('C:C', 4.30*4.71)
+    worksheet.write(0, 2, "Замечание", cell_format2)
+
+    worksheet.set_column('D:D', 4.30*4.71)
+    worksheet.write(0, 3, "Версия замечания", cell_format2wrap)
+
+    worksheet.set_column('E:E', 96.22)
+    worksheet.write(0, 4, "Замечание", cell_format2)
+
+    worksheet.set_column('F:F', 8*4.71)
+    worksheet.write(0, 5, "Тип задачи", cell_format2)
+
+    worksheet.set_column('G:G', 96.22)
+    worksheet.write(0, 6, "Задача", cell_format2)
+
+    worksheet.set_column('H:H', 6.75*4.71)
+    worksheet.write(0, 7, "Данные к задаче", cell_format2)
+
+    worksheet.set_column('I:I', 6.75*4.71)
+    worksheet.write(0, 8, "Подразделения", cell_format2)
+
+    worksheet.set_column('J:J', 4.30*4.71)
+    worksheet.write(0, 9, "Срок", cell_format2)
+
+    worksheet.set_column('K:K', 6.75*4.71)
+    worksheet.write(0, 10, "Статус задачи", cell_format2)
+
+    worksheet.set_column('L:L', 6.75*4.71)
+    worksheet.write(0, 11, "Актуальность", cell_format2)
+
+    row = 1
+    for r in reestrs:
+        remarks = reestr.objects.filter(reestrID=r.id)
+        remarks_id = [i.id for i in remarks]
+        tasks = gipTask.objects.filter(task_remark__in=remarks_id).order_by("-actuality", "id")
+        for t in tasks:
+            worksheet.write(row, 0, str(row), cell_format4)
+            worksheet.write(row, 1, r.reestr_index[4:], cell_format4)
+            worksheet.write(row, 2, t.task_remark.num_remark, cell_format4wrap)
+            worksheet.write(row, 3, t.task_remark.remark_v, cell_format4)
+            remark_text = reestr.objects.get(id=t.task_remark.id)
+            if remark_text is not None:
+                worksheet.write(row, 4, remark_text.remark_name, cell_format4left)
+            if t.type_number[0] == '1':
+                worksheet.write(row, 5, 'Нарушения ЗНП и/или НД', cell_format4wrap)
+            if t.type_number[0] == '2':
+                worksheet.write(row, 5, 'Корректировки документации/принятых проектных решений', cell_format4wrap)
+            if t.type_number[0] == '3':
+                worksheet.write(row, 5, 'Корректировка смежных разделов', cell_format4wrap)
+            if t.type_number[0] == '4':
+                worksheet.write(row, 5, 'Задания смежным подразделениям', cell_format4wrap)
+            if t.type_number[0] == '7':
+                worksheet.write(row, 5, 'Исходные данные от Заказчика', cell_format4wrap)
+            worksheet.write(row, 6, t.task_text, cell_format4left)
+            worksheet.write(row, 7, t.task_data, cell_format4left)
+            worksheet.write(row, 8, t.task_departments, cell_format4left)
+            worksheet.write(row, 9, dateDBformat(t.task_deadlines), cell_format4)
+            worksheet.write(row, 10, t.task_status, cell_format4wrap)
+            if t.actuality:
+                worksheet.write(row, 11, "Актуальная задача", cell_format4wrap)
+            else:
+                worksheet.write(row, 11, "Неактуальная задача", cell_format4wrap)
+            row += 1
+    row = str(row-1)
+    worksheet.autofilter('B1:L'+row)
     workbook.close()
     return name
 
@@ -738,7 +876,7 @@ def xlslxCreate(request, userRole='Администратор', actual=True):
             cancel = remarks[i].cancel_remark + " от " + dateDBformat(remarks[i].cancel_remark_date)
         worksheet.write(9 + i + k, 18, cancel, cell_format4)
 
-        worksheet.write(9 + i + k, 19, remarks[i].total_importance, cell_format4)
+        worksheet.write(9 + i + k, 19, remarks[i].total_importance, cell_format4wrap)
 
         worksheet.write(9 + i + k, 20, remarks[i].root_cause_list, cell_format4)
 

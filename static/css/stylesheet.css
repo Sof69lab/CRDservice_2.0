@@ -152,10 +152,22 @@ li {
     cursor: pointer;
     font-size: 80%;
 }
+.grey-button {
+    background: var(--grey);
+    border: none;
+    border-radius: 2px;
+    padding: 5px 5px;
+    color: var(--white);
+    cursor: pointer;
+    font-size: 80%;
+}
 td {
     background: var(--white);
     border: 1px solid var(--light_grey);
     cursor: pointer;
+}
+.imp4 {
+    height: 30px;
 }
 
 summary {
@@ -521,4 +533,77 @@ details[open] > .AI-tracks:hover::before {
 }
 .original-select {
     display: none;
+}
+.kanban {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    padding: 16px;
+    height: 88vh;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+.kanban-column {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+.kanban-column-header {
+    font-weight: bold;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    padding: 8px;
+    flex-shrink: 0;
+    color: var(--white);
+}
+.kanban-cards {
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.kanban-card {
+    border: solid 2px;
+    border-radius: 5px;
+    position: relative;
+    background: var(--white);
+    padding: 4px;
+    padding-bottom: 32px;
+    flex-shrink: 0;
+}
+.kanban-card-canceled {
+    border: solid 2px;
+    border-radius: 5px;
+    position: relative;
+    background: var(--light_grey);
+    padding: 4px;
+    border: none;
+}
+.task-cancel-button {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    background: var(--white);
+    color: var(--red);
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+}
+.task-return-button {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    background: var(--light_grey);
+    color: var(--green);
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 0px;
+    line-height: 1;
 }

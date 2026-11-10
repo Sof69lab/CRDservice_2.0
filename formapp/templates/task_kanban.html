@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Задачи ГИПа</title>
+    <link rel="stylesheet" href="{% static 'css/stylesheet.css'%}" type="text/css">
+</head>
+<body>
+<h3 id="reest_num">Перечень задач для реестра {{ reest.project_dogovor }}-{{ reest.num_reestr }}</h3>
+<button class="bright-blue-button" id="all_departments" onclick="filterByDep(this)" name="dep_filter">Все</button>
+{% for d in departments %}
+    <button class="bright-blue-button" onclick="filterByDep(this)" name="dep_filter">{{ d }}</button>
+{% endfor %}
+<div class="kanban">
+    <div class="kanban-column">
+        <div class="kanban-column-header" style="background: var(--orange);">Новые задачи</div>
+        <div class="kanban-cards">
+            {% for task in tasks_new %}
+                {% if task.actuality %}
+                    <div class="kanban-card" style="border-color: var(--orange);">
+                        <p style="color: var(--grey); position: absolute; left: 4px; top: 2px; margin: 0px;">
+                            {% if task.type_number == "7.1" or task.type_number == "7.2" or task.type_number == "7.3" or task.type_number == "7.4" or task.type_number == "7.5" or task.type_number == "7.6" or task.type_number == "1.1.1" or task.type_number == "1.1.2" or task.type_number == "1.1.3" or task.type_number == "1.1.4" or task.type_number == "1.2" or task.type_number == "1.3" %}
+                            <span style="color: var(--red); font-weight: bold; font-size: 14px;">!</span>
+                            {% endif %}
+                            Замечание: {{ task.task_remark }}
+                        </p>
+                        {% if task.task_deadlines %}
+                            <p style="color: var(--grey); position: absolute; right: 4px; bottom: 16px; margin: 0px;">Срок: {{ task.task_deadlines }}</p>
+                        {% endif %}
+                        <button class="task-cancel-button" onclick="event.stopPropagation(); this.nextElementSibling.submit();">&#10060</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="canceling" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                        <p style="white-space: pre-line; margin-top: 18px; margin-bottom: 18px;">{{ task.task_text }}</p>
+                        {% if task.task_departments %}
+                            <p style="color: var(--grey); position: absolute; left: 4px; bottom: 16px; margin: 0px;" class="dep">Подразделения: {{ task.task_departments }}</p>
+                        {% endif %}
+                        <button class="task-button" style="position: absolute; right: 2px; bottom: 2px; color: var(--blue);" onclick="event.stopPropagation(); this.nextElementSibling.submit();">▶</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="to_work" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="kanban-card-canceled">
+                        <p style="color: var(--grey); position: absolute; left: 4px; top: 2px; margin: 0px;">
+                            {% if task.type_number == "7.1" or task.type_number == "7.2" or task.type_number == "7.3" or task.type_number == "7.4" or task.type_number == "7.5" or task.type_number == "7.6" or task.type_number == "1.1.1" or task.type_number == "1.1.2" or task.type_number == "1.1.3" or task.type_number == "1.1.4" or task.type_number == "1.2" or task.type_number == "1.3" %}
+                            <span style="color: var(--red); font-weight: bold; font-size: 14px;">!</span>
+                            {% endif %}
+                            Замечание: {{ task.task_remark }}
+                        </p>
+                        {% if task.task_deadlines %}
+                        <p style="color: var(--grey); position: absolute; right: 4px; bottom: 4px; margin: 0px;">Срок: {{ task.task_deadlines }}</p>
+                        {% endif %}
+                        <button class="task-return-button" onclick="event.stopPropagation(); this.nextElementSibling.submit();">&#8630</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="canceling" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                        <p style="white-space: pre-line; margin-top: 18px; margin-bottom: 18px;"><s>{{ task.task_text }}</s></p>
+                        {% if task.task_departments %}
+                        <p style="color: var(--grey); position: absolute; left: 4px; bottom: 4px; margin: 0px;" class="dep">Подразделения: {{ task.task_departments }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="kanban-column">
+        <div class="kanban-column-header" style="background: var(--blue);">В работе</div>
+        <div class="kanban-cards">
+            {% for task in tasks_work %}
+                {% if task.actuality %}
+                    <div class="kanban-card" style="border-color: var(--blue);">
+                        <p style="color: var(--grey); position: absolute; left: 4px; top: 2px; margin: 0px;">
+                            {% if task.type_number == "7.1" or task.type_number == "7.2" or task.type_number == "7.3" or task.type_number == "7.4" or task.type_number == "7.5" or task.type_number == "7.6" or task.type_number == "1.1.1" or task.type_number == "1.1.2" or task.type_number == "1.1.3" or task.type_number == "1.1.4" or task.type_number == "1.2" or task.type_number == "1.3" %}
+                            <span style="color: var(--red); font-weight: bold; font-size: 14px;">!</span>
+                            {% endif %}
+                            Замечание: {{ task.task_remark }}
+                        </p>
+                        {% if task.task_deadlines %}
+                            <p style="color: var(--grey); position: absolute; right: 4px; bottom: 16px; margin: 0px;">Срок: {{ task.task_deadlines }}</p>
+                        {% endif %}
+                        <button class="task-cancel-button" onclick="event.stopPropagation(); this.nextElementSibling.submit();">&#10060</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="canceling" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                        <p style="white-space: pre-line; margin-top: 18px; margin-bottom: 18px;">{{ task.task_text }}</p>
+                        {% if task.task_departments %}
+                            <p style="color: var(--grey); position: absolute; left: 4px; bottom: 16px; margin: 0px;" class="dep">Подразделения: {{ task.task_departments }}</p>
+                        {% endif %}
+                        <button class="task-button" style="position: absolute; left: 2px; bottom: 2px; color: var(--orange);" onclick="event.stopPropagation(); this.nextElementSibling.submit();">◀</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="to_new" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                        <button class="task-button" style="position: absolute; right: 2px; bottom: 2px; color: var(--green);" onclick="event.stopPropagation(); this.nextElementSibling.submit();">▶</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="to_done" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="kanban-card-canceled">
+                        <p style="color: var(--grey); position: absolute; left: 4px; top: 2px; margin: 0px;">
+                            {% if task.type_number == "7.1" or task.type_number == "7.2" or task.type_number == "7.3" or task.type_number == "7.4" or task.type_number == "7.5" or task.type_number == "7.6" or task.type_number == "1.1.1" or task.type_number == "1.1.2" or task.type_number == "1.1.3" or task.type_number == "1.1.4" or task.type_number == "1.2" or task.type_number == "1.3" %}
+                            <span style="color: var(--red); font-weight: bold; font-size: 14px;">!</span>
+                            {% endif %}
+                            Замечание: {{ task.task_remark }}
+                        </p>
+                        {% if task.task_deadlines %}
+                        <p style="color: var(--grey); position: absolute; right: 4px; bottom: 4px; margin: 0px;">Срок: {{ task.task_deadlines }}</p>
+                        {% endif %}
+                        <button class="task-return-button" onclick="event.stopPropagation(); this.nextElementSibling.submit();">&#8630</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="canceling" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                        <p style="white-space: pre-line; margin-top: 18px; margin-bottom: 18px;"><s>{{ task.task_text }}</s></p>
+                        {% if task.task_departments %}
+                        <p style="color: var(--grey); position: absolute; left: 4px; bottom: 4px; margin: 0px;" class="dep">Подразделения: {{ task.task_departments }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="kanban-column">
+        <div class="kanban-column-header" style="background: var(--green);">Выполнено</div>
+        <div class="kanban-cards">
+            {% for task in tasks_done %}
+                {% if task.actuality %}
+                    <div class="kanban-card" style="border-color: var(--green);">
+                        <p style="color: var(--grey); position: absolute; left: 4px; top: 2px; margin: 0px;">
+                            {% if task.type_number == "7.1" or task.type_number == "7.2" or task.type_number == "7.3" or task.type_number == "7.4" or task.type_number == "7.5" or task.type_number == "7.6" or task.type_number == "1.1.1" or task.type_number == "1.1.2" or task.type_number == "1.1.3" or task.type_number == "1.1.4" or task.type_number == "1.2" or task.type_number == "1.3" %}
+                            <span style="color: var(--red); font-weight: bold; font-size: 14px;">!</span>
+                            {% endif %}
+                            Замечание: {{ task.task_remark }}
+                        </p>
+                        {% if task.task_deadlines %}
+                            <p style="color: var(--grey); position: absolute; right: 4px; bottom: 16px; margin: 0px;">Срок: {{ task.task_deadlines }}</p>
+                        {% endif %}
+                        <button class="task-cancel-button" onclick="event.stopPropagation(); this.nextElementSibling.submit();">&#10060</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="canceling" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                        <p style="white-space: pre-line; margin-top: 18px; margin-bottom: 18px;">{{ task.task_text }}</p>
+                        {% if task.task_departments %}
+                            <p style="color: var(--grey); position: absolute; left: 4px; bottom: 16px; margin: 0px;" class="dep">Подразделения: {{ task.task_departments }}</p>
+                        {% endif %}
+                        <button class="task-button" style="position: absolute; left: 2px; bottom: 2px; color: var(--blue);" onclick="event.stopPropagation(); this.nextElementSibling.submit();">◀</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="to_work" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                        <button class="task-button" style="position: absolute; right: 2px; bottom: 2px; color: var(--grey);" onclick="event.stopPropagation(); this.nextElementSibling.submit();">▶</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="to_archive" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="kanban-card-canceled">
+                        <p style="color: var(--grey); position: absolute; left: 4px; top: 2px; margin: 0px;">
+                            {% if task.type_number == "7.1" or task.type_number == "7.2" or task.type_number == "7.3" or task.type_number == "7.4" or task.type_number == "7.5" or task.type_number == "7.6" or task.type_number == "1.1.1" or task.type_number == "1.1.2" or task.type_number == "1.1.3" or task.type_number == "1.1.4" or task.type_number == "1.2" or task.type_number == "1.3" %}
+                            <span style="color: var(--red); font-weight: bold; font-size: 14px;">!</span>
+                            {% endif %}
+                            Замечание: {{ task.task_remark }}
+                        </p>
+                        {% if task.task_deadlines %}
+                            <p style="color: var(--grey); position: absolute; right: 4px; bottom: 4px; margin: 0px;">Срок: {{ task.task_deadlines }}</p>
+                        {% endif %}
+                        <button class="task-return-button" onclick="event.stopPropagation(); this.nextElementSibling.submit();">&#8630</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="canceling" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                        <p style="white-space: pre-line; margin-top: 18px; margin-bottom: 18px;"><s>{{ task.task_text }}</s></p>
+                        {% if task.task_departments %}
+                            <p style="color: var(--grey); position: absolute; left: 4px; bottom: 4px; margin: 0px;" class="dep">Подразделения: {{ task.task_departments }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <div class="kanban-column">
+        <div class="kanban-column-header" style="background: var(--grey);">Архив</div>
+        <div class="kanban-cards">
+            {% for task in tasks_archive %}
+                {% if task.actuality %}
+                    <div class="kanban-card" style="border-color: var(--grey);">
+                        <p style="color: var(--grey); position: absolute; left: 4px; top: 2px; margin: 0px;">
+                            {% if task.type_number == "7.1" or task.type_number == "7.2" or task.type_number == "7.3" or task.type_number == "7.4" or task.type_number == "7.5" or task.type_number == "7.6" or task.type_number == "1.1.1" or task.type_number == "1.1.2" or task.type_number == "1.1.3" or task.type_number == "1.1.4" or task.type_number == "1.2" or task.type_number == "1.3" %}
+                            <span style="color: var(--red); font-weight: bold; font-size: 14px;">!</span>
+                            {% endif %}
+                            Замечание: {{ task.task_remark }}
+                        </p>
+                        {% if task.task_deadlines %}
+                            <p style="color: var(--grey); position: absolute; right: 4px; bottom: 16px; margin: 0px;">Срок: {{ task.task_deadlines }}</p>
+                        {% endif %}
+                        <button class="task-cancel-button" onclick="event.stopPropagation(); this.nextElementSibling.submit();">&#10060</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="canceling" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                        <p style="white-space: pre-line; margin-top: 18px; margin-bottom: 18px;">{{ task.task_text }}</p>
+                        {% if task.task_departments %}
+                            <p style="color: var(--grey); position: absolute; left: 4px; bottom: 16px; margin: 0px;" class="dep">Подразделения: {{ task.task_departments }}</p>
+                        {% endif %}
+                        <button class="task-button" style="position: absolute; left: 2px; bottom: 2px; color: var(--green);" onclick="event.stopPropagation(); this.nextElementSibling.submit();">◀</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="to_done" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="kanban-card-canceled">
+                        <p style="color: var(--grey); position: absolute; left: 4px; top: 2px; margin: 0px;">
+                            {% if task.type_number == "7.1" or task.type_number == "7.2" or task.type_number == "7.3" or task.type_number == "7.4" or task.type_number == "7.5" or task.type_number == "7.6" or task.type_number == "1.1.1" or task.type_number == "1.1.2" or task.type_number == "1.1.3" or task.type_number == "1.1.4" or task.type_number == "1.2" or task.type_number == "1.3" %}
+                            <span style="color: var(--red); font-weight: bold; font-size: 14px;">!</span>
+                            {% endif %}
+                            Замечание: {{ task.task_remark }}
+                        </p>
+                        {% if task.task_deadlines %}
+                            <p style="color: var(--grey); position: absolute; right: 4px; bottom: 4px; margin: 0px;">Срок: {{ task.task_deadlines }}</p>
+                        {% endif %}
+                        <button class="task-return-button" onclick="event.stopPropagation(); this.nextElementSibling.submit();">&#8630</button>
+                        <form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input name="canceling" hidden value="true">
+                            <input name="task_id" hidden value="{{ task.id }}">
+                        </form>
+                        <p style="white-space: pre-line; margin-top: 18px; margin-bottom: 18px;"><s>{{ task.task_text }}</s></p>
+                        {% if task.task_departments %}
+                            <p style="color: var(--grey); position: absolute; left: 4px; bottom: 4px; margin: 0px;" class="dep">Подразделения: {{ task.task_departments }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<button class="blue-button"><a style="color:white" class="text" href="{% url 'home' %}">Вернуться к реестрам</a></button>
+<button class="blue-button"><a style="color:white" class="text" href="{% url 'homeGIP' id=reest.id %}">Вернуться к замечаниям</a></button>
+<form hidden novalidate method="post" onsubmit="return false;" enctype="multipart/form-data" id="table_export_form">
+    {% csrf_token %}
+    <input name="table_export" hidden value="true">
+</form>
+<button class="turquoise-button" onclick="event.stopPropagation(); document.getElementById('table_export_form').submit();">Выгрузить задачи в файл</button>
+</body>
+<script>
+    let cards = Array.from(document.querySelectorAll('.kanban-card-canceled, .kanban-card'));
+    console.log(cards);
+    let departments = document.getElementsByName("dep_filter");
+    let all_dep = false;
+    function filterByDep(e) {
+        if (e.id == "all_departments") {
+            if (e.className == "bright-blue-button") {
+                departments.forEach(item => {item.className = "grey-button"});
+                cards.forEach(item => {item.setAttribute("hidden", "hidden")});
+            } else {
+                departments.forEach(item => {item.className = "bright-blue-button"});
+                cards.forEach(item => {item.removeAttribute("hidden")});
+            }
+        } else {
+            let re = new RegExp(`(?:^|,\\s*|\\s+)${e.innerHTML}(&=,\\s*|\\s+|$)`);
+            if (e.className == "bright-blue-button") {
+                e.className = "grey-button";
+                all_dep = true;
+                for (let i=1; i < departments.length; i++) {
+                    if (departments[i].className == "bright-blue-button") {
+                        all_dep = false;
+                        break;
+                    }
+                }
+                if (all_dep) {
+                    departments[0].className = "grey-button";
+                }
+                for (let i=0; i < cards.length; i++) {
+                    if (re.test(cards[i].querySelector('.dep').innerHTML)) {
+                        cards[i].setAttribute('hidden', 'hidden');
+                    }
+                }
+            } else {
+                e.className = "bright-blue-button";
+                all_dep = true;
+                for (let i=1; i < departments.length; i++) {
+                    if (departments[i].className == "grey-button") {
+                        all_dep = false;
+                        break;
+                    }
+                }
+                if (all_dep) {
+                    departments[0].className = "bright-blue-button";
+                }
+                for (let i=0; i < cards.length; i++) {
+                    if (re.test(cards[i].querySelector('.dep').innerHTML)) {
+                        cards[i].removeAttribute('hidden');
+                    }
+                }
+            }
+        }
+    }
+</script>
+</html>

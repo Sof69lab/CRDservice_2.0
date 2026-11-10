@@ -4,7 +4,7 @@ from formapp.functions import *
 from django.shortcuts import render
 from django.utils import timezone
 from formapp.forms import *
-from formapp.models import reestr, reestInfo, files, contracts, customers, aiChatSession, aiChatMessage
+from formapp.models import reestr, reestInfo, files, contracts, customers, aiChatSession, aiChatMessage, gipTask
 from changelog.models import ChangeLog
 from formapp.auto_remark import auto_import, auto_export
 from formsite.settings import MEDIA_ROOT
@@ -23,6 +23,7 @@ from io import StringIO
 
 emptyUserID = User.objects.filter(last_name="1. Сотрудник больше не работает")[0].id
 emptyUserID = 1
+root_cause_text_numbers = ['1.1. ', '1.2. ', '1.3. ', '1. ', '2.1. ', '2.2. ', '2. ', '3.1. ', '3.2. ', '3.3. ', '3. ', '4.1. ', '4.2. ', '4.3. ', '4.4. ', '4.5. ', '4.6. ', '4. ', '5.1. ', '5.2. ', '5.3. ', '5. ', '6. ', '7. ']
 
 order_subquery = reestr.objects.filter(reestrID=OuterRef("pk")).exclude(status__in=["На согласовании Рецензентом", "Замечание снято"])
 
@@ -96,6 +97,36 @@ remark_employee_priority_order = Case(
 )
 
 MAX_FILE_UPLOAD = 30 * 1024 * 1024
+DEP_ARRAY = ["ГТО", "ГО", "ОСО", "ОГиТ", "ОКиВД", "ОССС", "ОТВС", "ОЭиРБ", "ОЭА", "ПО", "СО", "ТХО", "ЭО", "ОГИП", "Гр. ИГДИ", "Гр. ИГИ", "Гр. ИГФИ", "Гр. ИГМИ", "Гр. ИЭИ", "ХГЛ", "АГ", "НИЛ-11", "НИО-28", "ХАЛ", "НИЛ-35", "НИЛ-5", "НИО-32", "Субподряд"]
+DEP_FULL_ARRAY = ['Гидротехнический отдел (ГТО)',
+                  'Горный отдел (ГО)',
+                  'Общестроительный отдел (ОСО)',
+                  'Отдел генплана и транспорта (ОГиТ)',
+                  'Отдел комплектации и выпуска документации (ОКиВД)',
+                  'Отдел связи, сигнализации и спецразделов (ОССС)',
+                  'Отдел тепловодоснабжения (ОТВС)',
+                  'Отдел экологии и радиационной безопасности (ОЭиРБ)',
+                  'Отдел экономического анализа (ОЭА)',
+                  'Производственный отдел (ПО)',
+                  'Сметный отдел (СО)',
+                  'Технологический отдел (ТХО)',
+                  'Электротехнический отдел (ЭО)',
+                  'Отдел главных инженеров проекта (ОГИП)',
+                  'Группа инженерно-геодезических изысканий (Гр. ИГДИ)',
+                  'Группа инженерно-геологических изысканий (Гр. ИГИ)',
+                  'Группа инженерно-геофизических исследований (Гр. ИГФИ)',
+                  'Группа инженерно-гидрометеорологических изысканий (Гр. ИГМИ)',
+                  'Группа инженерно-экологических изысканий (Гр. ИЭИ)',
+                  'Химико-грунтоведческая лаборатория (ХГЛ)',
+                  'Аналитическая группа (АГ)',
+                  'Научно-исследовательская лаборатория радиационной безопасности (НИЛ-11)',
+                  'Научно-исследовательский отдел горных работ (НИО-28)',
+                  'Химико-аналитическая лаборатория (ХАЛ)',
+                  'Научно-исследовательская лаборатория технологии выщелачивания (НИЛ-35)',
+                  'Научно-исследовательский отдел гидрогеологического моделирования и глубинного захоронения жидких отходов (НИЛ-5)',
+                  'Научно-исследовательский отдел комплексной переработки сырья (НИО-32)',
+                  'Субподряд']
+EXCLUDE_ARRAY = ['Отдел комплектации и выпуска документации (ОКиВД)', 'Производственный отдел (ПО)', 'Группа инженерно-геофизических исследований (Гр. ИГФИ)', 'Аналитическая группа (АГ)']
 
 def home(request):
     info = []
@@ -728,7 +759,7 @@ def home(request):
         if request.POST.get('email'):
             return render(request, 'index.html',
                           {'reestrs': reestrs, 'group': group, 'info': info, 'department': department,
-                           'reviewer_sended': reviewer_sended, 'closed': closed, 'worked': len(reestrs)-reviewer_sended-closed, 'reviewer_sended_reestNum': reviewer_sended_reestNum})
+                           'reviewer_sended': reviewer_sended, 'closed': closed, 'worked': len(reestrs)-reviewer_sended-closed, 'reviewer_sended_reestNum': reviewer_sended_reestNum, 'username': shortName(request.user)})
         elif request.POST.get('causes_downloader'):
             begin_date = request.POST.get("begin_date")
             end_date = request.POST.get("end_date")
@@ -740,7 +771,7 @@ def home(request):
             else:
                 return render(request, 'index.html',
                               {'reestrs': reestrs, 'group': group, 'info': info, 'department': department,
-                               'reviewer_sended': reviewer_sended, 'closed': closed, 'worked': len(reestrs)-reviewer_sended-closed, 'reviewer_sended_reestNum': reviewer_sended_reestNum})
+                               'reviewer_sended': reviewer_sended, 'closed': closed, 'worked': len(reestrs)-reviewer_sended-closed, 'reviewer_sended_reestNum': reviewer_sended_reestNum, 'username': shortName(request.user)})
         else:
             name = xlslxCreate(request)
             file_path = MEDIA_ROOT + "\\Tables" + name
@@ -749,7 +780,7 @@ def home(request):
     else:
         return render(request, 'index.html',
                       {'reestrs': reestrs, 'group': group, 'info': info, 'department': department,
-                       'reviewer_sended': reviewer_sended, 'closed': closed, 'worked': len(reestrs)-reviewer_sended-closed, 'reviewer_sended_reestNum': reviewer_sended_reestNum})
+                       'reviewer_sended': reviewer_sended, 'closed': closed, 'worked': len(reestrs)-reviewer_sended-closed, 'reviewer_sended_reestNum': reviewer_sended_reestNum, 'username': shortName(request.user)})
 
 def newReestr(request):
     if request.user.groups.filter(name='ГИП').exists() or request.user.groups.filter(
@@ -1007,6 +1038,478 @@ def date_formatting(d):
     result += str(d.month) +'.' + str(d.year)
     return result
 
+def task_creating(reest, r):
+    status_str = "Новая задача"
+    if r.status == "Замечание снято":
+        status_str = "В архиве"
+    actuality = False
+    if r.actuality:
+        actuality = True
+    tasks11 = gipTask.objects.filter((Q(type_number__in=['1.1.1', '1.1.2', '1.1.3', '1.1.4']) & Q(task_remark=r)))
+    tasks12 = gipTask.objects.filter((Q(type_number='1.2') & Q(task_remark=r)))
+    tasks13 = gipTask.objects.filter((Q(type_number='1.3') & Q(task_remark=r)))
+    tasks2 = gipTask.objects.filter((Q(type_number='2') & Q(task_remark=r)))
+    tasks3 = gipTask.objects.filter((Q(type_number='3') & Q(task_remark=r)))
+    tasks412 = gipTask.objects.filter((Q(type_number__in=['4.1', '4.2']) & Q(task_remark=r)))
+    tasks434 = gipTask.objects.filter((Q(type_number__in=['4.3', '4.4']) & Q(task_remark=r)))
+    tasks7 = gipTask.objects.filter((Q(type_number__in=['7.1', '7.2', '7.3', '7.4', '7.5', '7.6']) & Q(task_remark=r)))
+    # блок1
+    #блок1.1
+    if r.importance1 and (r.imp1_comment_znp is not None and r.imp1_comment_znp != ''):
+        if len(tasks11) == 0:
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='1.1.1',
+                task_reestr=reest,
+                task_remark=r,
+                task_text="Проверить перечень нарушенных " + r.department + " требований ЗНП: " + r.imp1_comment_znp,
+                task_departments=r.department,
+                task_data=r.imp1_comment_znp,
+                task_status=status_str,
+                actuality=actuality
+            )
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='1.1.2',
+                task_reestr=reest,
+                task_remark=r,
+                task_text="Запланировать совещание с " + r.department + " для обсуждения необходимости внесения изменений в ЗНП",
+                task_departments=r.department,
+                task_status=status_str,
+                actuality=actuality
+            )
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='1.1.3',
+                task_reestr=reest,
+                task_remark=r,
+                task_text="Подготовить перечень изменений для внесения в ЗНП по обратной связи от " + r.department,
+                task_departments=r.department,
+                task_status=status_str,
+                actuality=actuality
+            )
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='1.1.4',
+                task_reestr=reest,
+                task_remark=r,
+                task_text="Запланировать совещание с Заказчиком для обсуждения внесения изменений в ЗНП по обратной связи от " + r.department,
+                task_departments=r.department,
+                task_status=status_str,
+                actuality=actuality
+            )
+        else:
+            for t in tasks11:
+                if t.type_number=='1.1.1' and (r.department != t.task_department or r.imp1_comment_znp != t.task_data):
+                    t.task_text = "Проверить перечень нарушенных " + r.department + " требований ЗНП: " + r.imp1_comment_znp
+                    t.task_departments = r.department
+                    t.task_data = r.imp1_comment_znp
+                    t.save()
+                if t.type_number=='1.1.2' and r.department != t.task_department:
+                    t.task_text = "Запланировать совещание с " + r.department + " для обсуждения необходимости внесения изменений в ЗНП"
+                    t.task_departments = r.department
+                    t.save()
+                if t.type_number=='1.1.3' and r.department != t.task_department:
+                    t.task_text = "Подготовить перечень изменений для внесения в ЗНП по обратной связи от " + r.department
+                    t.task_departments = r.department
+                    t.save()
+                if t.type_number=='1.1.4' and r.department != t.task_department:
+                    t.task_text = "Запланировать совещание с Заказчиком для обсуждения внесения изменений в ЗНП по обратной связи от " + r.department
+                    t.task_departments = r.department
+                    t.save()
+    if (not r.importance1 or r.imp1_comment_znp is None or r.imp1_comment_znp == '') and len(tasks11) > 0:
+        for t in tasks11:
+            if not t.manual_change:
+                t.actuality = False
+                t.save()
+    # блок1.2
+    if r.importance1 and (r.imp1_comment_nd is not None and r.imp1_comment_nd != ''):
+        if len(tasks12) == 0:
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='1.2',
+                task_reestr=reest,
+                task_remark=r,
+                task_text="Проверить перечень нарушенных " + r.department + " обязательных требований нормативных документов: " + r.imp1_comment_nd,
+                task_departments=r.department,
+                task_data=r.imp1_comment_nd,
+                task_status=status_str,
+                actuality=actuality
+            )
+        elif r.department != tasks12[0].task_departments or tasks12[0].task_data != r.imp1_comment_nd:
+            tasks12[0].task_text = "Проверить перечень нарушенных " + r.department + " обязательных требований нормативных документов: " + r.imp1_comment_nd
+            tasks12[0].task_departments = r.department
+            tasks12[0].task_data = r.imp1_comment_nd
+            tasks12[0].save()
+    if (not r.importance1 or r.imp1_comment_nd is None or r.imp1_comment_nd == '') and len(tasks12) > 0:
+        for t in tasks12:
+            if not t.manual_change:
+                t.actuality = False
+                t.save()
+    # блок1.3
+    if r.importance1:
+        if len(tasks13) == 0:
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='1.3',
+                task_reestr=reest,
+                task_remark=r,
+                task_text="Подготовить перечень доработок, которые необходимо внести " + r.department + " в проект/раздел/подраздел",
+                task_departments=r.department,
+                task_status=status_str,
+                actuality=actuality
+            )
+        elif r.department != tasks13[0].task_departments:
+            tasks13[
+                0].task_text = "Подготовить перечень доработок, которые необходимо внести " + r.department + " в проект/раздел/подраздел"
+            tasks13[0].task_departments = r.department
+            tasks13[0].save()
+    elif len(tasks13) > 0:
+        for t in tasks13:
+            if not t.manual_change:
+                t.actuality = False
+                t.save()
+    # блок2
+    if r.importance2 or r.importance5:
+        if len(tasks2) == 0:
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='2',
+                task_reestr=reest,
+                task_remark=r,
+                task_text="Проконтролировать внесение изменений " + r.department + " в документацию в срок " + date_formatting(
+                    r.answer_deadline_correct_plan),
+                task_departments=r.department,
+                task_deadlines=r.answer_deadline_correct_plan,
+                task_status=status_str,
+                actuality=actuality
+            )
+        elif tasks2[0].task_departments != r.department or tasks2[0].task_deadlines != r.answer_deadline_correct_plan:
+            tasks2[0].task_text = "Проконтролировать внесение изменений " + r.department + " в документацию в срок " + date_formatting(r.answer_deadline_correct_plan)
+            tasks2[0].task_departments = r.department
+            tasks2[0].task_deadlines = r.answer_deadline_correct_plan
+            tasks2[0].save()
+    if (not r.importance2 and not r.importance5) and len(tasks2) > 0:
+        for t in tasks2:
+            if not t.manual_change:
+                t.actuality = False
+                t.save()
+    # блок3
+    if r.importance3 and r.imp3_dep is not None and r.imp3_dep != '':
+        deps = r.imp3_dep.split(', ')
+        if len(tasks3) == 0:
+            for d in deps:
+                gipTask.objects.create(
+                    initial_date=date.today(),
+                    type_number='3',
+                    task_reestr=reest,
+                    task_remark=r,
+                    task_text="Направить данное замечание в смежное подразделение: " + d,
+                    task_departments=r.imp3_dep,
+                    task_data=r.imp3_comment,
+                    task_status=status_str,
+                    actuality=actuality
+                )
+        else:
+            used_d = []
+            for t in tasks3:
+                if t.tasks_departments not in deps:
+                    if not t.manual_change:
+                        t.actuality = False
+                        t.save()
+                else:
+                    used_d.append(t.tasks_departments)
+                    if t.task_data != r.imp3_comment:
+                        t.task_data = r.imp3_comment
+                        t.save()
+            for d in deps:
+                if d not in used_d:
+                    gipTask.objects.create(
+                        initial_date=date.today(),
+                        type_number='3',
+                        task_reestr=reest,
+                        task_remark=r,
+                        task_text="Направить данное замечание в смежное подразделение: " + d,
+                        task_departments=r.imp3_dep,
+                        task_data=r.imp3_comment,
+                        task_status=status_str,
+                        actuality=actuality
+                    )
+    elif r.importance3 and len(tasks3) == 0:
+        gipTask.objects.create(
+            initial_date=date.today(),
+            type_number='3',
+            task_reestr=reest,
+            task_remark=r,
+            task_text="Направить данное замечание в смежное подразделение.",
+            task_status=status_str,
+            actuality=actuality
+        )
+    if (not r.importance3) and len(tasks3) > 0:
+        for t in tasks3:
+            if not t.manual_change:
+                t.actuality = False
+                t.save()
+    # блок4
+    if r.importance4 and r.imp4_comment is not None and r.imp4_comment != '' and r.imp4_out_date is not None:
+        deps = r.imp4_comment.split(', ')
+        if len(tasks412) == 0:
+            for d in deps:
+                gipTask.objects.create(
+                    initial_date=date.today(),
+                    type_number='4.1',
+                    task_reestr=reest,
+                    task_remark=r,
+                    task_text="Проконтролировать подготовку и выдачу " + r.department + " задания в смежное подразделение " + d + ", " + (date_formatting(r.imp4_out_date[d]) if r.imp4_out_date[d] is not None else ''),
+                    task_departments=r.department + ', ' + d,
+                    task_deadlines=r.imp4_out_date[d],
+                    task_status=status_str,
+                    actuality=actuality
+                )
+                gipTask.objects.create(
+                    initial_date=date.today(),
+                    type_number='4.2',
+                    task_reestr=reest,
+                    task_remark=r,
+                    task_text="Проконтролировать внесение изменений в документацию " + d,
+                    task_departments=d,
+                    task_status=status_str,
+                    actuality=actuality
+                )
+        else:
+            used_d = []
+            for t in tasks412:
+                if t.tasks_departments not in deps:
+                    if not t.manual_change:
+                        t.actuality = False
+                        t.save()
+                else:
+                    if t.type_number == '4.1' and t.task_deadlines != r.imp4_out_date[t.tasks_departments]:
+                        t.task_text = "Проконтролировать подготовку и выдачу " + r.department + " задания в смежное подразделение " + t.tasks_departments + ", " + (date_formatting(r.imp4_out_date[t.tasks_departments]) if r.imp4_out_date[t.tasks_departments] is not None else '')
+                        t.task_deadlines = r.imp4_out_date[t.tasks_departments]
+                        t.save()
+                        used_d.append(t.tasks_departments)
+            for d in deps:
+                if d not in used_d:
+                    gipTask.objects.create(
+                        initial_date=date.today(),
+                        type_number='4.1',
+                        task_reestr=reest,
+                        task_remark=r,
+                        task_text="Проконтролировать подготовку и выдачу " + r.department + " задания в смежное подразделение " + d + ", " + (
+                            date_formatting(r.imp4_out_date[d]) if r.imp4_out_date[d] is not None else ''),
+                        task_departments=r.department + ', ' + d,
+                        task_deadlines=r.imp4_out_date[d],
+                        task_status=status_str,
+                        actuality=actuality
+                    )
+                    gipTask.objects.create(
+                        initial_date=date.today(),
+                        type_number='4.2',
+                        task_reestr=reest,
+                        task_remark=r,
+                        task_text="Проконтролировать внесение изменений в документацию " + d,
+                        task_departments=d,
+                        task_status=status_str,
+                        actuality=actuality
+                    )
+    if (not r.importance4 or r.imp4_comment is None or r.imp4_comment == '') and len(tasks412) > 0:
+        for t in tasks412:
+            if not t.manual_change:
+                t.actuality = False
+                t.save()
+    if r.importance4 and r.imp4_comment_in is not None and r.imp4_comment_in != '' and r.imp4_in_date is not None:
+        deps = r.imp4_comment_in.split(', ')
+        if len(tasks434) > 0:
+            for d in deps:
+                gipTask.objects.create(
+                    initial_date=date.today(),
+                    type_number='4.3',
+                    task_reestr=reest,
+                    task_remark=r,
+                    task_text="Проконтролировать подготовку и выдачу " + d + " задания(й) в " + r.department + ", " + date_formatting(
+                        r.imp4_in_date[d]),
+                    task_departments=r.department + ', ' + d,
+                    task_deadlines=r.imp4_in_date[d],
+                    task_status=status_str,
+                    actuality=actuality
+                )
+                gipTask.objects.create(
+                    initial_date=date.today(),
+                    type_number='4.4',
+                    task_reestr=reest,
+                    task_remark=r,
+                    task_text="Проконтролировать внесение изменений в документацию " + r.department + " по заданию от " + d,
+                    task_departments=r.department,
+                    task_status=status_str,
+                    actuality=actuality
+                )
+        else:
+            used_d = []
+            for t in tasks434:
+                if t.tasks_departments not in deps:
+                    if not t.manual_change:
+                        t.actuality = False
+                        t.save()
+                else:
+                    if t.type_number == '4.3' and t.task_deadlines != r.imp4_in_date[t.tasks_departments]:
+                        t.task_text = "Проконтролировать подготовку и выдачу " + t.task_departments + " задания(й) в " + r.department + ", " + date_formatting(r.imp4_in_date[t.tasks_departments])
+                        t.task_deadlines = r.imp4_in_date[t.tasks_departments]
+                        t.save()
+                        used_d.append(t.tasks_departments)
+            for d in deps:
+                if d not in used_d:
+                    gipTask.objects.create(
+                        initial_date=date.today(),
+                        type_number='4.3',
+                        task_reestr=reest,
+                        task_remark=r,
+                        task_text="Проконтролировать подготовку и выдачу " + d + " задания(й) в " + r.department + ", " + date_formatting(
+                            r.imp4_in_date[d]),
+                        task_departments=r.department + ', ' + d,
+                        task_deadlines=r.imp4_in_date[d],
+                        task_status=status_str,
+                        actuality=actuality
+                    )
+                    gipTask.objects.create(
+                        initial_date=date.today(),
+                        type_number='4.4',
+                        task_reestr=reest,
+                        task_remark=r,
+                        task_text="Проконтролировать внесение изменений в документацию " + r.department + " по заданию от " + d,
+                        task_departments=r.department,
+                        task_status=status_str,
+                        actuality=actuality
+                    )
+    if (not r.importance4 or r.imp4_comment_in is None or r.imp4_comment_in == '') and len(tasks434) > 0:
+        for t in tasks434:
+            if not t.manual_change:
+                t.actuality = False
+                t.save()
+    # блок7
+    if r.importance7 and r.imp7_comment is not None and r.imp7_comment != '':
+        if len(tasks7) == 0:
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='7.1',
+                task_reestr=reest,
+                task_remark=r,
+                task_text="Подготовить перечень исходных данных от Заказчика для " + r.department + ": " + ", ".join(r.imp7_comment),
+                task_departments=r.department,
+                task_data=r.imp7_comment,
+                task_status=status_str,
+                actuality=actuality
+            )
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='7.2',
+                task_reestr=reest,
+                task_remark=r,
+                task_text="Запланировать совещание с " + r.department + " для обсуждения получения дополнительных исходных данных от Заказчика;",
+                task_departments=r.department,
+                task_data=r.imp7_comment,
+                task_status=status_str,
+                actuality=actuality
+            )
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='7.4',
+                task_reestr=reest,
+                task_remark=r,
+                task_text="Запланировать совещание с Заказчиком для обсуждения получения дополнительных исходных данных для " + r.department,
+                task_departments=r.department,
+                task_data=r.imp7_comment,
+                task_status=status_str,
+                actuality=actuality
+            )
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='7.6',
+                task_reestr=reest,
+                task_remark=r,
+                task_text="Проконтролировать внесение изменений в документацию " + r.department + " по дополнительным исходным данным от Заказчика",
+                task_departments=r.department,
+                task_data=r.imp7_comment,
+                task_status=status_str,
+                actuality=actuality
+            )
+            text_str = "Запросить у Заказчика перечень исходных данных для " + r.department + ":"
+            for i, j in zip(r.imp7_comment, r.imp7_date):
+                print(i, j)
+                text_str += '\n'+i + ' в срок до ' + date_formatting(j)
+                gipTask.objects.create(
+                    initial_date=date.today(),
+                    type_number='7.5',
+                    task_reestr=reest,
+                    task_remark=r,
+                    task_text="Направить полученные от Заказчика " + i + " в срок до " + date_formatting(j),
+                    task_departments=r.department,
+                    task_data=i,
+                    task_deadlines=j,
+                    task_status=status_str,
+                    actuality=actuality
+                )
+            gipTask.objects.create(
+                initial_date=date.today(),
+                type_number='7.3',
+                task_reestr=reest,
+                task_remark=r,
+                task_text=text_str,
+                task_departments=r.department,
+                task_data=r.imp7_comment,
+                task_status=status_str,
+                actuality=actuality
+            )
+        else:
+            used_id = []
+            text_str = "Запросить у Заказчика перечень исходных данных для " + r.department + ":"
+            for i, j in zip(r.imp7_comment, r.imp7_date):
+                text_str += '\n' + i + ' в срок до ' + date_formatting(j)
+            for t in tasks7:
+                if t.task_departments != r.department:
+                    t.task_departments = r.department
+                if t.task_data in r.imp7_comment and t.type_number =='7.5':
+                    t.task_text = "Направить полученные от Заказчика " + t.task_data + " в срок до " + date_formatting(r.imp7_date[r.imp7_comment.index(t.task_data)])
+                    t.task_deadlines = r.imp7_date[r.imp7_comment.index(t.task_data)]
+                    t.save()
+                    used_id.append(t.task_data)
+                elif t.task_data not in r.imp7_comment and t.type_number == '7.5':
+                    if not t.manual_change:
+                        t.actuality = False
+                        t.save()
+                if t.type_number != '7.5':
+                    t.task_data = r.imp7_comment
+                    if t.type_number == "7.1":
+                        t.task_text = "Подготовить перечень исходных данных от Заказчика для " + r.department + ": " + ", ".join(r.imp7_comment)
+                    if t.type_number == "7.2":
+                        t.task_text = "Запланировать совещание с " + r.department + " для обсуждения получения дополнительных исходных данных от Заказчика;"
+                    if t.type_number == "7.4":
+                        t.task_text = "Запланировать совещание с Заказчиком для обсуждения получения дополнительных исходных данных для " + r.department
+                    if t.type_number == "7.6":
+                        t.task_text = "Проконтролировать внесение изменений в документацию " + r.department + " по дополнительным исходным данным от Заказчика"
+                    if t.type_number == '7.3':
+                        t.task_text = text_str
+                    t.save()
+            for i, j in zip(r.imp7_comment, r.imp7_date):
+                if i not in used_id:
+                    gipTask.objects.create(
+                        initial_date=date.today(),
+                        type_number='7.5',
+                        task_reestr=reest,
+                        task_remark=r,
+                        task_text="Направить полученные от Заказчика " + i + " в срок до " + date_formatting(j),
+                        task_departments=r.department,
+                        task_data=i,
+                        task_deadlines=j,
+                        task_status=status_str,
+                        actuality=actuality
+                    )
+    if (not r.importance7 or r.imp7_comment is None or r.imp7_comment == '') and len(tasks7) > 0:
+        for t in tasks7:
+            if not t.manual_change:
+                t.actuality = False
+                t.save()
+
 def homeGIP(request, id):
     try:
         department = departments.objects.get(user=request.user.id).department
@@ -1152,12 +1655,11 @@ def homeGIP(request, id):
                 file_path = MEDIA_ROOT + "\\Tables" + name
                 response = FileResponse(open(file_path, 'rb'), as_attachment=True)
                 return response
-            elif request.POST.get('timelineData'):
-                chronicle(request, id)
-                # name = xlslxCreate(request, actual=False)
-                # file_path = MEDIA_ROOT + "\\Tables" + name
-                # response = FileResponse(open(file_path, 'rb'), as_attachment=True)
-                #return response
+            # elif request.POST.get('tasksForming'): #формирование задач по запросу
+            #     remarks = reestr.objects.filter(reestrID=reest.id)
+            #     for r in remarks:
+            #         task_creating(reest, r)
+            #     return redirect('gip_tasks', reest.id)
             else:
                 name = xlslxCreate(request)
                 file_path = MEDIA_ROOT + "\\Tables" + name
@@ -1350,7 +1852,8 @@ def homeGIP(request, id):
                         'subcontracts': subcontracts,
                         'fact': fact,
                         'plan': plan,
-                        'duration': duration})
+                        'duration': duration,
+                       'username': shortName(request.user)})
                 mails = []
                 if request.POST.get("status") == "Формирование":
                     reest.status = "На заполнении"
@@ -1427,7 +1930,8 @@ def homeGIP(request, id):
                         'subcontracts': subcontracts,
                         'fact': fact,
                         'plan': plan,
-                        'duration': duration})
+                        'duration': duration,
+                       'username': shortName(request.user)})
     elif request.user.groups.filter(name='Руководитель').exists():
         group = "Руководитель"
         remark_boss_priority_order = Case(
@@ -1581,7 +2085,8 @@ def homeGIP(request, id):
                                             'subcontracts': subcontracts,
                                             'fact': fact,
                                             'plan': plan,
-                                            'duration': duration})
+                                            'duration': duration,
+                                            'username': shortName(request.user)})
 
 
 def fileManage(request, id):
@@ -2061,9 +2566,11 @@ def boss(request, id):
                 if form.is_valid():
                     executor_fail_name = form.cleaned_data.get('executor_fail_name')
                     executor_fail_text = form.cleaned_data.get('executor_fail_text')
-                    db_form.executor_name = form.cleaned_data.get('executor_name')
-                    if (
-                            executor_fail_name is not None and executor_fail_name.id == emptyUserID and executor_fail_text != "") or executor_fail_name is None or executor_fail_name.id != emptyUserID:
+                    executor_name = form.cleaned_data.get('executor_name')
+                    db_form.executor_name = executor_name
+                    if executor_name.groups.filter(name='Субподрядчик').exists():
+                        db_form.department = "Субподряд"
+                    if (executor_fail_name is not None and executor_fail_name.id == emptyUserID and executor_fail_text != "") or executor_fail_name is None or executor_fail_name.id != emptyUserID:
                         try:
                             db_form.executor_fail_name = executor_fail_name
                             db_form.executor_fail_text = executor_fail_text
@@ -2077,7 +2584,7 @@ def boss(request, id):
                             db_form.status = "На заполнении исполнителем"
                             db_form.save(
                                 update_fields=['executor_fail_name', 'executor_name', 'executor_fail_text', 'status',
-                                               'comment', 'answer_remark'])
+                                               'comment', 'answer_remark', 'department'])
                             remarks = reestr.objects.filter((Q(reestrID=db_form.reestrID) & Q(actuality=True) & Q(
                                 responsibleTrouble_name=db_form.responsibleTrouble_name)))
                             send = True
@@ -2175,7 +2682,13 @@ def employee(request, id):
                 answer_remark = form.cleaned_data.get('answer_remark')
                 total_importance = form.cleaned_data.get('total_importance')
                 root_cause_list = form.cleaned_data.get('root_cause_list')
-                root_cause_text = form.cleaned_data.get('root_cause_text')
+                root_cause_text = request.POST.getlist('root_cause_text')
+                root_cause_str = ''
+                print(root_cause_text)
+                for i, t in enumerate(root_cause_text):
+                    if t != '':
+                        root_cause_str += root_cause_text_numbers[i] + t + '\n'
+                root_cause_text = root_cause_str
                 answer_date = form.cleaned_data.get('answer_date_plan')
                 answer_deadline = form.cleaned_data.get('answer_deadline_correct_plan')
                 root_cause_comment = form.cleaned_data.get('root_cause_comment')
@@ -2189,10 +2702,21 @@ def employee(request, id):
                 importance4 = form.cleaned_data.get('importance4')
                 imp4_comment = form.cleaned_data.get('imp4_comment')
                 imp4_comment_in = form.cleaned_data.get('imp4_comment_in')
+                imp4_in_date_array = request.POST.getlist('imp4_in_date_single')
+                imp4_out_date_array = request.POST.getlist('imp4_out_date_single')
+                imp4_in_date_dict = {}
+                imp4_out_date_dict = {}
+                print(root_cause_text)
+                for i in range(len(imp4_out_date_array)):
+                    if imp4_out_date_array[i] != '' and DEP_ARRAY[i] in imp4_comment:
+                        imp4_out_date_dict[DEP_ARRAY[i]] = imp4_out_date_array[i]
+                    if imp4_in_date_array[i] != '' and DEP_ARRAY[i] in imp4_comment_in:
+                        imp4_in_date_dict[DEP_ARRAY[i]] = imp4_in_date_array[i]
                 importance5 = form.cleaned_data.get('importance5')
                 importance6 = form.cleaned_data.get('importance6')
                 importance7 = form.cleaned_data.get('importance7')
-                imp7_comment = form.cleaned_data.get('imp7_comment')
+                imp7_comment = request.POST.getlist('imp7_comment')
+                imp7_date = request.POST.getlist('imp7_date')
                 importance_test = True
                 rcc_list = ['1.3.1.', '1.3.2.', '2.2.1.', '3.1.1.', '3.1.2.', '3.1.5.', '3.1.6.', '3.2.1.',
                             '3.2.3.', '3.3.1.', '4.1.1.', '4.1.2.', '4.2.1.', '4.2.2.', '4.3.1.', '4.4.1.',
@@ -2209,13 +2733,16 @@ def employee(request, id):
                 if importance4 and (imp4_comment is None or imp4_comment == "") and (imp4_comment_in is None or imp4_comment_in == ""):
                     importance_test = False
                     form.add_error('imp4_comment', 'Пожалуйста, внесите данные')
-                if importance7 and (imp7_comment is None or imp7_comment == ""):
+                elif ((imp4_comment is not None and imp4_comment != "" and any(k not in imp4_out_date_dict for k in imp4_comment.split(", "))) or
+                      (imp4_comment_in is not None and imp4_comment_in != "" and any(k not in imp4_in_date_dict for k in imp4_comment_in.split(", ")))):
+                    importance_test = False
+                    form.add_error('imp4_comment', 'Пожалуйста, внесите данные')
+                if importance7 and ((imp7_comment is None or '' in imp7_comment) or (imp7_date is None or '' in imp7_date)):
                     importance_test = False
                     form.add_error('imp7_comment', 'Пожалуйста, внесите данные')
-                print(root_cause_list)
+                    form.add_error('imp7_date', '   ')
                 if (answer_date and answer_deadline and labor_costs_plan and comment and total_importance and
                         (root_cause_list is None or root_cause_list == "" or root_cause_list and
-                        ("0." not in root_cause_list or ("0." in root_cause_list and root_cause_text != "")) and
                         (all(x not in root_cause_list for x in rcc_list) or (
                                 any(x in root_cause_list for x in rcc_list) and root_cause_comment != ""))) and importance_test):
                     try:
@@ -2235,19 +2762,29 @@ def employee(request, id):
                         db_form.importance5 = importance5
                         db_form.importance6 = importance6
                         db_form.importance7 = importance7
-                        db_form.imp1_comment_znp = imp1_comment_znp
-                        db_form.imp1_comment_nd = imp1_comment_nd
-                        db_form.imp3_comment = imp3_comment
-                        db_form.imp3_dep = imp3_dep
-                        db_form.imp4_comment = imp4_comment
-                        db_form.imp4_comment_in = imp4_comment_in
-                        db_form.imp7_comment = imp7_comment
+                        if importance1:
+                            db_form.imp1_comment_znp = imp1_comment_znp
+                            db_form.imp1_comment_nd = imp1_comment_nd
+                        if importance3:
+                            db_form.imp3_comment = imp3_comment
+                            db_form.imp3_dep = imp3_dep
+                        if importance4:
+                            db_form.imp4_comment = imp4_comment
+                            db_form.imp4_comment_in = imp4_comment_in
+                            if len(imp4_in_date_array) > 0:
+                                db_form.imp4_out_date = imp4_out_date_dict
+                            if len(imp4_out_date_array) > 0:
+                                db_form.imp4_in_date = imp4_in_date_dict
+                        if importance7:
+                            db_form.imp7_comment = imp7_comment
+                            db_form.imp7_date = imp7_date
                         if importance1:
                             db_form.importance2 = None
                             db_form.importance3 = None
                             db_form.importance5 = None
                             db_form.importance6 = None
                             db_form.imp3_comment = None
+                            db_form.imp3_dep = None
                         if importance1 is False and importance2 is False:
                             db_form.importance3 = None
                             db_form.importance4 = None
@@ -2255,8 +2792,13 @@ def employee(request, id):
                             db_form.importance6 = None
                             db_form.importance7 = None
                             db_form.imp3_comment = None
+                            db_form.imp3_dep = None
                             db_form.imp4_comment = None
-                            db_form.imp7_comment = None
+                            db_form.imp4_comment_in = None
+                            db_form.imp4_out_date = None
+                            db_form.imp4_in_date = None
+                            db_form.imp7_comment = []
+                            db_form.imp7_date = []
                         if importance5 is False:
                             db_form.importance6 = None
                         if db_form.responsibleTrouble_name == db_form.gip or db_form.gip == request.user or db_form.gip in subs:
@@ -2270,7 +2812,8 @@ def employee(request, id):
                                                     'root_cause_comment', 'root_cause_text', 'status', 'deadline',
                                                     'importance1', 'importance2', 'importance3',
                                                     'importance4', 'importance5', 'importance6',
-                                                    'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep'])
+                                                    'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp4_in_date',
+                                                    'imp4_out_date', 'imp7_comment', 'imp7_date', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep'])
                         form.save_files(reestr=reest,
                                         name=form.cleaned_data.get('cause_file_name'),
                                         comment=form.cleaned_data.get('cause_file_comment'),
@@ -2295,8 +2838,9 @@ def employee(request, id):
                                     mails.append(mail)
                             email_sender(mails, message, reest.id)
                         messages.success(request, "Изменения сохранены")
-                    except Exception:
-                        messages.error(request, "Возникла ошибка")
+                    except Exception as e:
+                        exc_type, exc_obj, exc_tb = sys.exc_info()
+                        messages.error(request, "Возникла ошибка "+str(exc_tb.tb_lineno) + " " + str(e))
                 if answer_date is None:
                     form.add_error('answer_date_plan', 'Пожалуйста, внесите данные')
                 if answer_deadline is None:
@@ -2307,8 +2851,6 @@ def employee(request, id):
                     form.add_error('comment', 'Пожалуйста, внесите данные')
                 if total_importance == "":
                     form.add_error('total_importance', 'Пожалуйста, внесите данные')
-                if "0." in root_cause_list and root_cause_text == "":
-                    form.add_error('root_cause_text', 'Пожалуйста, внесите данные')
                 if any(x in root_cause_list for x in rcc_list) and root_cause_comment == "":
                     form.add_error('root_cause_comment', 'Пожалуйста, внесите данные')
             else:
@@ -2316,7 +2858,12 @@ def employee(request, id):
                 comment = form.cleaned_data.get('comment')
                 total_importance = form.cleaned_data.get('total_importance')
                 root_cause_list = form.cleaned_data.get('root_cause_list')
-                root_cause_text = form.cleaned_data.get('root_cause_text')
+                root_cause_text = request.POST.getlist('root_cause_text')
+                root_cause_str = ''
+                for i, t in enumerate(root_cause_text):
+                    if t != '':
+                        root_cause_str += root_cause_text_numbers[i] + t + '\n'
+                root_cause_text = root_cause_str
                 answer_date = form.cleaned_data.get('answer_date_plan')
                 answer_deadline = form.cleaned_data.get('answer_deadline_correct_plan')
                 root_cause_comment = form.cleaned_data.get('root_cause_comment')
@@ -2333,8 +2880,6 @@ def employee(request, id):
                     form.add_error('comment', 'Пожалуйста, внесите данные')
                 if total_importance == "":
                     form.add_error('total_importance', 'Пожалуйста, внесите данные')
-                if "0." in root_cause_list and root_cause_text == "":
-                    form.add_error('root_cause_text', 'Пожалуйста, внесите данные')
                 if any(x in root_cause_list for x in rcc_list) and root_cause_comment == "":
                     form.add_error('root_cause_comment', 'Пожалуйста, внесите данные')
         else:
@@ -2374,7 +2919,10 @@ def employee(request, id):
                                                      endDate.day),
                                                  'emptyUserID': emptyUserID,
                                                  'next_step_key': next_step_key,
-                                                 'comment_buf': db_form.comment
+                                                 'comment_buf': db_form.comment,
+                                                 'DEP_FULL_ARRAY': DEP_FULL_ARRAY,
+                                                 'EXCLUDE_ARRAY': EXCLUDE_ARRAY,
+                                                 'root_cause_buf': db_form.root_cause_text
                                                  })
     else:
         return render(request, 'log_error.html',
@@ -2390,7 +2938,12 @@ def boss2(request, id):
             form = BossForm2(db_form, request.POST, request.FILES or None)
             if form.is_valid():
                 root_cause_list = form.cleaned_data.get('root_cause_list')
-                root_cause_text = form.cleaned_data.get('root_cause_text')
+                root_cause_text = request.POST.getlist('root_cause_text')
+                root_cause_str = ''
+                for i, t in enumerate(root_cause_text):
+                    if t != '':
+                        root_cause_str += root_cause_text_numbers[i] + t + '\n'
+                root_cause_text = root_cause_str
                 root_cause_comment = form.cleaned_data.get('root_cause-comment')
                 executor_fail_name = form.cleaned_data.get('executor_fail_name')
                 executor_fail_text = form.cleaned_data.get('executor_fail_text')
@@ -2404,10 +2957,20 @@ def boss2(request, id):
                 importance4 = form.cleaned_data.get('importance4')
                 imp4_comment = form.cleaned_data.get('imp4_comment')
                 imp4_comment_in = form.cleaned_data.get('imp4_comment_in')
+                imp4_in_date_array = request.POST.getlist('imp4_in_date_single')
+                imp4_out_date_array = request.POST.getlist('imp4_out_date_single')
+                imp4_in_date_dict = {}
+                imp4_out_date_dict = {}
+                for i in range(len(imp4_out_date_array)):
+                    if imp4_out_date_array[i] != '' and DEP_ARRAY[i] in imp4_comment:
+                        imp4_out_date_dict[DEP_ARRAY[i]] = imp4_out_date_array[i]
+                    if imp4_in_date_array[i] != '' and DEP_ARRAY[i] in imp4_comment_in:
+                        imp4_in_date_dict[DEP_ARRAY[i]] = imp4_in_date_array[i]
                 importance5 = form.cleaned_data.get('importance5')
                 importance6 = form.cleaned_data.get('importance6')
                 importance7 = form.cleaned_data.get('importance7')
-                imp7_comment = form.cleaned_data.get('imp7_comment')
+                imp7_comment = request.POST.getlist('imp7_comment')
+                imp7_date = request.POST.getlist('imp7_date')
                 importance_test = True
                 rcc_list = ['1.3.1.', '1.3.2.', '2.2.1.', '3.1.1.', '3.1.2.', '3.1.5.', '3.1.6.', '3.2.1.',
                             '3.2.3.', '3.3.1.', '4.1.1.', '4.1.2.', '4.2.1.', '4.2.2.', '4.3.1.', '4.4.1.',
@@ -2424,13 +2987,16 @@ def boss2(request, id):
                 if importance4 and (imp4_comment is None or imp4_comment == "")and (imp4_comment_in is None or imp4_comment_in == ""):
                     importance_test = False
                     form.add_error('imp4_comment', 'Пожалуйста, внесите данные')
-                if importance7 and (imp7_comment is None or imp7_comment == ""):
+                elif ((imp4_comment is not None and imp4_comment != "" and any(k not in imp4_out_date_dict for k in imp4_comment.split(", "))) or
+                      (imp4_comment_in is not None and imp4_comment_in != "" and any(k not in imp4_in_date_dict for k in imp4_comment_in.split(", ")))):
+                    importance_test = False
+                    form.add_error('imp4_comment', 'Пожалуйста, внесите данные')
+                if importance7 and ((imp7_comment is None or '' in imp7_comment) or (imp7_date is None or '' in imp7_date)):
                     importance_test = False
                     form.add_error('imp7_comment', 'Пожалуйста, внесите данные')
                 if (((
                              executor_fail_name is not None and executor_fail_name.id == emptyUserID and executor_fail_text != "") or executor_fail_name is None or (
-                             executor_fail_name.id != emptyUserID)) and (
-                        "0." not in root_cause_list or ("0." in root_cause_list and root_cause_text != "")) and
+                             executor_fail_name.id != emptyUserID)) and
                         (all(x not in root_cause_list for x in rcc_list) or (
                                 any(x in root_cause_list for x in rcc_list) and root_cause_comment != "")) and importance_test):
                     form.save(commit=False)
@@ -2460,8 +3026,8 @@ def boss2(request, id):
                         db_form.labor_costs_plan = form.cleaned_data.get('labor_costs_plan')
                         db_form.answer_remark = form.cleaned_data.get('answer_remark')
                         db_form.total_importance = form.cleaned_data.get('total_importance')
-                        db_form.root_cause_list = form.cleaned_data.get('root_cause_list')
-                        db_form.root_cause_text = form.cleaned_data.get('root_cause_text')
+                        db_form.root_cause_list = root_cause_list
+                        db_form.root_cause_text = root_cause_text
                         db_form.root_cause_comment = form.cleaned_data.get(
                             'root_cause_comment') if form.cleaned_data.get('root_cause_comment') is not None else ''
                         db_form.answer_date_plan = form.cleaned_data.get('answer_date_plan')
@@ -2473,13 +3039,45 @@ def boss2(request, id):
                         db_form.importance5 = importance5
                         db_form.importance6 = importance6
                         db_form.importance7 = importance7
-                        db_form.imp1_comment_znp = imp1_comment_znp
-                        db_form.imp1_comment_nd = imp1_comment_nd
-                        db_form.imp3_comment = imp3_comment
-                        db_form.imp3_dep = imp3_dep
-                        db_form.imp4_comment = imp4_comment
-                        db_form.imp4_comment_in = imp4_comment_in
-                        db_form.imp7_comment = imp7_comment
+                        if importance1:
+                            db_form.imp1_comment_znp = imp1_comment_znp
+                            db_form.imp1_comment_nd = imp1_comment_nd
+                        if importance3:
+                            db_form.imp3_comment = imp3_comment
+                            db_form.imp3_dep = imp3_dep
+                        if importance4:
+                            db_form.imp4_comment = imp4_comment
+                            db_form.imp4_comment_in = imp4_comment_in
+                            if len(imp4_in_date_array) > 0:
+                                db_form.imp4_out_date = imp4_out_date_dict
+                            if len(imp4_out_date_array) > 0:
+                                db_form.imp4_in_date = imp4_in_date_dict
+                        if importance7:
+                            db_form.imp7_comment = imp7_comment
+                            db_form.imp7_date = imp7_date
+                        if importance1:
+                            db_form.importance2 = None
+                            db_form.importance3 = None
+                            db_form.importance5 = None
+                            db_form.importance6 = None
+                            db_form.imp3_comment = None
+                            db_form.imp3_dep = None
+                        if importance1 is False and importance2 is False:
+                            db_form.importance3 = None
+                            db_form.importance4 = None
+                            db_form.importance5 = None
+                            db_form.importance6 = None
+                            db_form.importance7 = None
+                            db_form.imp3_comment = None
+                            db_form.imp3_dep = None
+                            db_form.imp4_comment = None
+                            db_form.imp4_comment_in = None
+                            db_form.imp4_out_date = None
+                            db_form.imp4_in_date = None
+                            db_form.imp7_comment = []
+                            db_form.imp7_date = []
+                        if importance5 is False:
+                            db_form.importance6 = None
                         if db_form.comment != form.cleaned_data.get('comment') and form.cleaned_data.get(
                                 'comment') != "":
                             d = datetime.now()
@@ -2561,18 +3159,50 @@ def boss2(request, id):
                                                                   endDate.month) +
                                                                           ('-' if endDate.day > 9 else '-0') + str(
                                                                   endDate.day),
-                                                              'comment_buf': db_form.comment
+                                                              'comment_buf': db_form.comment,
+                                                             'DEP_FULL_ARRAY': DEP_FULL_ARRAY,
+                                                             'EXCLUDE_ARRAY': EXCLUDE_ARRAY,
+                                                             'imp7_data': zip(db_form.imp7_comment, db_form.imp7_date),
+                                                             'root_cause_buf': db_form.root_cause_text
                                                               })
                     except Exception:
                         messages.error(request, "Возникла ошибка")
                 else:
-                    if "0." in root_cause_list and root_cause_text == "":
-                        form.add_error('root_cause_text', 'Пожалуйста, внесите данные')
                     if executor_fail_name and executor_fail_name.id == emptyUserID and executor_fail_text == "":
                         form.add_error('executor_fail_text', 'Пожалуйста, внесите данные')
                     if any(x in root_cause_list for x in rcc_list) and root_cause_comment == "":
                         form.add_error('root_cause_comment', 'Пожалуйста, внесите данные')
+                    return render(request, 'boss2.html', {'form': form,
+                                                          'gipcontext':
+                                                              db_form.gip.last_name + ' ' +
+                                                              db_form.gip.first_name,
+                                                          'rescontext':
+                                                              db_form.responsibleTrouble_name.last_name + ' ' +
+                                                              db_form.responsibleTrouble_name.first_name,
+                                                          'reestrID': db_form.reestrID.id,
+                                                          'customer': db_form.customer.name,
+                                                          'contract_number': db_form.project_dogovor.number,
+                                                          'reviewer': db_form.project_reviewer.name,
+                                                          'emptyUserID': emptyUserID,
+                                                          'start_date': str(reest.start_date.year) + (
+                                                              '-' if reest.start_date.month > 9 else '-0') + str(
+                                                              reest.start_date.month) + (
+                                                                            '-' if reest.start_date.day > 9 else '-0') + str(
+                                                              reest.start_date.day),
+                                                          'end_date': str(endDate.year) + (
+                                                              '-' if endDate.month > 9 else '-0') + str(
+                                                              endDate.month) +
+                                                                      ('-' if endDate.day > 9 else '-0') + str(
+                                                              endDate.day),
+                                                          'comment_buf': db_form.comment,
+                                                          'DEP_FULL_ARRAY': DEP_FULL_ARRAY,
+                                                          'EXCLUDE_ARRAY': EXCLUDE_ARRAY,
+                                                          'imp7_data': zip(imp7_comment, imp7_date),
+                                                          'root_cause_buf': db_form.root_cause_text
+                                                          })
             else:
+                imp7_comment = request.POST.getlist('imp7_comment')
+                imp7_date = request.POST.getlist('imp7_date')
                 return render(request, 'boss2.html', {'form': form,
                                                       'gipcontext':
                                                           db_form.gip.last_name + ' ' +
@@ -2594,7 +3224,11 @@ def boss2(request, id):
                                                           '-' if endDate.month > 9 else '-0') + str(
                                                           endDate.month) + ('-' if endDate.day > 9 else '-0') + str(
                                                           endDate.day),
-                                                      'comment_buf': db_form.comment
+                                                      'comment_buf': db_form.comment,
+                                                      'DEP_FULL_ARRAY': DEP_FULL_ARRAY,
+                                                      'EXCLUDE_ARRAY': EXCLUDE_ARRAY,
+                                                      'imp7_data': zip(imp7_comment, imp7_date),
+                                                      'root_cause_buf': db_form.root_cause_text
                                                       })
         else:
             form = BossForm2(reestr.objects.get(id=id))
@@ -2619,7 +3253,11 @@ def boss2(request, id):
                                                   '-' if endDate.month > 9 else '-0') + str(
                                                   endDate.month) + ('-' if endDate.day > 9 else '-0') + str(
                                                   endDate.day),
-                                              'comment_buf': db_form.comment
+                                              'comment_buf': db_form.comment,
+                                             'DEP_FULL_ARRAY': DEP_FULL_ARRAY,
+                                             'EXCLUDE_ARRAY': EXCLUDE_ARRAY,
+                                              'imp7_data': zip(db_form.imp7_comment, db_form.imp7_date),
+                                              'root_cause_buf': db_form.root_cause_text
                                               })
     else:
         return render(request, 'log_error.html',
@@ -2635,7 +3273,12 @@ def gip2(request, id):
             form = GIPform2(reestr.objects.get(id=id), request.POST, request.FILES or None)
             if form.is_valid():
                 root_cause_list = form.cleaned_data.get('root_cause_list')
-                root_cause_text = form.cleaned_data.get('root_cause_text')
+                root_cause_text = request.POST.getlist('root_cause_text')
+                root_cause_str = ''
+                for i, t in enumerate(root_cause_text):
+                    if t != '':
+                        root_cause_str += root_cause_text_numbers[i] + t + '\n'
+                root_cause_text = root_cause_str
                 root_cause_comment = form.cleaned_data.get('root_cause_comment')
                 importance1 = form.cleaned_data.get('importance1')
                 imp1_comment_znp = form.cleaned_data.get('imp1_comment_znp')
@@ -2647,10 +3290,20 @@ def gip2(request, id):
                 importance4 = form.cleaned_data.get('importance4')
                 imp4_comment = form.cleaned_data.get('imp4_comment')
                 imp4_comment_in = form.cleaned_data.get('imp4_comment_in')
+                imp4_in_date_array = request.POST.getlist('imp4_in_date_single')
+                imp4_out_date_array = request.POST.getlist('imp4_out_date_single')
+                imp4_in_date_dict = {}
+                imp4_out_date_dict = {}
+                for i in range(len(imp4_out_date_array)):
+                    if imp4_out_date_array[i] != '' and DEP_ARRAY[i] in imp4_comment:
+                        imp4_out_date_dict[DEP_ARRAY[i]] = imp4_out_date_array[i]
+                    if imp4_in_date_array[i] != '' and DEP_ARRAY[i] in imp4_comment_in:
+                        imp4_in_date_dict[DEP_ARRAY[i]] = imp4_in_date_array[i]
                 importance5 = form.cleaned_data.get('importance5')
                 importance6 = form.cleaned_data.get('importance6')
                 importance7 = form.cleaned_data.get('importance7')
-                imp7_comment = form.cleaned_data.get('imp7_comment')
+                imp7_comment = request.POST.getlist('imp7_comment')
+                imp7_date = request.POST.getlist('imp7_date')
                 importance_test = True
                 rcc_list = ['1.3.1.', '1.3.2.', '2.2.1.', '3.1.1.', '3.1.2.', '3.1.5.', '3.1.6.', '3.2.1.',
                             '3.2.3.', '3.3.1.', '4.1.1.', '4.1.2.', '4.2.1.', '4.2.2.', '4.3.1.', '4.4.1.',
@@ -2669,13 +3322,16 @@ def gip2(request, id):
                 if importance4 and (imp4_comment is None or imp4_comment == "") and (imp4_comment_in is None or imp4_comment_in == ""):
                     importance_test = False
                     form.add_error('imp4_comment', 'Пожалуйста, внесите данные')
-                if importance7 and (imp7_comment is None or imp7_comment == ""):
+                elif ((imp4_comment is not None and imp4_comment != "" and any(k not in imp4_out_date_dict for k in imp4_comment.split(", "))) or
+                      (imp4_comment_in is not None and imp4_comment_in != "" and any(k not in imp4_in_date_dict for k in imp4_comment_in.split(", ")))):
+                    importance_test = False
+                    form.add_error('imp4_comment', 'Пожалуйста, внесите данные')
+                if importance7 and ((imp7_comment is None or '' in imp7_comment) or (imp7_date is None or '' in imp7_date)):
                     importance_test = False
                     form.add_error('imp7_comment', 'Пожалуйста, внесите данные')
                 if (((
                              executor_fail_name is not None and executor_fail_name.id == emptyUserID and executor_fail_text != "") or executor_fail_name is None or (
-                             executor_fail_name.id != emptyUserID)) and (
-                        "0." not in root_cause_list or ("0." in root_cause_list and root_cause_text != "")) and
+                             executor_fail_name.id != emptyUserID)) and
                         (all(x not in root_cause_list for x in rcc_list) or (
                                 any(x in root_cause_list for x in rcc_list) and root_cause_comment != ""))
                         and importance_test):
@@ -2719,8 +3375,8 @@ def gip2(request, id):
                         db_form.labor_costs_plan = form.cleaned_data.get('labor_costs_plan')
                         db_form.answer_remark = form.cleaned_data.get('answer_remark')
                         db_form.total_importance = form.cleaned_data.get('total_importance')
-                        db_form.root_cause_list = form.cleaned_data.get('root_cause_list')
-                        db_form.root_cause_text = form.cleaned_data.get('root_cause_text')
+                        db_form.root_cause_list = root_cause_list
+                        db_form.root_cause_text = root_cause_text
                         db_form.root_cause_comment = form.cleaned_data.get(
                             'root_cause_comment') if form.cleaned_data.get('root_cause_comment') is not None else ''
                         db_form.answer_date_plan = form.cleaned_data.get('answer_date_plan')
@@ -2732,13 +3388,45 @@ def gip2(request, id):
                         db_form.importance5 = importance5
                         db_form.importance6 = importance6
                         db_form.importance7 = importance7
-                        db_form.imp1_comment_znp = imp1_comment_znp
-                        db_form.imp1_comment_nd = imp1_comment_nd
-                        db_form.imp3_dep = imp3_dep
-                        db_form.imp3_comment = imp3_comment
-                        db_form.imp4_comment = imp4_comment
-                        db_form.imp4_comment_in = imp4_comment_in
-                        db_form.imp7_comment = imp7_comment
+                        if importance1:
+                            db_form.imp1_comment_znp = imp1_comment_znp
+                            db_form.imp1_comment_nd = imp1_comment_nd
+                        if importance3:
+                            db_form.imp3_comment = imp3_comment
+                            db_form.imp3_dep = imp3_dep
+                        if importance4:
+                            db_form.imp4_comment = imp4_comment
+                            db_form.imp4_comment_in = imp4_comment_in
+                            if len(imp4_in_date_array) > 0:
+                                db_form.imp4_out_date = imp4_out_date_dict
+                            if len(imp4_out_date_array) > 0:
+                                db_form.imp4_in_date = imp4_in_date_dict
+                        if importance7:
+                            db_form.imp7_comment = imp7_comment
+                            db_form.imp7_date = imp7_date
+                        if importance1:
+                            db_form.importance2 = None
+                            db_form.importance3 = None
+                            db_form.importance5 = None
+                            db_form.importance6 = None
+                            db_form.imp3_comment = None
+                            db_form.imp3_dep = None
+                        if importance1 is False and importance2 is False:
+                            db_form.importance3 = None
+                            db_form.importance4 = None
+                            db_form.importance5 = None
+                            db_form.importance6 = None
+                            db_form.importance7 = None
+                            db_form.imp3_comment = None
+                            db_form.imp3_dep = None
+                            db_form.imp4_comment = None
+                            db_form.imp4_comment_in = None
+                            db_form.imp4_out_date = None
+                            db_form.imp4_in_date = None
+                            db_form.imp7_comment = []
+                            db_form.imp7_date = []
+                        if importance5 is False:
+                            db_form.importance6 = None
                         if db_form.comment != form.cleaned_data.get('comment') and form.cleaned_data.get(
                                 'comment') != "":
                             d = datetime.now()
@@ -2764,7 +3452,7 @@ def gip2(request, id):
                                         responsibleTrouble_name=db_form.responsibleTrouble_name) & Q(
                                         status="Согласовано ГИПом")))
                                     if reest.status != "На согласовании Рецензентом" and reest.status != "На доработке":
-                                        print(len(dep_remarks) - len(dep_remarks_approved))
+                                        # messages.success(request, str(len(dep_remarks))+' '+str(len(dep_remarks_approved)))
                                         if len(dep_remarks) - len(dep_remarks_approved) <= 1:
                                             message_to = []
                                             for r in dep_remarks:
@@ -2794,7 +3482,8 @@ def gip2(request, id):
                                             db_form.status = "Подготовка ответов исполнителем"
                                             db_form.save()
                                     for r in remarks:
-                                        if r.status not in ["Согласовано ГИПом", "Принято ГИПом"] and 'Подготовка' not in r.status:
+                                        if r.status not in ["Согласовано ГИПом",
+                                                            "Принято ГИПом"] and 'Подготовка' not in r.status:
                                             next = False
                                             break
                                     if next and reest.status != "На согласовании Рецензентом" and reest.status != "На доработке":
@@ -2867,19 +3556,50 @@ def gip2(request, id):
                                                                  '-' if endDate.month > 9 else '-0') + str(
                                                                  endDate.month) + ('-' if endDate.day > 9 else '-0') + str(
                                                                  endDate.day),
-                                                             'comment_buf': db_form.comment
+                                                             'comment_buf': db_form.comment,
+                                                             'DEP_FULL_ARRAY': DEP_FULL_ARRAY,
+                                                             'EXCLUDE_ARRAY': EXCLUDE_ARRAY,
+                                                             'imp7_data': zip(db_form.imp7_comment, db_form.imp7_date),
+                                                             'root_cause_buf': db_form.root_cause_text
                                                              })
                     except Exception as e:
                         exc_type, exc_obj, exc_tb = sys.exc_info()
                         messages.error(request, "Возникла ошибка " + str(e) + " " + str(exc_tb.tb_lineno))
                 else:
-                    if "0." in root_cause_list and root_cause_text == "":
-                        form.add_error('root_cause_text', 'Пожалуйста, внесите данные')
                     if any(x in root_cause_list for x in rcc_list) and root_cause_comment == "":
                         form.add_error('root_cause_comment', 'Пожалуйста, внесите данные')
                     if executor_fail_name is not None and executor_fail_name.id == emptyUserID and executor_fail_text == "":
                         form.add_error('executor_fail_text', 'Пожалуйста, внесите данные')
+                    return render(request, 'GIP2.html', {'form': form,
+                                                         'gipcontext':
+                                                             db_form.gip.last_name + ' ' +
+                                                             db_form.gip.first_name,
+                                                         'rescontext':
+                                                             db_form.responsibleTrouble_name.last_name + ' ' +
+                                                             db_form.responsibleTrouble_name.first_name,
+                                                         'reestrID': reest.id,
+                                                         'customer': db_form.customer.name,
+                                                         'contract_number': db_form.project_dogovor.number,
+                                                         'reviewer': db_form.project_reviewer.name,
+                                                         'emptyUserID': emptyUserID,
+                                                         'start_date': str(reest.start_date.year) + (
+                                                             '-' if reest.start_date.month > 9 else '-0') + str(
+                                                             reest.start_date.month) + (
+                                                                           '-' if reest.start_date.day > 9 else '-0') + str(
+                                                             reest.start_date.day),
+                                                         'end_date': str(endDate.year) + (
+                                                             '-' if endDate.month > 9 else '-0') + str(
+                                                             endDate.month) + ('-' if endDate.day > 9 else '-0') + str(
+                                                             endDate.day),
+                                                         'comment_buf': db_form.comment,
+                                                         'DEP_FULL_ARRAY': DEP_FULL_ARRAY,
+                                                         'EXCLUDE_ARRAY': EXCLUDE_ARRAY,
+                                                         'imp7_data': zip(db_form.imp7_comment, db_form.imp7_date),
+                                                         'root_cause_buf': db_form.root_cause_text
+                                                         })
             else:
+                imp7_comment = request.POST.getlist('imp7_comment')
+                imp7_date = request.POST.getlist('imp7_date')
                 return render(request, 'GIP2.html', {'form': form,
                                                      'gipcontext':
                                                          db_form.gip.last_name + ' ' +
@@ -2901,7 +3621,11 @@ def gip2(request, id):
                                                          '-' if endDate.month > 9 else '-0') + str(
                                                          endDate.month) + ('-' if endDate.day > 9 else '-0') + str(
                                                          endDate.day),
-                                                     'comment_buf': db_form.comment
+                                                     'comment_buf': db_form.comment,
+                                                     'DEP_FULL_ARRAY': DEP_FULL_ARRAY,
+                                                     'EXCLUDE_ARRAY': EXCLUDE_ARRAY,
+                                                     'imp7_data': zip(imp7_comment, imp7_date),
+                                                     'root_cause_buf': db_form.root_cause_text
                                                      })
         else:
             form = GIPform2(reestr.objects.get(id=id))
@@ -2926,7 +3650,11 @@ def gip2(request, id):
                                                  '-' if endDate.month > 9 else '-0') + str(
                                                  endDate.month) + ('-' if endDate.day > 9 else '-0') + str(
                                                  endDate.day),
-                                             'comment_buf': db_form.comment
+                                             'comment_buf': db_form.comment,
+                                             'DEP_FULL_ARRAY': DEP_FULL_ARRAY,
+                                             'EXCLUDE_ARRAY': EXCLUDE_ARRAY,
+                                              'imp7_data': zip(db_form.imp7_comment, db_form.imp7_date),
+                                              'root_cause_buf': db_form.root_cause_text
                                              })
     else:
         return render(request, 'log_error.html', {
@@ -2965,16 +3693,21 @@ def answer(request, id):
                         d.second) + ' ' + str(d.day) + '.' + str(d.month) + '.' + str(d.year) + ' ' + shortName(
                         request.user) + ")"
                 root_cause_list = form.cleaned_data.get('root_cause_list')
-                root_cause_text = form.cleaned_data.get('root_cause_text')
+                root_cause_text = request.POST.getlist('root_cause_text')
+                root_cause_str = ''
+                for i, t in enumerate(root_cause_text):
+                    if t != '':
+                        root_cause_str += root_cause_text_numbers[i] + t + '\n'
+                root_cause_text = root_cause_str
                 root_cause_comment = form.cleaned_data.get('root_cause_comment')
-                db_form.root_cause_list = form.cleaned_data.get('root_cause_list')
-                db_form.root_cause_text = form.cleaned_data.get('root_cause_text')
+                db_form.root_cause_list = root_cause_list
+                db_form.root_cause_text = root_cause_text
                 db_form.root_cause_comment = form.cleaned_data.get('root_cause_comment')
                 name = form.cleaned_data.get("cause_file_name")
                 file_comment = form.cleaned_data.get("cause_file_comment")
                 remark = form.cleaned_data.get("num_remark")
                 try:
-                    if root_cause_list and ("0." not in root_cause_list or ("0." in root_cause_list and root_cause_text != "")) and ((all(x not in root_cause_list for x in rcc_list) or (
+                    if root_cause_list and ((all(x not in root_cause_list for x in rcc_list) or (
                                     any(x in root_cause_list for x in rcc_list) and root_cause_comment != ""))):
                         try:
                             next = True
@@ -3054,11 +3787,16 @@ def answer(request, id):
                                                                    db_form.executor_name.last_name + ' ' +
                                                                    db_form.executor_name.first_name if db_form.executor_name else '',
                                                                'group': group,
-                                                               'reestrID': db_form.reestrID.id})
-                    if "0." in root_cause_list and root_cause_text == "":
-                        form.add_error('root_cause_text', 'Пожалуйста, внесите данные')
+                                                               'reestrID': db_form.reestrID.id,
+                                                               'custom_link_value': db_form.link_tech_name if db_form.link_tech_name is not None and db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
+                                                               'xml_link_value': db_form.link_tech_name[
+                                                                         34:] if db_form.link_tech_name is not None and 'XML файл(ы)' in db_form.link_tech_name else '',
+                                                               'imp7_data': zip(reestr.objects.get(id=id).imp7_comment, reestr.objects.get(id=id).imp7_date),
+                                                               'root_cause_buf': db_form.root_cause_text})
                     if any(x in root_cause_list for x in rcc_list) and root_cause_comment == "":
                         form.add_error('root_cause_comment', 'Пожалуйста, внесите данные')
+                    if root_cause_list is None or root_cause_list == '':
+                        form.add_error('root_cause_list', 'Пожалуйста, внесите данные')
                 except Exception:
                     messages.error(request, "Возникла ошибка")
             else:
@@ -3079,7 +3817,9 @@ def answer(request, id):
                                                        'reestrID': db_form.reestrID.id,
                                                        'custom_link_value': db_form.link_tech_name if db_form.link_tech_name is not None and db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
                                                        'xml_link_value': db_form.link_tech_name[
-                                                                         34:] if db_form.link_tech_name is not None and 'XML файл(ы)' in db_form.link_tech_name else ''
+                                                                         34:] if db_form.link_tech_name is not None and 'XML файл(ы)' in db_form.link_tech_name else '',
+                                                       'imp7_data': zip(reestr.objects.get(id=id).imp7_comment, reestr.objects.get(id=id).imp7_date),
+                                                       'root_cause_buf': db_form.root_cause_text
                                                        })
         else:
             form = AnswerForm(reestr.objects.get(id=id))
@@ -3103,7 +3843,10 @@ def answer(request, id):
                                                'reestrID': db_form.reestrID.id,
                                                'custom_link_value': db_form.link_tech_name if db_form.link_tech_name is not None and db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
                                                'xml_link_value': db_form.link_tech_name[
-                                                                 34:] if db_form.link_tech_name is not None and 'XML файл(ы)' in db_form.link_tech_name else ''
+                                                                 34:] if db_form.link_tech_name is not None and 'XML файл(ы)' in db_form.link_tech_name else '',
+                                               'imp7_data': zip(reestr.objects.get(id=id).imp7_comment,
+                                                                reestr.objects.get(id=id).imp7_date),
+                                               'root_cause_buf': db_form.root_cause_text
                                                })
     else:
         return render(request, 'log_error.html', {
@@ -3124,6 +3867,10 @@ def final(request, id):
             subs = departments.objects.get(user=request.user.id).substitute.all()
         except Exception:
             subs = []
+        if request.user == db_form.responsibleTrouble_name or db_form.responsibleTrouble_name in subs:
+            next_step_key = True
+        else:
+            next_step_key = False
         rcc_list = ['1.3.1.', '1.3.2.', '2.2.1.', '3.1.1.', '3.1.2.', '3.1.5.', '3.1.6.', '3.2.1.',
                     '3.2.3.', '3.3.1.', '4.1.1.', '4.1.2.', '4.2.1.', '4.2.2.', '4.3.1.', '4.4.1.',
                     '4.5.1.', '4.5.2.', '4.6.1.', '5.3.1.', '5.3.2.']
@@ -3144,10 +3891,14 @@ def final(request, id):
                     answer_deadline = form.cleaned_data.get('answer_deadline_correct_fact')
                     comment = form.cleaned_data.get('comment')
                     root_cause_list = form.cleaned_data.get('root_cause_list')
-                    root_cause_text = form.cleaned_data.get('root_cause_text')
+                    root_cause_text = request.POST.getlist('root_cause_text')
+                    root_cause_str = ''
+                    for i, t in enumerate(root_cause_text):
+                        if t != '':
+                            root_cause_str += root_cause_text_numbers[i] + t + '\n'
+                    root_cause_text = root_cause_str
                     root_cause_comment = form.cleaned_data.get('root_cause_comment')
-                    if (answer_date and answer_deadline and labor_costs_fact and answer_remark != "" and link_tech_name != "" and root_cause_list and
-                            ("0." not in root_cause_list or ("0." in root_cause_list and root_cause_text != "")) and
+                    if (answer_date and answer_deadline and labor_costs_fact and answer_remark != "" and link_tech_name != "" and root_cause_list and root_cause_list != '' and
                             (all(x not in root_cause_list for x in rcc_list) or (
                                     any(x in root_cause_list for x in rcc_list) and root_cause_comment != ""))):
                         try:
@@ -3212,8 +3963,8 @@ def final(request, id):
                         form.add_error('answer_remark', 'Пожалуйста, внесите данные')
                     if link_tech_name == "":
                         form.add_error('link_tech_name', 'Пожалуйста, внесите данные')
-                    if "0." in root_cause_list and root_cause_text == "":
-                        form.add_error('root_cause_text', 'Пожалуйста, внесите данные')
+                    if root_cause_list is None or root_cause_list == '':
+                        form.add_error('root_cause_list', 'Пожалуйста, внесите данные')
                     if any(x in root_cause_list for x in rcc_list) and root_cause_comment == "":
                         form.add_error('root_cause_comment', 'Пожалуйста, внесите данные')
                 else:
@@ -3228,7 +3979,12 @@ def final(request, id):
                     answer_date = form.cleaned_data.get('answer_date_fact')
                     answer_deadline = form.cleaned_data.get('answer_deadline_correct_fact')
                     root_cause_list = form.cleaned_data.get('root_cause_list')
-                    root_cause_text = form.cleaned_data.get('root_cause_text')
+                    root_cause_text = request.POST.getlist('root_cause_text')
+                    root_cause_str = ''
+                    for i, t in enumerate(root_cause_text):
+                        if t != '':
+                            root_cause_str += root_cause_text_numbers[i] + t + '\n'
+                    root_cause_text = root_cause_str
                     root_cause_comment = form.cleaned_data.get('root_cause_comment')
                     if answer_date is None:
                         form.add_error('answer_date_fact', 'Пожалуйста, внесите данные')
@@ -3240,9 +3996,9 @@ def final(request, id):
                         form.add_error('answer_remark', 'Пожалуйста, внесите данные')
                     if link_tech_name == "":
                         form.add_error('link_tech_name', 'Пожалуйста, внесите данные')
+                    if root_cause_list is None or root_cause_list == '':
+                        form.add_error('root_cause_list', 'Пожалуйста, внесите данные')
                     if root_cause_list:
-                        if "0." in root_cause_list and root_cause_text == "":
-                            form.add_error('root_cause_text', 'Пожалуйста, внесите данные')
                         if any(x in root_cause_list for x in rcc_list) and root_cause_comment == "":
                             form.add_error('root_cause_comment', 'Пожалуйста, внесите данные')
             else:
@@ -3261,7 +4017,12 @@ def final(request, id):
                         answer_deadline = form.cleaned_data.get('answer_deadline_correct_fact')
                         comment = form.cleaned_data.get('comment')
                         root_cause_list = form.cleaned_data.get('root_cause_list')
-                        root_cause_text = form.cleaned_data.get('root_cause_text')
+                        root_cause_text = request.POST.getlist('root_cause_text')
+                        root_cause_str = ''
+                        for i, t in enumerate(root_cause_text):
+                            if t != '':
+                                root_cause_str += root_cause_text_numbers[i] + t + '\n'
+                        root_cause_text = root_cause_str
                         root_cause_comment = form.cleaned_data.get('root_cause_comment')
                         if answer_date != "":
                             db_form.answer_date_fact = answer_date
@@ -3295,12 +4056,34 @@ def final(request, id):
                         messages.error(request, "Возникла ошибка " + str(e))
                 else:
                     print("ошибка в заполнении")
+            return render(request, 'final.html', {'form': form,
+                                                  'gipcontext':
+                                                      db_form.gip.last_name + ' ' +
+                                                      db_form.gip.first_name,
+                                                  'rescontext':
+                                                      db_form.responsibleTrouble_name.last_name + ' ' +
+                                                      db_form.responsibleTrouble_name.first_name if db_form.responsibleTrouble_name else '',
+                                                  'exfcontext':
+                                                      db_form.executor_fail_name.last_name + ' ' +
+                                                      db_form.executor_fail_name.first_name if db_form.executor_fail_name else '',
+                                                  'excontext':
+                                                      db_form.executor_name.last_name + ' ' +
+                                                      db_form.executor_name.first_name if db_form.executor_name else '',
+                                                  'reestrID': db_form.reestrID.id,
+                                                  'remarkID': id,
+                                                  'customer': db_form.customer.name,
+                                                  'contract_number': db_form.project_dogovor.number,
+                                                  'reviewer': db_form.project_reviewer.name,
+                                                  'role': role,
+                                                  'next_step_key': next_step_key,
+                                                  'custom_link_value': db_form.link_tech_name if db_form.link_tech_name is not None and db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
+                                                  'xml_link_value': db_form.link_tech_name[
+                                                                    34:] if db_form.link_tech_name is not None and 'XML файл(ы)' in db_form.link_tech_name else '',
+                                                  'imp7_data': zip(reestr.objects.get(id=id).imp7_comment,
+                                                                   reestr.objects.get(id=id).imp7_date),
+                                                  'root_cause_buf': root_cause_text})
         else:
             form = FinalForm(db_form)
-        if request.user == db_form.responsibleTrouble_name or db_form.responsibleTrouble_name in subs:
-            next_step_key = True
-        else:
-            next_step_key = False
         return render(request, 'final.html', {'form': form,
                                               'gipcontext':
                                                   db_form.gip.last_name + ' ' +
@@ -3322,7 +4105,9 @@ def final(request, id):
                                               'role': role,
                                               'next_step_key': next_step_key,
                                               'custom_link_value': db_form.link_tech_name if db_form.link_tech_name is not None and db_form.link_tech_name != 'Изменения не вносились' and 'XML файл(ы)' not in db_form.link_tech_name else '',
-                                              'xml_link_value': db_form.link_tech_name[34:] if db_form.link_tech_name is not None and 'XML файл(ы)' in db_form.link_tech_name else ''})
+                                              'xml_link_value': db_form.link_tech_name[34:] if db_form.link_tech_name is not None and 'XML файл(ы)' in db_form.link_tech_name else '',
+                                              'imp7_data': zip(reestr.objects.get(id=id).imp7_comment, reestr.objects.get(id=id).imp7_date),
+                                              'root_cause_buf': db_form.root_cause_text})
     else:
         return render(request, 'log_error.html', {'text': "Пожалуйста, авторизируйтесь, чтобы увидеть эту страницу."})
 
@@ -3374,7 +4159,8 @@ def remark(request, id):
                                                'status': reestr.objects.get(id=id).status,
                                                'role': role,
                                                'reestrID': reestr.objects.get(id=id).reestrID.id,
-                                               'comment_value': db_form.comment})
+                                               'comment_value': db_form.comment,
+                                               'imp7_data': zip(reestr.objects.get(id=id).imp7_comment, reestr.objects.get(id=id).imp7_date)})
     else:
         return redirect("accounts/login/?next=/")
 
@@ -3507,6 +4293,58 @@ def return_remarks(request, id):
         return render(request, 'log_error.html',
                       {'text': "Пожалуйста, авторизируйтесь в качестве ГИПа, чтобы увидеть эту страницу."})
 
+def gip_tasks(request, id):
+    if request.user.groups.filter(name='ГИП').exists() or request.user.is_superuser:
+        reest = reestInfo.objects.get(id=id)
+        remarks = reestr.objects.filter(reestrID=reest)
+        remarks_id = [i.id for i in remarks]
+        tasks_new = gipTask.objects.filter((Q(task_remark__in=remarks_id) & Q(task_status="Новая задача"))).order_by("-actuality", "id")
+        tasks_work = gipTask.objects.filter((Q(task_remark__in=remarks_id) & Q(task_status="В работе"))).order_by("-actuality", "id")
+        tasks_done = gipTask.objects.filter((Q(task_remark__in=remarks_id) & Q(task_status="Выполнено"))).order_by("-actuality", "id")
+        tasks_archive = gipTask.objects.filter((Q(task_remark__in=remarks_id) & Q(task_status="В архиве"))).order_by("-actuality", "id")
+        departments = np.unique(np.array(gipTask.objects.filter(task_remark__in=remarks_id).values_list('task_departments', flat=True)))
+        if request.method == 'POST':
+            if request.POST.get('table_export'):
+                name = xlsxTasks(reestInfo.objects.filter(id=id))
+                file_path = MEDIA_ROOT + "\\Tables" + name
+                response = FileResponse(open(file_path, 'rb'), as_attachment=True)
+                return response
+            if request.POST.get('to_work'):
+                changing_task = gipTask.objects.get(id=request.POST.get('task_id'))
+                changing_task.task_status = "В работе"
+            if request.POST.get('to_new'):
+                changing_task = gipTask.objects.get(id=request.POST.get('task_id'))
+                changing_task.task_status = "Новая задача"
+            if request.POST.get('to_done'):
+                changing_task = gipTask.objects.get(id=request.POST.get('task_id'))
+                changing_task.task_status = "Выполнено"
+            if request.POST.get('to_archive'):
+                changing_task = gipTask.objects.get(id=request.POST.get('task_id'))
+                changing_task.task_status = "В архиве"
+            if request.POST.get('canceling'):
+                changing_task = gipTask.objects.get(id=request.POST.get('task_id'))
+                if changing_task.actuality:
+                    changing_task.actuality = False
+                else:
+                    changing_task.actuality = True
+                changing_task.manual_change = True
+            changing_task.save()
+            request.session['skip_task_synk'] = True
+            return redirect('gip_tasks', id)
+        else:
+            skip_synk = request.session.pop('skip_task_synk', False)
+            if not skip_synk:
+                for r in remarks:
+                    task_creating(reest, r)
+        return render(request, 'task_kanban.html', {'reest': reest,
+                                                                        'tasks_new': tasks_new,
+                                                                        'tasks_work': tasks_work,
+                                                                        'tasks_done': tasks_done,
+                                                                        'tasks_archive': tasks_archive,
+                                                                        'departments': departments})
+    else:
+        return render(request, 'log_error.html',
+                  {'text': "Пожалуйста, авторизируйтесь в качестве ГИПа или администратора, чтобы увидеть эту страницу."})
 
 def import_remark(request, id):
     if request.user.groups.filter(name='ГИП').exists() or request.user.groups.filter(name='Наблюдатель').exists():
@@ -3713,6 +4551,26 @@ def aiGIP(request, sessionKey):
                         countRemarks = countRemarks + user_message[i]
                         i += 1
                     answer_message = "Первые " + countRemarks + " замечаний"
+                elif "Сформируй перечень задач для устранения замечаний из реестра(ов)" in user_message and "[" not in user_message:
+                    i = 64
+                    while user_message[i] not in '0123456789' and i < len(user_message) - 1:
+                        i+=1
+                    numReestrs = [""]
+                    while i < len(user_message) - 1:
+                        if user_message[i] not in " ,":
+                            numReestrs[-1] = numReestrs[-1] + user_message[i]
+                        elif i != len(user_message):
+                            numReestrs.append("")
+                        i += 1
+                    if i == len(user_message) - 1 and user_message[-1] in "0123456789-":
+                        numReestrs[-1] = numReestrs[-1] + user_message[-1]
+                    answer_message = 'Сформированы задачи для реестра(ов):'
+                    for j in numReestrs:
+                        reest = reestInfo.objects.get(reestr_index='110/' + j[:5] + 'Д_' + j[5:])
+                        remarks = reestr.objects.filter(reestrID=reest)
+                        for r in remarks:
+                            task_creating(reest, r)
+                        answer_message += " " + j + "(http://127.0.0.1:8000/gip_tasks/"+str(reest.id)+")"
                 realtime = timezone.now()
                 aiChatMessage.objects.create(session=session, role='assistant', content=answer_message, timestamp=realtime)
                 session.save()

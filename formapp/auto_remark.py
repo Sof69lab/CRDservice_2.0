@@ -13,6 +13,7 @@ def auto_import(file, reest):
     closed = []
     returned = {}
     for i, row in db.iterrows():
+        print(row['Статус'])
         status_in_file = row['Статус'].replace("_x000D_", "\n")
         if status_in_file == "Устранено":
             closed.append(row['Номер замечания в проекте'].replace("_x000D_", "\n") + '[' + str(row['ID замечания'][:-3]) + ']')
@@ -44,9 +45,12 @@ def auto_import(file, reest):
                                       answer_remark="")
     closed_remarks = reestr.objects.filter((Q(num_remark__in=closed) & Q(actuality=True) & Q(reestrID=reest.id)))
     returned_remarks = reestr.objects.filter((Q(num_remark__in=returned.keys()) & Q(actuality=True) & Q(reestrID=reest.id) & (Q(status="На согласовании Рецензентом") | Q(status="Замечание снято"))))
+    d = datetime.now()
     for r in closed_remarks:
         r.status = "Замечание снято"
-        r.save(update_fields=['status'])
+        r.cancel_remark = "Замечание снято согласно файлу " + str(file)
+        r.cancel_remark_date = d
+        r.save(update_fields=['status', 'cancel_remark', 'cancel_remark_date'])
     for r in returned_remarks:
         r.actuality = False
         r.save(update_fields=['actuality'])

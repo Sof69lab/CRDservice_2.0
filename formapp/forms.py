@@ -161,7 +161,8 @@ class RemarkForm(forms.ModelForm):
                   'labor_costs_fact', 'comment', 'answer_remark', 'link_tech_name', 'cancel_remark', 'total_importance',
                   'root_cause_list', 'root_cause_text', 'root_cause_comment', 'executor_fail_text', 'reestrID',
                   'importance1', 'importance2', 'importance3', 'importance4',
-                  'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep')
+                  'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp7_date',
+                  'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep')
         widgets = {
             'customer': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'project_dogovor': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
@@ -215,12 +216,13 @@ class RemarkForm(forms.ModelForm):
             'imp4_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp4_comment_in': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
+            'imp7_date': forms.DateInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'total_importance': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly',
                                                        'placeholder': '', 'id': 'total_imp'}),
             'root_cause_list': forms.TextInput(
                 attrs={'class': 'form-readonly', 'id': 'root_cause', 'readonly': 'readonly'}),
             'root_cause_text': forms.Textarea(
-                attrs={'class': 'form-readonly', 'readonly': 'readonly', 'id': 'root_cause'}),
+                attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'root_cause_comment': forms.Textarea(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'executor_fail_text': forms.TextInput(
                 attrs={'class': 'form-readonly', 'readonly': 'readonly', 'id': 'executor_fail_text'}),
@@ -273,6 +275,7 @@ class RemarkForm(forms.ModelForm):
         self.fields['imp4_comment'].initial = reest.imp4_comment
         self.fields['imp4_comment_in'].initial = reest.imp4_comment_in
         self.fields['imp7_comment'].initial = reest.imp7_comment
+        self.fields['imp7_date'].initial = reest.imp7_date
         if reest.cancel_remark:
             self.fields['cancel_remark'].initial = reest.cancel_remark + " от " + str(reest.cancel_remark_date)
 
@@ -599,7 +602,8 @@ class emplForm(forms.ModelForm):
         'answer_date_plan', 'answer_deadline_correct_plan', 'executor_fail_text',
         'labor_costs_plan', 'comment', 'answer_remark', 'total_importance', 'root_cause_list',
         'root_cause_comment', 'root_cause_text', 'status', 'importance1', 'importance2', 'importance3', 'importance4',
-        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep')
+        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp7_date',
+        'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep', 'imp4_in_date', 'imp4_out_date')
         error_messages = {
             'answer_date_plan': {'required': "Пожалуйста, внесите данные"},
             'answer_deadline_correct_plan': {'required': "Пожалуйста, внесите данные"},
@@ -656,14 +660,17 @@ class emplForm(forms.ModelForm):
             'imp3_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'imp4_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
             'imp4_comment_in': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
+            'imp4_in_date': forms.TextInput(attrs={'hidden': 'hidden'}),
+            'imp4_out_date': forms.TextInput(attrs={'hidden': 'hidden'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
+            'imp7_date': AdminDateWidget(attrs={'class': 'form-dateinput', 'type': 'date'}),
             'total_importance': forms.TextInput(
-                attrs={'required': 'required', 'class': 'form-importance', 'readonly': 'readonly', 'placeholder': '',
+                attrs={'required': 'required', 'class': 'form-importance', 'readonly': 'readonly', 'placeholder': 'Заполните поля 14.1-14.7',
                        'id': 'total_imp'}),
             'root_cause_list': forms.TextInput(
                 attrs={'class': 'form-textinput', 'id': 'root_cause', 'style': 'cursor: default;'}),
             'root_cause_text': forms.Textarea(
-                attrs={'class': 'form-textinput', 'autocomplete': 'off', 'id': 'root_cause0', 'hidden': 'hidden'}),
+                attrs={'class': 'form-textinput', 'autocomplete': 'off', 'id': 'root_cause0'}),
             'root_cause_comment': forms.Textarea(
                 attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'})
         }
@@ -738,7 +745,8 @@ class GIPform2(forms.ModelForm):
         'executor_fail_name', 'executor_name', 'answer_date_plan', 'answer_deadline_correct_plan', 'executor_fail_text',
         'labor_costs_plan', 'comment', 'answer_remark', 'total_importance', 'root_cause_list', 'reestrID', 'gip',
         'root_cause_comment', 'root_cause_text', 'status', 'importance1', 'importance2', 'importance3', 'importance4',
-        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep')
+        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp7_date',
+        'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep', 'imp4_in_date', 'imp4_out_date')
         error_messages = {
             'remark_name': {'required': 'Пожалуйста, внесите данные', },
             'rational': {'required': 'Пожалуйста, внесите данные', },
@@ -799,9 +807,12 @@ class GIPform2(forms.ModelForm):
             'imp3_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'imp4_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
             'imp4_comment_in': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
+            'imp4_in_date': forms.TextInput(attrs={'hidden': 'hidden'}),
+            'imp4_out_date': forms.TextInput(attrs={'hidden': 'hidden'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
+            'imp7_date': AdminDateWidget(attrs={'class': 'form-dateinput', 'type': 'date'}),
             'total_importance': forms.TextInput(
-                attrs={'class': 'form-textinput', 'id': 'total_imp', 'autocomplete': 'off', 'required': 'required'}),
+                attrs={'class': 'form-textinput', 'id': 'total_imp', 'autocomplete': 'off', 'required': 'required', 'placeholder': 'Заполните поля 14.1-14.7'}),
             'root_cause_list': forms.TextInput(
                 attrs={'class': 'form-textinput', 'id': 'root_cause', 'autocomplete': 'off', 'style': 'cursor: default;'}),
             'root_cause_text': forms.Textarea(
@@ -897,7 +908,11 @@ class GIPform2(forms.ModelForm):
         self.fields['imp3_comment'].initial = reest.imp3_comment
         self.fields['imp4_comment'].initial = reest.imp4_comment
         self.fields['imp4_comment_in'].initial = reest.imp4_comment_in
+        self.fields['imp4_comment'].initial = reest.imp4_comment
+        self.fields['imp4_in_date'].initial = reest.imp4_in_date
+        self.fields['imp4_out_date'].initial = reest.imp4_out_date
         self.fields['imp7_comment'].initial = reest.imp7_comment
+        self.fields['imp7_date'].initial = reest.imp7_date
 
         if reest.responsibleTrouble_name:
             self.fields['responsibleTrouble_name'].initial = reest.responsibleTrouble_name
@@ -930,7 +945,8 @@ class BossForm2(forms.ModelForm):
         'labor_costs_plan', 'comment', 'answer_remark', 'total_importance', 'root_cause_list', 'root_cause_text',
         'root_cause_comment', 'responsibleTrouble_name', 'gip', 'reestrID', 'status', 'executor_fail_text',
         'importance1', 'importance2', 'importance3', 'importance4',
-        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep')
+        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp7_date',
+        'imp1_comment_znp', 'imp1_comment_nd', 'imp3_dep', 'imp4_out_date', 'imp4_in_date')
         error_messages = {
             'remark_name': {'required': 'Пожалуйста, внесите данные', },
             'rational': {'required': 'Пожалуйста, внесите данные', },
@@ -992,9 +1008,12 @@ class BossForm2(forms.ModelForm):
             'imp3_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
             'imp4_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
             'imp4_comment_in': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off', 'hidden': 'hidden'}),
+            'imp4_in_date': forms.TextInput(attrs={'hidden': 'hidden'}),
+            'imp4_out_date': forms.TextInput(attrs={'hidden': 'hidden'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-textinput', 'autocomplete': 'off'}),
+            'imp7_date': AdminDateWidget(attrs={'class': 'form-dateinput', 'type': 'date'}),
             'total_importance': forms.TextInput(attrs={'class': 'form-textinput',
-                                                       'placeholder': '', 'id': 'total_imp', 'autocomplete': 'off',
+                                                       'placeholder': 'Заполните поля 14.1-14.7', 'id': 'total_imp', 'autocomplete': 'off',
                                                        'required': 'required'}),
             'root_cause_list': forms.TextInput(
                 attrs={'class': 'form-textinput', 'id': 'root_cause', 'autocomplete': 'off', 'style': 'cursor: default;'}),
@@ -1061,10 +1080,19 @@ class BossForm2(forms.ModelForm):
         self.fields['imp3_comment'].initial = reest.imp3_comment
         self.fields['imp4_comment'].initial = reest.imp4_comment
         self.fields['imp4_comment_in'].initial = reest.imp4_comment_in
+        self.fields['imp4_in_date'].initial = reest.imp4_in_date
+        self.fields['imp4_out_date'].initial = reest.imp4_out_date
         self.fields['imp7_comment'].initial = reest.imp7_comment
+        self.fields['imp7_date'].initial = reest.imp7_date
 
-        q1 = (Q(groups=2) | Q(groups=3) | Q(groups=1)) & Q(
-            departments__department=reest.responsibleTrouble_name.departments.department)
+        if reest.responsibleTrouble_name is not None:
+            if reest.responsibleTrouble_name.departments.department == "Дирекция":
+                q1 = (Q(groups=1) | Q(groups=2) | Q(groups=3))
+            else:
+                q1 = (Q(groups=1) | Q(groups=2) | Q(groups=3)) & Q(
+                    departments__department=reest.responsibleTrouble_name.departments.department)
+        else:
+            q1 = (Q(groups=1) | Q(groups=2) | Q(groups=3))
         q2 = Q(groups=4)
         q3 = Q(username="emptyUSER")
         qs = User.objects.filter(q1 | q2 | q3).annotate(
@@ -1112,7 +1140,7 @@ class FinalForm(forms.ModelForm):
         'labor_costs_plan', 'labor_costs_fact', 'comment', 'answer_remark', 'link_tech_name', 'total_importance',
         'root_cause_comment', 'root_cause_list', 'root_cause_text', 'importance1', 'importance2', 'importance3',
         'importance4',
-        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp3_dep', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd')
+        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp3_dep', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp7_date', 'imp1_comment_znp', 'imp1_comment_nd')
         error_messages = {
             'answer_date_plan': {'required': "Пожалуйста, внесите данные"},
             'answer_deadline_correct_plan': {'required': "Пожалуйста, внесите данные"},
@@ -1180,6 +1208,7 @@ class FinalForm(forms.ModelForm):
             'imp4_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp4_comment_in': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
+            'imp7_date': forms.DateInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'total_importance': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly',
                                                        'placeholder': '', 'id': 'total_imp'}),
             'root_cause_list': forms.TextInput(
@@ -1242,6 +1271,7 @@ class FinalForm(forms.ModelForm):
         self.fields['imp4_comment'].initial = reest.imp4_comment
         self.fields['imp4_comment_in'].initial = reest.imp4_comment_in
         self.fields['imp7_comment'].initial = reest.imp7_comment
+        self.fields['imp7_date'].initial = reest.imp7_date
         if reest.answer_date_fact:
             self.fields['answer_date_fact'].initial = str(reest.answer_date_fact)
         if reest.answer_deadline_correct_fact:
@@ -1357,7 +1387,7 @@ class AnswerForm(forms.ModelForm):
         'labor_costs_plan', 'labor_costs_fact', 'comment', 'answer_remark', 'link_tech_name', 'total_importance',
         'root_cause_list',
         'root_cause_comment', 'root_cause_text', 'status', 'importance1', 'importance2', 'importance3', 'importance4',
-        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp3_dep', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp1_comment_znp', 'imp1_comment_nd')
+        'importance5', 'importance6', 'importance7', 'imp3_comment', 'imp3_dep', 'imp4_comment', 'imp4_comment_in', 'imp7_comment', 'imp7_date', 'imp1_comment_znp', 'imp1_comment_nd')
         widgets = {
             'project_date_contract': forms.DateInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'project_name': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
@@ -1413,6 +1443,7 @@ class AnswerForm(forms.ModelForm):
             'imp4_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp4_comment_in': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'imp7_comment': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
+            'imp7_date': forms.DateInput(attrs={'class': 'form-readonly', 'readonly': 'readonly'}),
             'total_importance': forms.TextInput(attrs={'class': 'form-readonly', 'readonly': 'readonly',
                                                        'placeholder': '', 'id': 'total_imp'}),
             'root_cause_list': forms.TextInput(
@@ -1484,6 +1515,7 @@ class AnswerForm(forms.ModelForm):
         self.fields['imp4_comment'].initial = reest.imp4_comment
         self.fields['imp4_comment_in'].initial = reest.imp4_comment_in
         self.fields['imp7_comment'].initial = reest.imp7_comment
+        self.fields['imp7_date'].initial = reest.imp7_date
     def save_files(self, reestr, name, comment, remark):
         for upload in self.files.getlist("cause_add_files"):
             add_file = files(reestr=reestr, file=upload, upload_date=date.today(), file_name=name,

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from formapp.models import reestr, reestInfo, files, contracts, customers, reviewers, departments, aiChatSession, aiChatMessage
+from formapp.models import reestr, reestInfo, files, contracts, customers, reviewers, departments, aiChatSession, aiChatMessage, gipTask
 from django.contrib.admin.widgets import FilteredSelectMultiple
 
 class reestrAdmin(admin.ModelAdmin):
@@ -29,6 +29,10 @@ class aiChatSessionAdmin(admin.ModelAdmin):
     list_display = ('session_key', 'user', 'created_at', 'updated_at')
 class aiChatMessageAdmin(admin.ModelAdmin):
     list_display = ('session', 'role', 'content', 'timestamp')
+class gipTaskAdmin(admin.ModelAdmin):
+    list_display = ('task_remark', 'type_number', 'task_text', 'task_status', 'initial_date')
+    search_fields = ('task_remark', 'task_text', 'task_departments', 'task_data', 'task_deadlines')
+    list_filter = ('type_number', 'task_status', 'task_reestr')
 
 admin.site.register(reestr, reestrAdmin)
 admin.site.register(reestInfo, reestInfoAdmin)
@@ -39,3 +43,4 @@ admin.site.register(reviewers, reviewersAdmin)
 admin.site.register(departments, departmentsAdmin)
 admin.site.register(aiChatSession, aiChatSessionAdmin)
 admin.site.register(aiChatMessage, aiChatMessageAdmin)
+admin.site.register(gipTask, gipTaskAdmin)

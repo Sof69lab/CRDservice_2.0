@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.db.models.signals import post_delete, post_save
 from changelog.mixins import ChangeloggableMixin
 from changelog.signals import journal_save_handler, journal_delete_handler
+from django.contrib.postgres.fields import ArrayField
 
 def user_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/...
@@ -21,6 +22,56 @@ def get_full_name(self):
     return self.last_name + ' ' + self.first_name
 
 User.add_to_class("__str__", get_full_name)
+
+new_task = "Новая задача"
+work_task = "В работе"
+done_task = "Выполнено"
+archive_task = "В архиве"
+TASK_STATUS_CHOICES = [
+    (new_task, "Новая задача"),
+    (work_task, "В работе"),
+    (done_task, "Выполнено"),
+    (archive_task, "В архиве")
+]
+
+t111 = "1.1.1"
+t112 = "1.1.2"
+t113 = "1.1.3"
+t114 = "1.1.4"
+t12 = "1.2"
+t13 = "1.3"
+t2 = "2"
+t3 = "3"
+t41 = "4.1"
+t42 = "4.2"
+t43 = "4.3"
+t44 = "4.4"
+t71 = "7.1"
+t72 = "7.2"
+t73 = "7.3"
+t74 = "7.4"
+t75 = "7.5"
+t76 = "7.6"
+TASK_TYPE_CHOICES = [
+    (t111, "1.1.1"),
+    (t112, "1.1.2"),
+    (t113, "1.1.3"),
+    (t114, "1.1.4"),
+    (t12, "1.2"),
+    (t13, "1.3"),
+    (t2, "2"),
+    (t3, "3"),
+    (t41, "4.1"),
+    (t42, "4.2"),
+    (t43, "4.3"),
+    (t44, "4.4"),
+    (t71, "7.1"),
+    (t72, "7.2"),
+    (t73, "7.3"),
+    (t74, "7.4"),
+    (t75, "7.5"),
+    (t76, "7.6"),
+]
 
 form = "Формирование"
 write = "На заполнении"
@@ -272,20 +323,23 @@ class reestr(ChangeloggableMixin, models.Model):
     labor_costs_plan = models.FloatField(verbose_name="10.1 Трудозатраты, дн. (на устранение замечания) (План)", blank=True, null=True)
     comment = models.TextField(verbose_name="10.3. Комментарии", blank=True, null=True)
     answer_remark = models.TextField(verbose_name="11. Ответы на замечания", blank=True, null=True)
-    importance1 = models.BooleanField(verbose_name="Нарушены требования ЗНП и (или) обязательные требования нормативных документов", blank=True, null=True, default=None)
+    importance1 = models.BooleanField(verbose_name="14.1 Нарушены требования ЗНП и (или) обязательные требования нормативных документов", blank=True, null=True, default=None)
     imp1_comment_znp = models.TextField(verbose_name="ЗНП:", blank=True, null=True)
     imp1_comment_nd = models.TextField(verbose_name="НД:", blank=True, null=True)
-    importance2 = models.BooleanField(verbose_name="Требуется корректировка документации (свой раздел, глава, том, книга, др. док.)", blank=True, null=True, default=None)
-    importance3 = models.BooleanField(verbose_name="Требуется корректировка смежных разделов (глав, томов, др. док.)", blank=True, null=True, default=None)
+    importance2 = models.BooleanField(verbose_name="14.2 Корректировка документации (свой раздел, глава, том, книга, др. док.)", blank=True, null=True, default=None)
+    importance3 = models.BooleanField(verbose_name="14.3 Корректировка смежных разделов (глав, томов, др. док.)", blank=True, null=True, default=None)
     imp3_comment = models.TextField(verbose_name="Укажите разделы (главы, тома, др. док.)", blank=True, null=True)
     imp3_dep = models.TextField(verbose_name="Укажите соответствующие разделам смежные подразделения", blank=True, null=True)
-    importance4 = models.BooleanField(verbose_name="Требуется выдача задания смежным подразделениям (без учёта ОКиВД) и (или) получение исходных данных от них", blank=True, null=True, default=None)
-    imp4_comment_in = models.TextField(verbose_name="Получить исходные данные", blank=True, null=True)
+    importance4 = models.BooleanField(verbose_name="14.4 Выдача задания смежным подразделениям (без учёта ОКиВД) и (или) получение исходных данных от них", blank=True, null=True, default=None)
+    imp4_comment_in = models.TextField(verbose_name="Получить задание (исходные данные)", blank=True, null=True)
     imp4_comment = models.TextField(verbose_name="Выдать задание", blank=True, null=True)
-    importance5 = models.BooleanField(verbose_name="Требуется корректировка принятых проектных решений", blank=True, null=True, default=None)
-    importance6 = models.BooleanField(verbose_name="Корректировка принятых проектных решений требуется по вине/инициативе Заказчика", blank=True, null=True, default=None)
-    importance7 = models.BooleanField(verbose_name="Требуется получение дополнительных исходных данных от Заказчика", blank=True, null=True, default=None)
-    imp7_comment = models.TextField(verbose_name="Укажите, какие исходные данные требуются от Заказчика", blank=True, null=True)
+    imp4_in_date = models.JSONField(verbose_name="Сроки получения исходных данных", blank=True, null=True)
+    imp4_out_date = models.JSONField(verbose_name="Сроки выдачи задания", blank=True, null=True)
+    importance5 = models.BooleanField(verbose_name="14.5 Корректировка принятых проектных решений", blank=True, null=True, default=None)
+    importance6 = models.BooleanField(verbose_name="14.6 Корректировка принятых проектных решений требуется по причине", blank=True, null=True, default=None)
+    importance7 = models.BooleanField(verbose_name="14.7 Получение дополнительных исходных данных от Заказчика", blank=True, null=True, default=None)
+    imp7_comment = ArrayField(models.TextField(), default=list, blank=True, verbose_name="Укажите, какие исходные данные требуются от Заказчика")
+    imp7_date = ArrayField(models.DateField(), default=list, blank=True, verbose_name="Укажите необходимый срок их получения")
     total_importance = models.TextField(verbose_name="14. Значимость замечания", blank=True, null=True)
     root_cause_list = models.TextField(verbose_name="15. Коренная причина", blank=True, null=True)
     root_cause_text = models.TextField(verbose_name="Формулировка коренной причины", blank=True, null=True) #необязательное поле
@@ -298,6 +352,7 @@ class reestr(ChangeloggableMixin, models.Model):
     answer_date_fact = models.DateField(verbose_name="8. Дата предоставления ответов на замечания (Факт)", blank=True, null=True)
     answer_deadline_correct_fact = models.DateField(verbose_name="10. Срок внесения корректировок (Факт)", blank=True, null=True)
     labor_costs_fact = models.FloatField(verbose_name="10.2. Трудозатраты, дн. (на устранение замечания) (Факт)", blank=True, null=True)
+    create_date = models.DateField(auto_now_add=True, verbose_name="Дата создания замечания", blank=True, null=True)
     def __str__(self):
         return f"{self.project_dogovor.number[4:8]}-{self.num_reestr}-{self.num_remark}-{self.remark_v}"
 
@@ -320,6 +375,22 @@ class files(ChangeloggableMixin, models.Model):
 
 post_save.connect(journal_save_handler, sender=files)
 post_delete.connect(journal_delete_handler, sender=files)
+
+class gipTask(models.Model):
+    class Meta:
+        verbose_name = "задача"
+        verbose_name_plural = "Задачи ГИПа"
+    initial_date = models.DateField(verbose_name="Дата создания задачи")
+    type_number = models.CharField(max_length=50, verbose_name="Тип задачи", choices=TASK_TYPE_CHOICES)
+    task_reestr = models.ForeignKey(reestInfo, on_delete=models.CASCADE, verbose_name="Реестр")
+    task_remark = models.ForeignKey(reestr, on_delete=models.CASCADE, verbose_name="Замечание")
+    task_text = models.TextField(verbose_name="Текст задачи")
+    task_departments = models.TextField(verbose_name="Подразделения, относящиеся к задаче", null=True, blank=True)
+    task_deadlines = models.DateField(verbose_name="Срок исполнения задачи", null=True, blank=True)
+    task_data = models.TextField(verbose_name="Данные по задаче", null=True, blank=True)
+    task_status = models.CharField(max_length=15, verbose_name="Статус задачи", default="Новая задача", choices=TASK_STATUS_CHOICES)
+    actuality = models.BooleanField(verbose_name="Актуальность", default=True)
+    manual_change = models.BooleanField(verbose_name="Внесение изменений пользователями", default=False)
 
 class aiChatSession(models.Model):
     class Meta:

@@ -30,4 +30,5 @@ urlpatterns = [
     path("aiGIP/<str:sessionKey>/", views.aiGIP, name='aiGIP'),
     path("status/<int:id>/", views.status, name='status'),
     path("subtitute/<int:id>/", views.subtitute, name='subtitute'),
+    path("gip_tasks/<int:id>/", views.gip_tasks, name='gip_tasks')
 ]

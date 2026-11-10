@@ -90,6 +90,14 @@
                             <button class="suggestion-button" id="b2_4">Выгрузи всё что нашлось для замечаний ...</button>
                         </div>
                     </details>
+                    <details id="group3" style="display: inline-block; vertical-align: top;">
+                        <summary class="AI-tracks">
+                            Выгрузка задач
+                        </summary>
+                        <div>
+                            <button class="suggestion-button" id="b3_1">Сформируй перечень задач для устранения замечаний из реестра(ов) ...</button>
+                        </div>
+                    </details>
                 </div>
             </div>
         </div>
@@ -136,6 +144,10 @@
             textIdx = customText.indexOf("замечаний ...");
             if (textIdx > -1) {
                 customText = customText.slice(0, textIdx+10) + "[введите номера замечаний через запятую]" + customText.slice(textIdx+13);
+            }
+            textIdx = customText.indexOf("реестра(ов) ...");
+            if (textIdx > -1) {
+                customText = customText.slice(0, textIdx+12) + "[введите через запятую номера реестров в формате 1234-1]" + customText.slice(textIdx+15);
             }
             userText.value = customText;
             send_button.removeAttribute("disabled");

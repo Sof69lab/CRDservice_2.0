@@ -188,6 +188,8 @@
                                     <li class="alert danger"> {{error}} </li>
                                 {% endfor %}
                             {% endif %}<br />
+                            {% get_verbose_field_name "total_importance" %}<br />
+                            {{ form.total_importance }}<br /><br />
                             <table id="importance_table" style="width:70%">
                                 <tr>
                                     <td>{% get_verbose_field_name "importance1" %}</td>
@@ -203,11 +205,11 @@
                                     <td>{{ form.imp1_comment_nd }}</td>
                                 </tr>
                                 <tr id="imp2" hidden>
-                                    <td>Корректировка документации (свой раздел, глава, том, книга, др. док.)</td>
+                                    <td>{% get_verbose_field_name "importance2" %}</td>
                                     <td>{{ form.importance2 }}</td>
                                 </tr>
                                 <tr id="imp3" hidden>
-                                    <td>Корректировка смежных разделов (глав, томов, др. док.)</td>
+                                    <td>{% get_verbose_field_name "importance3" %}</td>
                                     <td>{{ form.importance3 }}</td>
                                 </tr>
                                 <tr class="imp3" hidden>
@@ -235,7 +237,7 @@
                                     </td>
                                 </tr>
                                 <tr id="imp4" hidden>
-                                    <td>Выдача задания смежным подразделениям (без учёта ОКиВД) и (или) получение исходных данных от них</td>
+                                    <td>{% get_verbose_field_name "importance4" %}</td>
                                     <td>{{ form.importance4 }}</td>
                                 </tr>
                                 <tr class="imp4" hidden>
@@ -263,178 +265,37 @@
                                     </td>
                                 </tr>
                                 <tr id="imp5" hidden>
-                                    <td>Корректировка принятых проектных решений</td>
+                                    <td>{% get_verbose_field_name "importance5" %}</td>
                                     <td>{{ form.importance5 }}</td>
+                                    <td id="imp5_critical" style="color: red;"><b></b></td>
                                 </tr>
                                 <tr id="imp6" hidden>
-                                    <td>Корректировка принятых проектных решений требуется по причине</td>
+                                    <td>{% get_verbose_field_name "importance6" %}</td>
                                     <td>{{ form.importance6 }} </td>
                                 </tr>
                                 <tr id="imp7" hidden>
-                                    <td>Получение дополнительных исходных данных от Заказчика</td>
+                                    <td>{% get_verbose_field_name "importance7" %}</td>
                                     <td>{{ form.importance7 }}</td>
                                     <td id="imp7_critical" style="color: red;"><b></b></td>
                                 </tr>
                                 <tr class="imp7" hidden>
-                                    <td colspan="2">{% get_verbose_field_name "imp7_comment" %}</td>
+                                    <td colspan="2">Укажите, какие исходные данные требуются от Заказчика и необходимый срок их получения</td>
                                 </tr>
-                                <tr class="imp7" hidden>
-                                    <td colspan="2">{{ form.imp7_comment }}
-                                        {% if form.imp7_comment.errors %}
-                                            {% for error in form.imp7_comment.errors %}
-                                                <li class="alert danger"> {{error}} </li>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </td>
-                                </tr>
+                                {% for item1, item2 in imp7_data %}
+                                    <tr class="imp7" hidden>
+                                        <td colspan="2" style="padding-left: 12px;"><input class="form-readonly" value="{{ item1 }}"></td>
+                                        <td colspan="2" style="padding-left: 12px;"><input class="form-readonly" value="{{ item2 }}"></td>
+                                    </tr>
+                                {% endfor %}
                             </table>
-                            {% get_verbose_field_name "total_importance" %}<br />
-                            {{ form.total_importance }}<br /><br />
                             <p id="rootCause">
                                 {% get_verbose_field_name "root_cause_list" %}<br />
                                 {{ form.root_cause_list }}
-                                для множественного выбора нажмите и удерживайте Ctrl
                             </p>
-                            <select id="causes1" class="form-selectmultiple" multiple required>
-                                <option value=""></option>
-                                <option value="0.">0. Требуется классификация НС</option>
-                                <optgroup label="1. Проектная документация">
-                                    <optgroup label="- 1.1. Несоответствие оформления выпускаемой документации установленным
-                                        нормам и правилам (ГОСТ, СПДС, ЕСКД, СТО и т.д.) и правилам офрмления, оговоренным и принятым с Заказчиком">
-                                        <option value="1.1.1.">-- 1.1.1. Несоответствие оформления выпускаемой документации
-                                            (направляемой Заказчику, в ГГЭ и др.) установленным нормам и правилам (ГОСТ, СПДС,
-                                                ЕСКД, СТО и т.д.) по вине сотрудников ОКиВД</option>
-                                        <option value="1.1.2.">-- 1.1.2. Несоответствие оформления выпускаемой документации
-                                            установленным нормам и правилам (ГОСТ, СПДС, ЕСКД, СТО т.д.) по вине нормоконтролёров</option>
-                                        <option value="1.1.3.">-- 1.1.3. Несоответствие оформления выпускаемой документации
-                                            установленным нормам и правилам (ГОСТ, СПДС, ЕСКД, СТО т.д.) и правилам оформления,
-                                             оговоренным и принятым с заказчиком по вине исполнителей</option>
-                                    </optgroup>
-                                    <option value="1.2.1.">- 1.2. Некорректное использование исполнителями нормативных
-                                            документов (НД) или некорректная ссылка исполнителя на НД при подготовке документации
-                                    </option>
-                                    <optgroup label="- 1.3. Некорректное применение установленных требований со стороны
-                                        Рецензента (Заказчика, ГГЭ и др.)">
-                                        <option value="1.3.1.">-- 1.3.1. Некорректная ссылка на НД при подготовке замечания
-                                              со стороны Рецензента (Заказчика, ГГЭ и др.)</option>
-                                        <option value="1.3.2.">-- 1.3.2. Некорректная ссылка на невыполнение Исполнителем
-                                                НД со стороны Рецензента (Заказчика, ГГЭ и др.), в случае "невнимательного
-                                                (неполного) прочтения документации"</option>
-                                    </optgroup>
-                                </optgroup>
-                                <optgroup label="2. Оборудование">
-                                    <option value="2.1.1.">- 2.1. Использование при проведении инженерно-изыскательских,
-                                            научно-исследовательских работ и подготовки проектной документации оборудования
-                                            и программного обеспечения, несоответствующего требованиям ТЗ или состояние и
-                                            характеристики которых не позволяют производить качественные исследования и выпуск
-                                            проектной документации</option>
-                                    <option value="2.2.1.">- 2.2. Неправомерное требование со стороны Рецензента (Заказчика,
-                                            ГГЭ и др.) использовать программное обеспечение, приборы и сертифицированные
-                                            лаборатории, не указанные в ТЗ</option>
-                                </optgroup>
-                                <optgroup label="3. Персонал">
-                                    <optgroup label="- 3.1. Нарушение персоналом (исполнителями) требований Договора, ЗНП
-                                        (ТЗ) или других НД (использование устаревших НД)">
-                                        <option value="3.1.1.">-- 3.1.1. Не знание (не выполнение) требований Договора, ЗНП
-                                            (ТЗ, протоколов, решений, писем) и других НД, использование устаревших НД</option>
-                                        <option value="3.1.2.">-- 3.1.2. Не предоставление необходимых документов (разрешений,
-                                            сертификатов, договоров, протоколов, отчётов, актов, аттестатов, картографии,
-                                                справок, фото-видео материалов и др.)</option>
-                                        <option value="3.1.3.">-- 3.1.3. Отсутствие необходимых расчётов (измерений,
-                                                испытаний) или допущение ошибки при их выполнении (в случае их обязательного
-                                                выполнения)</option>
-                                        <option value="3.1.4.">-- 3.1.4. Технические ошибки из-за невнимательности</option>
-                                        <option value="3.1.5.">-- 3.1.5. Исполнителем, допустившим несоответствие, является субподрядчик</option>
-                                        <option value="3.1.6.">-- 3.1.6. Исполнитель, допустивший несоответствие, уволился из организации</option>
-                                    </optgroup>
-                                    <optgroup label="- 3.2. Недостаточное взаимодействие между подразделениями при проектировании,
-                                        в части предоставления (получения) необходимых и достаточных исходных данных в
-                                        установленный графиком срок">
-                                        <option value="3.2.1.">-- 3.2.1. Нарушение сроков выдачи задания (исходных данных)
-                                                смежным подразделениям (или получение от них)</option>
-                                        <option value="3.2.2.">-- 3.2.2. Нарушение сроков выполнения работ исполнителями,
-                                            влияющее на сроки работ смежных подразделений</option>
-                                        <option value="3.2.3.">-- 3.2.3. Предоставление недостаточных (некорректных) исходных
-                                                данных смежным подразделениям</option>
-                                    </optgroup>
-                                    <optgroup label="- 3.3. Недостаточное количество персонала (исполнителей) для выполнения работ">
-                                        <option value="3.3.1.">-- 3.3.1. Нарушение сроков выдачи задания (исходных данных)
-                                                смежным подразделениям (или получение от них) в следствии недостаточного
-                                                количества исполнителей</option>
-                                        <option value="3.3.2.">-- 3.3.2. Нарушение сроков выполнения работ исполнителями,
-                                                влияющее на сроки работ смежных подразделений в следствии недостаточного
-                                                количества исполнителей</option>
-                                        <option value="3.3.3.">-- 3.3.3. Нарушение сроков выполнения работ исполнителями,
-                                                влияющее на сроки выпуска проекта/документации в следствии недостаточного
-                                                количества исполнителей</option>
-                                    </optgroup>
-                                </optgroup>
-                                <optgroup label="4. Управление">
-                                    <optgroup label="- 4.1. Недостаточный уровень планирования работ по проекту со стороны
-                                        ГИП и руководителей подразделений, связанный с ошибками в планировании (в определении
-                                        приоритетности выполнения работ по Проекту; в распределении ресурсов внутри подразделения по Проектам)">
-                                        <option value="4.1.1.">-- 4.1.1. Нарушение сроков выпуска проектов, связанное с
-                                                ошибками планирования ГИП или Руководителей подразедений</option>
-                                        <option value="4.1.2.">-- 4.1.2. Нарушение сроков выпуска проектов, связанное с
-                                                ошибками планирования ГИП или Руководителей подразедений (при изменении приоритетов
-                                                в очерёдности проектирования со стороны Руководства Общества, Холдинга, Заказчика)</option>
-                                    </optgroup>
-                                    <optgroup label="- 4.2. Недостаточный уровень планирования выполнения договоров со стороны
-                                         планово-производственного отдела (ППО), связанный с ошибками в планировании (в
-                                         определении приоритетности выполнения Проектов; в распределении ресурсов производственного
-                                         блока по Проектам">
-                                         <option value="4.2.1.">-- 4.2.1. Нарушение сроков выпуска проектов, связанное с ошибками
-                                            планирования Руководства производственного блока или ППО</option>
-                                         <option value="4.2.2.">-- 4.2.2. Нарушение сроков выпуска проектов, связанное с ошибками
-                                             планирования Руководства производственного блока или ППО (при изменении приоритетов
-                                            в очерёдности проектирования со стороны Руководства Общества, Холдинга, Заказчика)</option>
-                                    </optgroup>
-                                    <option value="4.3.1.">- 4.3. Слабый контроль (проверка) выпускаемой документации на
-                                            предмет её соответствия требованиям Договора, ЗПН (ТЗ) или других НД со стороны
-                                            ГИП или руководителей подразделений</option>
-                                    <option value="4.4.1.">- 4.4. Изменение Заказчиком ЗНП (ТЗ) в процессе выполнения работ
-                                         (дополнительные требования Заказчика на различных стадиях проектирования)</option>
-                                    <optgroup label="- 4.5. Несвоевременное предоставление (не предоставление) Заказчиком
-                                        исходных данных (ИД), правоустанавливающих и учредительных документов (истечение их
-                                        срока действия">
-                                        <option value="4.5.1.">-- 4.5.1. Несвоевременное предоставление (не предоставление)
-                                            Заказчиком ИД (предоставление некорректных ИД)</option>
-                                        <option value="4.5.2.">-- 4.5.2. Непредставление правоустанавливающих документов со
-                                            стороны Заказчика (истечение их срока действия) для ведения работ по договору</option>
-                                    </optgroup>
-                                    <option value="4.6.1.">- 4.6. Изменение сроков выпуска проектов, связанные с изменением
-                                         приоиртетов Руководства холдинга (Заказчика) в очерёдности проектирования</option>
-                                </optgroup>
-                                <optgroup label="5. Методы/технология">
-                                    <option value="5.1.1.">- 5.1. Неиспользование исполнителями при проведении работ по договору
-                                         передовых современных технологий проектирования (3D-проектирования)</option>
-                                    <optgroup label="- 5.2. Неиспользование исполнителями вспомогательных инструментов и
-                                        программ для проверки актуальности НД">
-                                        <option value="5.2.1.">-- 5.2.1. Неиспользование исполнителями вспомогательных инструментов и
-                                        программ для проверки актуальности НД (в т.ч. информационно-справочной системы "Кодекс-Техэксперт")</option>
-                                    </optgroup>
-                                    <optgroup label="- 5.3. Нарушение методологии (процедур) нормоконтроля качества,
-                                        установленных в организации">
-                                        <option value="5.3.1.">-- 5.3.1. Формальное исполнение функций нормоконтроля со стороны
-                                             Руководства производственного блока или ГИПов</option>
-                                        <option value="5.3.2.">-- 5.3.2. Формальное исполнение функций нормоконтроля со стороны
-                                             Руководителей подразделений или исполнителей</option>
-                                    </optgroup>
-                                </optgroup>
-                                <option value="6.">6. Материал, сырьё, комплектующие</option>
-                                <option value="7.">7. Окружающая среда</option>
-                            </select>
+                            {% include "fragments/root_cause_element.html" %}
+                            <p id="root_cause_buf" hidden>{{ root_cause_buf }}</p>
                             {% if form.root_cause_list.errors %}
                                 {% for error in form.root_cause_list.errors %}
-                                    <li class="alert danger"> {{error}} </li>
-                                {% endfor %}
-                            {% endif %}
-                            <p id="root_cause_text" hidden>
-                                {% get_verbose_field_name "root_cause_text" %}<br />
-                            </p>
-                            {{ form.root_cause_text }}
-                            {% if form.root_cause_text.errors %}
-                                {% for error in form.root_cause_text.errors %}
                                     <li class="alert danger"> {{error}} </li>
                                 {% endfor %}
                             {% endif %}
@@ -549,27 +410,23 @@
             event.preventDefault();
             return false;
         }
-        let cause_input = document.getElementById("root_cause")
-        cause_input.addEventListener('keydown', (e) => {
-            const allowedKeys = ['Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'];
-            if (!allowedKeys.includes(e.key) && !e.ctrlKey && !e.altKey && !e.metaKey) {
-                e.preventDefault();
-            }
-        });
-        cause_input.addEventListener('paste', preventInput);
-        cause_input.addEventListener('cut', preventInput);
-        cause_input.addEventListener('drop', preventInput);
-        cause_input.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-        });
 
-        let s = document.getElementById("header").innerHTML;
-        let lbls = [];
-        let lbl = document.getElementById("cause_label");
-        s = s.substring(0,35).concat(s.substring(39,43),s.substring(45,47));
-        document.getElementById("header").innerHTML = s;
-        let causes1 = document.getElementById("causes1");
-        causes1.addEventListener('change', selectCause);
+        let img_background = "#FFFFFF url('http://127.0.0.1:8000/static/exclamation.png') no-repeat right 1px top 0.5%";
+		const root_cause_text_numbers = ['1.1.', '1.2.', '1.3.', '1.', '2.1.', '2.2.', '2.', '3.1.', '3.2.', '3.3.', '3.', '4.1.', '4.2.', '4.3.', '4.4.', '4.5.', '4.6.', '4.', '5.1.', '5.2.', '5.3.', '5.', '6.', '7.']
+        let root_cause_buf = document.getElementById("root_cause_buf").innerHTML.split("\n");
+        for (let i=0; i < root_cause_buf.length; i++) {
+            let separated_str = root_cause_buf[i].split(" ");
+            if (root_cause_text_numbers.includes(separated_str[0])) {
+                document.getElementById(separated_str[0]).value = separated_str.slice(1).join(' ');
+            }
+        }
+        let root_cause_numbers = document.getElementById("root_cause").value.split(", ");
+        for (let i=0; i < root_cause_numbers.length; i++) {
+            if (root_cause_numbers[i].length > 0 && '1234567'.includes(root_cause_numbers[i][0])) {
+                let checkbox_elem = document.getElementById("causes"+root_cause_numbers[i]);
+                checkbox_elem.checked = true;
+            }
+        }
         let cause_file1 = document.getElementById("cause_file1");
         let cause_file2 = document.getElementById("cause_file2");
         let cause_file3 = document.getElementById("cause_file3");
@@ -577,297 +434,37 @@
         let cause_name = document.getElementById("id_cause_file_name");
         let cause_comment = document.getElementById("id_cause_file_comment");
         let cause = document.getElementById("root_cause").value;
-
-        let causes = [];
-        let txt = document.getElementById("id_root_cause_comment");
-        let j = 0;
-        for (i=0; i < cause.length; i++) {
-            if (cause[i] == ',') {
-                causes.push(cause.slice(j, i));
-                j = i + 2;
-            }
-        }
-        causes.push(cause.slice(j));
-        if (cause) {
-            document.getElementById("causes1").style.borderColor="#56C02B";
-        } else {
-            document.getElementById("root_cause_text").setAttribute("hidden", "");
-            document.getElementById("root_cause0").removeAttribute("required");
-            txt.removeAttribute("required");
-            txt.setAttribute("hidden", "");
-            cause_file1.setAttribute("hidden", "");
-            cause_file2.setAttribute("hidden", "");
-            cause_file3.setAttribute("hidden", "");
-            cause_add.setAttribute("hidden", "");
-            cause_name.setAttribute("hidden", "");
-            cause_comment.setAttribute("hidden", "");
-            cause_add.removeAttribute("required");
-            cause_name.removeAttribute("required");
-            cause_comment.removeAttribute("required");
-        }
-        if (cause.includes("0.")) {
-            document.getElementById("root_cause_text").removeAttribute("hidden");
-            document.getElementById("root_cause0").setAttribute("required", "");
-            document.getElementById("root_cause0").removeAttribute("hidden");
-            txt.setAttribute("hidden", "");
-            txt.removeAttribute("required");
-            cause_file1.setAttribute("hidden", "");
-            cause_file2.setAttribute("hidden", "");
-            cause_file3.setAttribute("hidden", "");
-            cause_add.setAttribute("hidden", "");
-            cause_name.setAttribute("hidden", "");
-            cause_comment.setAttribute("hidden", "");
-            cause_add.removeAttribute("required");
-            cause_name.removeAttribute("required");
-            cause_comment.removeAttribute("required");
-        } else {
-            document.getElementById("root_cause_text").setAttribute("hidden", "");
-            document.getElementById("root_cause0").removeAttribute("required");
-            let cause_file = document.getElementById("cause_file");
-            let cause_add = document.getElementById("id_cause_add_files");
-            let cause_name = document.getElementById("id_cause_file_name");
-            let cause_comment = document.getElementById("id_cause_file_comment");
-        }
-        if (cause.includes("1.3.1.") || cause.includes("1.3.2.") || cause.includes("3.1.1.") || cause.includes("3.1.2.")) {
-                lbls.push("конкретные пункты НД");
-                txt.removeAttribute("hidden");
-                txt.setAttribute("required", "");
-                cause_file1.setAttribute("hidden", "");
-                cause_file2.setAttribute("hidden", "");
-                cause_file3.setAttribute("hidden", "");
-                cause_add.setAttribute("hidden", "");
-                cause_name.setAttribute("hidden", "");
-                cause_comment.setAttribute("hidden", "");
-                cause_add.removeAttribute("required");
-                cause_name.removeAttribute("required");
-                cause_comment.removeAttribute("required");
-            }
-        if (cause.includes("2.2.1.")) {
-            lbls.push("конкретное ПО или оборудование");
-            txt.setAttribute("required", "");
-            txt.removeAttribute("hidden");
-            cause_file1.setAttribute("hidden", "");
-            cause_file2.setAttribute("hidden", "");
-            cause_file3.setAttribute("hidden", "");
-            cause_add.setAttribute("hidden", "");
-            cause_name.setAttribute("hidden", "");
-            cause_comment.setAttribute("hidden", "");
-            cause_add.removeAttribute("required");
-            cause_name.removeAttribute("required");
-            cause_comment.removeAttribute("required");
-        }
-        if (cause.includes("3.1.5.")) {
-            lbls.push("конкретного субподрядчика");
-            txt.setAttribute("required", "");
-            txt.removeAttribute("hidden");
-            cause_file1.setAttribute("hidden", "");
-            cause_file2.setAttribute("hidden", "");
-            cause_file3.setAttribute("hidden", "");
-            cause_add.setAttribute("hidden", "");
-            cause_name.setAttribute("hidden", "");
-            cause_comment.setAttribute("hidden", "");
-            cause_add.removeAttribute("required");
-            cause_name.removeAttribute("required");
-            cause_comment.removeAttribute("required");
-        }
-        if (cause.includes("3.1.6.")) {
-            lbls.push("конкретного исполнителя");
-            txt.setAttribute("required", "");
-            txt.removeAttribute("hidden");
-            cause_file1.setAttribute("hidden", "");
-            cause_file2.setAttribute("hidden", "");
-            cause_file3.setAttribute("hidden", "");
-            cause_add.setAttribute("hidden", "");
-            cause_name.setAttribute("hidden", "");
-            cause_comment.setAttribute("hidden", "");
-            cause_add.removeAttribute("required");
-            cause_name.removeAttribute("required");
-            cause_comment.removeAttribute("required");
-        }
-        if (cause.includes("3.2.1.") || cause.includes("3.2.3.") || cause.includes("3.3.1.")) {
-            lbls.push("конкретные подразделения");
-            txt.setAttribute("required", "");
-            txt.removeAttribute("hidden");
-            cause_file1.setAttribute("hidden", "");
-            cause_file2.setAttribute("hidden", "");
-            cause_file3.setAttribute("hidden", "");
-            cause_add.setAttribute("hidden", "");
-            cause_name.setAttribute("hidden", "");
-            cause_comment.setAttribute("hidden", "");
-            cause_add.removeAttribute("required");
-            cause_name.removeAttribute("required");
-            cause_comment.removeAttribute("required");
-        }
-        if (cause.includes("4.1.1.") || cause.includes("4.2.1.")) {
-            lbls.push("конкретные факты и Руководителей");
-            txt.setAttribute("required", "");
-            txt.removeAttribute("hidden");
-        }
-        if (cause.includes("4.1.2.") || cause.includes("4.2.2.")) {
-            lbls.push("конкретные факты, Руководителей и конкретные распоряжения");
-            txt.setAttribute("required", "");
-            txt.removeAttribute("hidden");
-        }
-        if (cause.includes("4.3.1.")) {
-            lbls.push("конкретных Руководителей");
-            txt.setAttribute("required", "");
-            txt.removeAttribute("hidden");
-        }
-        if (cause.includes("4.4.1.") || cause.includes("4.5.1.") || cause.includes("4.5.2.")) {
-            lbls.push("конкретные факты");
-            txt.setAttribute("required", "");
-            txt.removeAttribute("hidden");
-        }
-        if (cause.includes("4.6.1.")) {
-            lbls.push("конкретные Распоряжения и документы");
-            txt.setAttribute("required", "");
-            txt.removeAttribute("hidden");
-        }
-        if (cause.includes("5.3.1.")) {
-            lbls.push("конкретных Руководителей (нормоконтролёров)");
-            txt.setAttribute("required", "");
-            txt.removeAttribute("hidden");
-            cause_file1.setAttribute("hidden", "");
-            cause_file2.setAttribute("hidden", "");
-            cause_file3.setAttribute("hidden", "");
-            cause_add.setAttribute("hidden", "");
-            cause_name.setAttribute("hidden", "");
-            cause_comment.setAttribute("hidden", "");
-            cause_add.removeAttribute("required");
-            cause_name.removeAttribute("required");
-            cause_comment.removeAttribute("required");
-        }
-        if (cause.includes("5.3.2.")) {
-            lbls.push("конкретных Руководителей и исполнителей (нормоконтролёров)");
-            txt.setAttribute("required", "");
-            cause_file1.setAttribute("hidden", "");
-            cause_file2.setAttribute("hidden", "");
-            cause_file3.setAttribute("hidden", "");
-            cause_add.setAttribute("hidden", "");
-            cause_name.setAttribute("hidden", "");
-            cause_comment.setAttribute("hidden", "");
-            cause_add.removeAttribute("required");
-            cause_name.removeAttribute("required");
-            cause_comment.removeAttribute("required");
-        }
-        if (lbls.length > 0) {
-            lbl.removeAttribute("hidden");
-            lbl.innerHTML = "Укажите ";
-            for (let i=0; i < lbls.length; i++) {
-                lbl.innerHTML += lbls[i];
-                if (i < lbls.length-1) {
-                    lbl.innerHTML += ", ";
-                }
-            }
-        }
-
-        const custom_link_script = `<input id='custom_link' name='custom_link' class='form-textinput' type='text' disabled autocomplete='off' style='width: 88%;' placeholder='Том Х, ХХХ, изм. Х, Раздел ХХ'>`;
-        document.getElementById('id_link_tech_name_1').parentElement.insertAdjacentHTML('afterend', custom_link_script);
-        const xml_link_script = `  <input id='xml_link' name='xml_link' class='form-textinput' type='text' disabled autocomplete='off' style='width: 25%;'>`;
-        document.getElementById('id_link_tech_name_2').parentElement.insertAdjacentHTML('afterend', xml_link_script);
-        let custom_link = document.getElementById('custom_link');
-        custom_link.value = document.getElementById('id_custom_link_form').innerHTML;
-        let xml_link = document.getElementById('xml_link');
-        xml_link.value = document.getElementById('id_xml_link_form').innerHTML;
-        function selectLink(e) {
-            if (this.checked) {
-                if (this.value == 'Изменения вносились') {
-                    custom_link.removeAttribute('disabled');
-                    custom_link.setAttribute('required', 'required');
-                    xml_link.removeAttribute('required');
-                    xml_link.setAttribute('disabled', 'disabled');
-                } else if (this.value == 'XML файл(ы)') {
-                    xml_link.removeAttribute('disabled');
-                    xml_link.setAttribute('required', 'required');
-                    custom_link.removeAttribute('required');
-                    custom_link.setAttribute('disabled', 'disabled');
-                } else {
-                    custom_link.removeAttribute('required');
-                    custom_link.setAttribute('disabled', 'disabled');
-                    xml_link.removeAttribute('required');
-                    xml_link.setAttribute('disabled', 'disabled');
-                }
-            }
-        }
-        const radioButtonsLink = document.querySelectorAll('input[name="link_tech_name"]');
-        for(const radioButton of radioButtonsLink){
-            radioButton.addEventListener('change', selectLink);
-            if (radioButton.checked) {
-                if (radioButton.value == 'Изменения вносились') {
-                    custom_link.removeAttribute('disabled');
-                    custom_link.setAttribute('required', 'required');
-                    xml_link.removeAttribute('required');
-                    xml_link.setAttribute('disabled', 'disabled');
-                } else if (radioButton.value == 'XML файл(ы)') {
-                    xml_link.removeAttribute('disabled');
-                    xml_link.setAttribute('required', 'required');
-                    custom_link.removeAttribute('required');
-                    custom_link.setAttribute('disabled', 'disabled');
-                } else {
-                    custom_link.removeAttribute('required');
-                    custom_link.setAttribute('disabled', 'disabled');
-                    xml_link.removeAttribute('required');
-                    xml_link.setAttribute('disabled', 'disabled');
-                }
-            }
-        }
-
-        function selectCause(e) {
-            let lbl = document.getElementById("cause_label");
-            let txt = document.getElementById("id_root_cause_comment");
-            let cause_file1 = document.getElementById("cause_file1");
-            let cause_file2 = document.getElementById("cause_file2");
-            let cause_file3 = document.getElementById("cause_file3");
-            let cause_add = document.getElementById("id_cause_add_files");
-            let cause_name = document.getElementById("id_cause_file_name");
-            let cause_comment = document.getElementById("id_cause_file_comment");
-            if (this.selectedOptions != "") {
-                document.getElementById("rootCause").removeAttribute("hidden");
-                let selectedCause = this.selectedOptions;
-                document.getElementById("root_cause").value = "";
-                for (let i=0; i < selectedCause.length; i++) {
-                    document.getElementById("root_cause").value += selectedCause[i].value;
-                    if (i < selectedCause.length - 1) {
-                        document.getElementById("root_cause").value += ", ";
+        const root_cause_tree = document.querySelector('.root-cause-tree');
+        root_cause_tree.addEventListener('change', (e) => {
+            if (!e.target.classList.contains('root-cause-node-checkbox') && !e.target.classList.contains('form-textinput')) return;
+            const checkbox = e.target;
+            rootCauseForming();
+        });
+        let root_causes = document.getElementsByClassName('root-cause-node-checkbox');
+        const root_cause_text = document.getElementsByName('root_cause_text');
+        function rootCauseForming() {
+            let root_cause_str = '';
+            for (let i=0; i < root_cause_text.length; i++) {
+                if (root_cause_text[i].value != '') {
+                    if (root_cause_str.length > 0) {
+                        root_cause_str += ', ';
                     }
+                    root_cause_str += root_cause_text[i].id;
                 }
             }
-            let cause = document.getElementById("root_cause").value;
-            if (cause.includes("0.")) {
-                document.getElementById("root_cause_text").removeAttribute("hidden");
-                document.getElementById("root_cause0").setAttribute("required", "");
-                document.getElementById("root_cause0").removeAttribute("hidden");
-                txt.setAttribute("hidden", "");
-                txt.removeAttribute("required");
-                lbl.setAttribute("hidden", "");
-                cause_file1.setAttribute("hidden", "");
-                cause_file2.setAttribute("hidden", "");
-                cause_file3.setAttribute("hidden", "");
-                cause_add.setAttribute("hidden", "");
-                cause_name.setAttribute("hidden", "");
-                cause_comment.setAttribute("hidden", "");
-                cause_add.removeAttribute("required");
-                cause_name.removeAttribute("required");
-                cause_comment.removeAttribute("required");
-            } else {
-                document.getElementById("root_cause_text").setAttribute("hidden", "");
-                document.getElementById("root_cause0").removeAttribute("required");
-                document.getElementById("root_cause0").setAttribute("hidden", "");
-
-                txt.setAttribute("hidden", "");
-                txt.removeAttribute("required");
-                cause_file1.setAttribute("hidden", "");
-                cause_file2.setAttribute("hidden", "");
-                cause_file3.setAttribute("hidden", "");
-                cause_add.setAttribute("hidden", "");
-                cause_name.setAttribute("hidden", "");
-                cause_comment.setAttribute("hidden", "");
-                cause_add.removeAttribute("required");
-                cause_name.removeAttribute("required");
-                cause_comment.removeAttribute("required");
-                lbl.setAttribute("hidden", "");
+            for (let i=0; i < root_causes.length; i++) {
+                if (root_causes[i].checked && root_causes[i].value != 'on') {
+                    if (root_cause_str.length > 0) {
+                        root_cause_str += ', ';
+                    }
+                    root_cause_str += root_causes[i].value;
+                }
             }
-
+            document.getElementById("root_cause").value = root_cause_str;
+            let cause = document.getElementById("root_cause").value;
+            let lbls = [];
+            let txt = document.getElementById("id_root_cause_comment");
+            let lbl = document.getElementById("cause_label");
             if (cause.includes("1.3.1.") || cause.includes("1.3.2.") || cause.includes("3.1.1.") || cause.includes("3.1.2.")) {
                 txt.removeAttribute("hidden");
                 lbl.removeAttribute("hidden");
@@ -1036,11 +633,96 @@
                 cause_name.removeAttribute("required");
                 cause_comment.removeAttribute("required");
             }
-            lbl.innerHTML = "Укажите ";
-            for (let i=0; i < lbls.length; i++) {
-                lbl.innerHTML += lbls[i];
-                if (i < lbls.length-1) {
-                    lbl.innerHTML += ", ";
+            if (lbls.length > 0) {
+                lbl.innerHTML = "Укажите ";
+                for (let i=0; i < lbls.length; i++) {
+                    lbl.innerHTML += lbls[i];
+                    if (i < lbls.length-1) {
+                        lbl.innerHTML += ", ";
+                    }
+                }
+            } else {
+                txt.setAttribute("hidden", "");
+                lbl.setAttribute("hidden", "");
+                lbls.push("конкретных Руководителей и исполнителей (нормоконтролёров)");
+                txt.removeAttribute("required");
+                cause_file1.setAttribute("hidden", "");
+                cause_file2.setAttribute("hidden", "");
+                cause_file3.setAttribute("hidden", "");
+                cause_add.setAttribute("hidden", "");
+                cause_name.setAttribute("hidden", "");
+                cause_comment.setAttribute("hidden", "");
+                cause_add.removeAttribute("required");
+                cause_name.removeAttribute("required");
+                cause_comment.removeAttribute("required");
+            }
+        }
+        rootCauseForming();
+        let cause_input = document.getElementById("root_cause")
+        cause_input.addEventListener('keydown', (e) => {
+            const allowedKeys = ['Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'];
+            if (!allowedKeys.includes(e.key) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                e.preventDefault();
+            }
+        });
+        cause_input.addEventListener('paste', preventInput);
+        cause_input.addEventListener('cut', preventInput);
+        cause_input.addEventListener('drop', preventInput);
+        cause_input.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        let s = document.getElementById("header").innerHTML;
+        s = s.substring(0,35).concat(s.substring(39,43),s.substring(45,47));
+        document.getElementById("header").innerHTML = s;
+
+        const custom_link_script = `<input id='custom_link' name='custom_link' class='form-textinput' type='text' disabled autocomplete='off' style='width: 88%;' placeholder='Том Х, ХХХ, изм. Х, Раздел ХХ'>`;
+        document.getElementById('id_link_tech_name_1').parentElement.insertAdjacentHTML('afterend', custom_link_script);
+        const xml_link_script = `  <input id='xml_link' name='xml_link' class='form-textinput' type='text' disabled autocomplete='off' style='width: 25%;'>`;
+        document.getElementById('id_link_tech_name_2').parentElement.insertAdjacentHTML('afterend', xml_link_script);
+        let custom_link = document.getElementById('custom_link');
+        custom_link.value = document.getElementById('id_custom_link_form').innerHTML;
+        let xml_link = document.getElementById('xml_link');
+        xml_link.value = document.getElementById('id_xml_link_form').innerHTML;
+        function selectLink(e) {
+            if (this.checked) {
+                if (this.value == 'Изменения вносились') {
+                    custom_link.removeAttribute('disabled');
+                    custom_link.setAttribute('required', 'required');
+                    xml_link.removeAttribute('required');
+                    xml_link.setAttribute('disabled', 'disabled');
+                } else if (this.value == 'XML файл(ы)') {
+                    xml_link.removeAttribute('disabled');
+                    xml_link.setAttribute('required', 'required');
+                    custom_link.removeAttribute('required');
+                    custom_link.setAttribute('disabled', 'disabled');
+                } else {
+                    custom_link.removeAttribute('required');
+                    custom_link.setAttribute('disabled', 'disabled');
+                    xml_link.removeAttribute('required');
+                    xml_link.setAttribute('disabled', 'disabled');
+                }
+            }
+        }
+        const radioButtonsLink = document.querySelectorAll('input[name="link_tech_name"]');
+        for(const radioButton of radioButtonsLink){
+            radioButton.addEventListener('change', selectLink);
+            if (radioButton.checked) {
+                if (radioButton.value == 'Изменения вносились') {
+                    custom_link.removeAttribute('disabled');
+                    custom_link.setAttribute('required', 'required');
+                    xml_link.removeAttribute('required');
+                    xml_link.setAttribute('disabled', 'disabled');
+                } else if (radioButton.value == 'XML файл(ы)') {
+                    xml_link.removeAttribute('disabled');
+                    xml_link.setAttribute('required', 'required');
+                    custom_link.removeAttribute('required');
+                    custom_link.setAttribute('disabled', 'disabled');
+                } else {
+                    custom_link.removeAttribute('required');
+                    custom_link.setAttribute('disabled', 'disabled');
+                    xml_link.removeAttribute('required');
+                    xml_link.setAttribute('disabled', 'disabled');
                 }
             }
         }
@@ -1103,8 +785,9 @@
                         for (const k of radioButtons7) {
                             if (k.checked && k.value=="True") {
                                 imp7_critical.innerHTML = '!';
-                                imps7[0].removeAttribute("hidden");
-                                imps7[1].removeAttribute("hidden");
+                                for (let i=0; i < imps7.length; i++) {
+                                    imps7[i].removeAttribute("hidden");
+                                }
                             }
                         }
                     }
@@ -1142,8 +825,9 @@
                                                             for (const q of radioButtons7) {
                                                                 if (q.checked && q.value == "True") {
                                                                     imp7_critical.innerHTML = '!';
-                                                                    imps7[0].removeAttribute("hidden");
-                                                                    imps7[1].removeAttribute("hidden");
+                                                                    for (let i=0; i < imps7.length; i++) {
+                                                                        imps7[i].removeAttribute("hidden");
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -1153,8 +837,9 @@
                                                     for (const m of radioButtons7) {
                                                         if (m.checked && m.value == "True") {
                                                             imp7_critical.innerHTML = '!';
-                                                            imps7[0].removeAttribute("hidden");
-                                                            imps7[1].removeAttribute("hidden");
+                                                            for (let i=0; i < imps7.length; i++) {
+                                                                imps7[i].removeAttribute("hidden");
+                                                            }
                                                         }
                                                     }
                                                 }

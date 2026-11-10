@@ -51,7 +51,7 @@
                 <h5 style="margin-bottom: 0;">Пользователь: </h5>
             </td>
             <td class="head-block-left" style="width: 5%;">
-                <h5 style="margin-bottom: 0;">{{ user.last_name }} {{ user.first_name }}</h5>
+                <h5 style="margin-bottom: 0;">{{ username }}</h5>
             </td>
         </tr>
         <tr>
@@ -60,7 +60,12 @@
                 <h5 style="margin-bottom: 10px; margin-top: 5px">Роль:</h5>
             </td>
             <td class="head-block-left" style="width: 5%;">
-                <h5 id="group" style="margin-bottom: 10px; margin-top: 5px">{{ group }}</h5>
+                {% if group == "Наблюдатель" and username != "Наблюдатель" %}
+					<h5 id="group" style="margin-bottom: 10px; margin-top: 5px" hidden>{{ group }}</h5>
+					<h5 style="margin-bottom: 10px; margin-top: 5px">Контролёр</h5>
+				{% else %}
+					<h5 id="group" style="margin-bottom: 10px; margin-top: 5px">{{ group }}</h5>
+				{% endif %}
             </td>
         </tr>
         <tr>

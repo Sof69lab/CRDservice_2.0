@@ -169,6 +169,10 @@
                             {% get_verbose_field_name "cancel_remark" %}<br />
                             {{ form.cancel_remark }}
                         </p>
+                        <p>
+                            {% get_verbose_field_name "total_importance" %}<br />
+                            {{ form.total_importance }}
+                        </p>
                         <table id="importance_table" style="width:70%">
                             <tr>
                                 <td>{% get_verbose_field_name "importance1" %}</td>
@@ -184,11 +188,11 @@
                                 <td>{{ form.imp1_comment_nd }}</td>
                             </tr>
                             <tr id="imp2" hidden>
-                                <td>Корректировка документации (свой раздел, глава, том, книга, др. док.)</td>
+                                <td>{% get_verbose_field_name "importance2" %}</td>
                                 <td>{{ form.importance2 }}</td>
                             </tr>
                             <tr id="imp3" hidden>
-                                <td>Корректировка смежных разделов (глав, томов, др. док.)</td>
+                                <td>{% get_verbose_field_name "importance3" %}</td>
                                 <td>{{ form.importance3 }}</td>
                             </tr>
                             <tr class="imp3" hidden>
@@ -216,7 +220,7 @@
                                 </td>
                             </tr>
                             <tr id="imp4" hidden>
-                                <td>Выдача задания смежным подразделениям (без учёта ОКиВД) и (или) получение исходных данных от них</td>
+                                <td>{% get_verbose_field_name "importance4" %}</td>
                                 <td>{{ form.importance4 }}</td>
                             </tr>
                             <tr class="imp4" hidden>
@@ -244,35 +248,29 @@
                                 </td>
                             </tr>
                             <tr id="imp5" hidden>
-                                <td>Корректировка принятых проектных решений</td>
+                                <td>{% get_verbose_field_name "importance5" %}</td>
                                 <td>{{ form.importance5 }}</td>
+                                <td id="imp5_critical" style="color: red;"><b></b></td>
                             </tr>
                             <tr id="imp6" hidden>
-                                <td>Корректировка принятых проектных решений требуется по причине</td>
+                                <td>{% get_verbose_field_name "importance6" %}</td>
                                 <td>{{ form.importance6 }} </td>
                             </tr>
                             <tr id="imp7" hidden>
-                                <td>Получение дополнительных исходных данных от Заказчика</td>
+                                <td>{% get_verbose_field_name "importance7" %}</td>
                                 <td>{{ form.importance7 }}</td>
                                 <td id="imp7_critical" style="color: red;"><b></b></td>
                             </tr>
                             <tr class="imp7" hidden>
-                                <td colspan="2">{% get_verbose_field_name "imp7_comment" %}</td>
+                                <td colspan="2">Укажите, какие исходные данные требуются от Заказчика и необходимый срок их получения</td>
                             </tr>
-                            <tr class="imp7" hidden>
-                                <td colspan="2">{{ form.imp7_comment }}
-                                    {% if form.imp7_comment.errors %}
-                                        {% for error in form.imp7_comment.errors %}
-                                            <li class="alert danger"> {{error}} </li>
-                                        {% endfor %}
-                                    {% endif %}
-                                </td>
-                            </tr>
+                            {% for item1, item2 in imp7_data %}
+                                <tr class="imp7" hidden>
+                                    <td colspan="2" style="padding-left: 12px;"><input class="form-readonly" value="{{ item1 }}"></td>
+                                    <td colspan="2" style="padding-left: 12px;"><input class="form-readonly" value="{{ item2 }}"></td>
+                                </tr>
+                            {% endfor %}
                         </table>
-                        <p>
-                            {% get_verbose_field_name "total_importance" %}<br />
-                            {{ form.total_importance }}
-                        </p>
                         <p>
                             {% get_verbose_field_name "root_cause_list" %}<br />
                             {{ form.root_cause_list }}
@@ -311,6 +309,7 @@
                         let imps7 = document.getElementsByClassName("imp7");
                         let imp1_critical = document.getElementById("imp1_critical").firstChild;
                         let imp7_critical = document.getElementById("imp7_critical").firstChild;
+                        let imp5_critical = document.getElementById("imp5_critical").firstChild;
                         const radioButtons1 = document.querySelectorAll('input[name="importance1"]');
                         for (const i of radioButtons1) {
                             i.disabled = true;
@@ -357,8 +356,9 @@
                                         for (const k of radioButtons7) {
                                             if (k.checked && k.value=="True") {
                                                 imp7_critical.innerHTML = '!';
-                                                imps7[0].removeAttribute("hidden");
-                                                imps7[1].removeAttribute("hidden");
+                                                for (let i=0; i < imps7.length; i++) {
+                                                    imps7[i].removeAttribute("hidden");
+                                                }
                                             }
                                         }
                                     }
@@ -389,6 +389,7 @@
                                                         for (const n of radioButtons5) {
                                                             if (n.checked) {
                                                                 if (n.value == "True") {
+                                                                    imp5_critical.innerHTML = '!';
                                                                     imp6.removeAttribute("hidden");
                                                                     for (const m of radioButtons6) {
                                                                         if (m.checked) {
@@ -396,8 +397,9 @@
                                                                             for (const q of radioButtons7) {
                                                                                 if (q.checked && q.value == "True") {
                                                                                     imp7_critical.innerHTML = '!';
-                                                                                    imps7[0].removeAttribute("hidden");
-                                                                                    imps7[1].removeAttribute("hidden");
+                                                                                    for (let i=0; i < imps7.length; i++) {
+                                                                                        imps7[i].removeAttribute("hidden");
+                                                                                    }
                                                                                 }
                                                                             }
                                                                         }
@@ -407,8 +409,9 @@
                                                                     for (const m of radioButtons7) {
                                                                         if (m.checked && m.value == "True") {
                                                                             imp7_critical.innerHTML = '!';
-                                                                            imps7[0].removeAttribute("hidden");
-                                                                            imps7[1].removeAttribute("hidden");
+                                                                            for (let i=0; i < imps7.length; i++) {
+                                                                                imps7[i].removeAttribute("hidden");
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
@@ -423,7 +426,7 @@
                             }
                         }
 
-                        if (document.getElementById("root_cause").value != "0.") {
+                        if (document.getElementById("id_root_cause_text").value == "") {
                             document.getElementById("root_cause_define").setAttribute("hidden", "");
                         }
 

@@ -216,6 +216,15 @@
                                     <li class="alert danger"> {{error}} </li>
                                 {% endfor %}
                             {% endif %}
+                            <p id="totalImportance">
+                                {% get_verbose_field_name "total_importance" %}<br />
+                            </p>
+                            {{ form.total_importance }}
+                            {% if form.total_importance.errors %}
+                                {% for error in form.total_importance.errors %}
+                                    <li class="alert danger"> {{error}} </li>
+                                {% endfor %}
+                            {% endif %}
                             <table id="importance_table" style="width:70%">
                                 <tr>
                                     <td>{% get_verbose_field_name "importance1" %}</td>
@@ -238,11 +247,11 @@
                                     <td>{{ form.imp1_comment_nd }}</td>
                                 </tr>
                                 <tr id="imp2" hidden>
-                                    <td>Корректировка документации (свой раздел, глава, том, книга, др. док.)</td>
+                                    <td>{% get_verbose_field_name "importance2" %}</td>
                                     <td>{{ form.importance2 }}</td>
                                 </tr>
                                 <tr id="imp3" hidden>
-                                    <td>Корректировка смежных разделов (глав, томов, др. док.)</td>
+                                    <td>{% get_verbose_field_name "importance3" %}</td>
                                     <td>{{ form.importance3 }}</td>
                                 </tr>
                                 <tr class="imp3" hidden>
@@ -265,128 +274,32 @@
                                     <td colspan="2">
                                         <fieldset>
                                             <legend>{% get_verbose_field_name "imp3_dep" %}</legend>
-                                            Проектный блок
+                                            {% for dep in DEP_FULL_ARRAY %}
+                                            {% if dep == "Гидротехнический отдел (ГТО)" %}
+                                            Проектный блок</b>
                                             <br/>
-                                            <div>
-                                                <input type="checkbox" id="d1" class="imp3_dep"/>
-                                                <label for="d1">Гидротехнический отдел (ГТО)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d2" class="imp3_dep"/>
-                                                <label for="d2">Горный отдел (ГО)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d3" class="imp3_dep"/>
-                                                <label for="d3">Общестроительный отдел (ОСО)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d4" class="imp3_dep"/>
-                                                <label for="d4">Отдел генплана и транспорта (ОГиТ)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d5" class="imp3_dep"/>
-                                                <label for="d5">Отдел комплектации и выпуска документации (ОКиВД)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d6" class="imp3_dep"/>
-                                                <label for="d6">Отдел связи, сигнализации и спецразделов (ОССС)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d7" class="imp3_dep"/>
-                                                <label for="d7">Отдел тепловодоснабжения (ОТВС)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d8" class="imp3_dep"/>
-                                                <label for="d8">Отдел экологии и радиационной безопасности (ОЭиРБ)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d9" class="imp3_dep"/>
-                                                <label for="d9">Отдел экономического анализа (ОЭА)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d10" class="imp3_dep"/>
-                                                <label for="d10">Производственный отдел (ПО)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d11" class="imp3_dep"/>
-                                                <label for="d11">Сметный отдел (СО)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d12" class="imp3_dep"/>
-                                                <label for="d12">Технологический отдел (ТХО)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d13" class="imp3_dep"/>
-                                                <label for="d13">Электротехнический отдел (ЭО)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d14" class="imp3_dep"/>
-                                                <label for="d14">Отдел главных инженеров проекта (ОГИП)</label>
-                                            </div>
+                                            {% endif %}
+                                            {% if dep == "Группа инженерно-геодезических изысканий (Гр. ИГДИ)" %}
                                             Блок инженерных изысканий
                                             <br/>
-                                            <div>
-                                                <input type="checkbox" id="d15" class="imp3_dep"/>
-                                                <label for="d15">Группа инженерно-геодезических изысканий (Гр. ИГДИ)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d16" class="imp3_dep"/>
-                                                <label for="d16">Группа инженерно-геологических изысканий (Гр. ИГИ)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d17" class="imp3_dep"/>
-                                                <label for="d17">Группа инженерно-геофизических исследований (Гр. ИГФИ)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d18" class="imp3_dep"/>
-                                                <label for="d18">Группа инженерно-гидрометеорологических изысканий (Гр. ИГМИ)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d19" class="imp3_dep"/>
-                                                <label for="d19">Группа инженерно-экологических изысканий (Гр. ИЭИ)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d20" class="imp3_dep"/>
-                                                <label for="d20">Химико-грунтоведческая лаборатория (ХГЛ)</label>
-                                            </div>
+                                            {% endif %}
+                                            {% if dep == "Аналитическая группа (АГ)" %}
                                             Управление по научной и инновационной деятельности
                                             <br/>
-                                            <div>
-                                                <input type="checkbox" id="d21" class="imp3_dep"/>
-                                                <label for="d21">Аналитическая группа (АГ)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d22" class="imp3_dep"/>
-                                                <label for="d22">Научно-исследовательская лаборатория радиационной безопасности (НИЛ-11)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d23" class="imp3_dep"/>
-                                                <label for="d23">Научно-исследовательский отдел горных работ (НИО-28)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d24" class="imp3_dep"/>
-                                                <label for="d24">Химико-аналитическая лаборатория (ХАЛ)</label>
-                                            </div>
+                                            {% endif %}
+                                            {% if dep == "Научно-исследовательская лаборатория технологии выщелачивания (НИЛ-35)" %}
                                             Дирекция по развитию
                                             <br/>
-                                            <div>
-                                                <input type="checkbox" id="d25" class="imp3_dep"/>
-                                                <label for="d25">Научно-исследовательская лаборатория технологии выщелачивания (НИЛ-35)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d26" class="imp3_dep"/>
-                                                <label for="d26">Научно-исследовательский отдел гидрогеологического моделирования и глубинного захоронения жидких отходов (НИЛ-5)</label>
-                                            </div>
-                                            <div>
-                                                <input type="checkbox" id="d27" class="imp3_dep"/>
-                                                <label for="d27">Научно-исследовательский отдел комплексной переработки сырья (НИО-32)</label>
-                                            </div>
+                                            {% endif %}
+                                            {% if dep == "Субподряд" %}
                                             Прочее
                                             <br/>
+                                            {% endif %}
                                             <div>
-                                                <input type="checkbox" id="d28" class="imp3_dep"/>
-                                                <label for="d28">Субподряд</label>
+                                                <input type="checkbox" id="d{{ loop.index }}" class="imp3_dep"/>
+                                                <label for="d{{ loop.index }}">{{ dep }}</label>
                                             </div>
+                                            {% endfor %}
                                         </fieldset>
                                         {% if form.imp3_dep.errors %}
                                             {% for error in form.imp3_dep.errors %}
@@ -396,172 +309,61 @@
                                     </td>
                                 </tr>
                                 <tr id="imp4" hidden>
-                                    <td>Выдача задания смежным подразделениям (без учёта ОКиВД) и (или) получение исходных данных от них</td>
+                                    <td>{% get_verbose_field_name "importance4" %}</td>
                                     <td>{{ form.importance4 }}</td>
                                 </tr>
-                                <tr class="imp4" hidden>
+                                <tr class="imp4" hidden style="table-layout: fixed;">
                                     <td>
                                         <table>
                                             <tr>
                                                 <td><b>Укажите подразделение</b></td>
-                                                <td><b>Выдать задание</b></td>
-                                                <td><b>Получить исходные данные</b></td>
+                                                <td colspan="2"><b>{% get_verbose_field_name "imp4_comment" %}</b></td>
+                                                <td colspan="2"><b>{% get_verbose_field_name "imp4_comment_in" %}</b></td>
                                             </tr>
+                                            {% for dep in DEP_FULL_ARRAY %}
+                                            {% if dep == "Гидротехнический отдел (ГТО)" %}
                                             <tr>
-                                                <td colspan="3"><b>Проектный блок</b></td>
+                                                <td colspan="5"><b>Проектный блок</b></td>
                                             </tr>
-                                            <tr class="imp4">
-                                                <td>Гидротехнический отдел (ГТО)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            {% endif %}
+                                            {% if dep == "Группа инженерно-геодезических изысканий (Гр. ИГДИ)" %}
+                                            <tr>
+                                                <td colspan="5"><b>Блок инженерных изысканий</b></td>
                                             </tr>
-                                            <tr class="imp4">
-                                                <td>Горный отдел (ГО)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            {% endif %}
+                                            {% if dep == "Аналитическая группа (АГ)" %}
+                                            <tr>
+                                                <td colspan="5"><b>Управление по научной и инновационной деятельности</b></td>
                                             </tr>
-                                            <tr class="imp4">
-                                                <td>Общестроительный отдел (ОСО)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            {% endif %}
+                                            {% if dep == "Научно-исследовательская лаборатория технологии выщелачивания (НИЛ-35)" %}
+                                            <tr>
+                                                <td colspan="5"><b>Дирекция по развитию</b></td>
                                             </tr>
-                                            <tr class="imp4">
-                                                <td>Отдел генплана и транспорта (ОГиТ)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
+                                            {% endif %}
+                                            {% if dep == "Субподряд" %}
+                                            <tr>
+                                                <td colspan="5"><b>Прочее</b></td>
                                             </tr>
+                                            {% endif %}
+                                            {% if dep in EXCLUDE_ARRAY %}
                                             <tr class="imp4" hidden>
-                                                <td>Отдел комплектации и выпуска документации (ОКиВД)</td>
+                                                <td>{{ dep }}</td>
                                                 <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td><input class="form-dateinput" type="date" name="imp4_out_date_single" hidden></td>
                                                 <td><input type="checkbox" class="imp4_in"/></td>
+                                                <td><input class="form-dateinput" type="date" name="imp4_in_date_single" hidden></td>
                                             </tr>
+                                            {% else %}
                                             <tr class="imp4">
-                                                <td>Отдел связи, сигнализации и спецразделов (ОССС)</td>
+                                                <td>{{ dep }}</td>
                                                 <td><input type="checkbox" class="imp4_out"/></td>
+                                                <td style="min-width: 175px;"><input class="form-dateinput" type="date" name="imp4_out_date_single" hidden></td>
                                                 <td><input type="checkbox" class="imp4_in"/></td>
+                                                <td style="min-width: 175px;"><input class="form-dateinput" type="date" name="imp4_in_date_single" hidden></td>
                                             </tr>
-                                            <tr class="imp4">
-                                                <td>Отдел тепловодоснабжения (ОТВС)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Отдел экологии и радиационной безопасности (ОЭиРБ)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Отдел экономического анализа (ОЭА)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Производственный отдел (ПО)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Сметный отдел (СО)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Технологический отдел (ТХО)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Электротехнический отдел (ЭО)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Отдел главных инженеров проекта (ОГИП)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="3"><b>Блок инженерных изысканий</b></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Группа инженерно-геодезических изысканий (Гр. ИГДИ)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Группа инженерно-геологических изысканий (Гр. ИГИ)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Группа инженерно-геофизических исследований (Гр. ИГФИ)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Группа инженерно-гидрометеорологических изысканий (Гр. ИГМИ)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Группа инженерно-экологических изысканий (Гр. ИЭИ)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Химико-грунтоведческая лаборатория (ХГЛ)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="3"><b>Управление по научной и инновационной деятельности</b></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Аналитическая группа (АГ)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Научно-исследовательская лаборатория радиационной безопасности (НИЛ-11)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Научно-исследовательский отдел горных работ (НИО-28)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Химико-аналитическая лаборатория (ХАЛ)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="3"><b>Дирекция по развитию</b></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Научно-исследовательская лаборатория технологии выщелачивания (НИЛ-35)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Научно-исследовательский отдел гидрогеологического моделирования и глубинного захоронения жидких отходов (НИЛ-5)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Научно-исследовательский отдел комплексной переработки сырья (НИО-32)</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="3"><b>Прочее</b></td>
-                                            </tr>
-                                            <tr class="imp4">
-                                                <td>Субподряд</td>
-                                                <td><input type="checkbox" class="imp4_out"/></td>
-                                                <td><input type="checkbox" class="imp4_in"/></td>
-                                            </tr>
+                                            {% endif %}
+                                            {% endfor %}
                                         </table>
                                         {% if form.imp4_comment.errors %}
                                             {% for error in form.imp4_comment.errors %}
@@ -571,24 +373,27 @@
                                     </td>
                                 </tr>
                                 <tr class="imp4" hidden>
-                                    <td colspan="2">{{ form.imp4_comment_in }}</td>
-                                    <td colspan="2">{{ form.imp4_comment }}</td>
+                                    <td>{{ form.imp4_comment_in }}</td>
+                                    <td>{{ form.imp4_comment }}</td>
+                                    <td>{{ form.imp4_in_date }}</td>
+                                    <td>{{ form.imp4_out_date }}</td>
                                 </tr>
                                 <tr id="imp5" hidden>
-                                    <td>Корректировка принятых проектных решений</td>
+                                    <td>{% get_verbose_field_name "importance5" %}</td>
                                     <td>{{ form.importance5 }}</td>
+                                    <td id="imp5_critical" style="color: red;"><b></b></td>
                                 </tr>
                                 <tr id="imp6" hidden>
-                                    <td>Корректировка принятых проектных решений требуется по причине</td>
+                                    <td>{% get_verbose_field_name "importance6" %}</td>
                                     <td>{{ form.importance6 }} </td>
                                 </tr>
                                 <tr id="imp7" hidden>
-                                    <td>Получение дополнительных исходных данных от Заказчика</td>
+                                    <td>{% get_verbose_field_name "importance7" %}</td>
                                     <td>{{ form.importance7 }}</td>
                                     <td id="imp7_critical" style="color: red;"><b></b></td>
                                 </tr>
                                 <tr class="imp7" hidden>
-                                    <td colspan="2">{% get_verbose_field_name "imp7_comment" %}</td>
+                                    <td colspan="2">Укажите, какие исходные данные требуются от Заказчика и необходимый срок их получения</td>
                                 </tr>
                                 <tr class="imp7" hidden>
                                     <td colspan="2">{{ form.imp7_comment }}
@@ -598,17 +403,15 @@
                                             {% endfor %}
                                         {% endif %}
                                     </td>
+                                    <td colspan="2" style="padding-left: 12px;">{{ form.imp7_date }}
+                                        {% if form.imp7_date.errors %}
+                                            {% for error in form.imp7_date.errors %}
+                                                <li class="alert danger"> <br/> </li>
+                                            {% endfor %}
+                                        {% endif %}</td>
+                                    <td style="padding-left: 12px; min-width: 95px;" ><button id="newID" class="green-button">Добавить ИД</button></td>
                                 </tr>
                             </table>
-                            <p id="totalImportance">
-                                {% get_verbose_field_name "total_importance" %}<br />
-                            </p>
-                            {{ form.total_importance }}
-                            {% if form.total_importance.errors %}
-                                {% for error in form.total_importance.errors %}
-                                    <li class="alert danger"> {{error}} </li>
-                                {% endfor %}
-                            {% endif %}
                             <p id="comments">
                                 <b>{% get_verbose_field_name "comment" %}</b><br />
                             </p>
@@ -622,148 +425,11 @@
                             <p id="rootCause">
                                 {% get_verbose_field_name "root_cause_list" %}<br />
                                 {{ form.root_cause_list }}
-                                для множественного выбора нажмите и удерживайте Ctrl
                             </p>
-                            <select id="causes1" class="form-selectmultiple" multiple>
-                                <option value=""></option>
-                                <option value="0.">0. Требуется классификация НС</option>
-                                <optgroup label="1. Проектная документация">
-                                    <optgroup label="- 1.1. Несоответствие оформления выпускаемой документации установленным
-                                        нормам и правилам (ГОСТ, СПДС, ЕСКД, СТО и т.д.) и правилам офрмления, оговоренным и принятым с Заказчиком">
-                                        <option value="1.1.1.">-- 1.1.1. Несоответствие оформления выпускаемой документации
-                                            (направляемой Заказчику, в ГГЭ и др.) установленным нормам и правилам (ГОСТ, СПДС,
-                                                ЕСКД, СТО и т.д.) по вине сотрудников ОКиВД</option>
-                                        <option value="1.1.2.">-- 1.1.2. Несоответствие оформления выпускаемой документации
-                                            установленным нормам и правилам (ГОСТ, СПДС, ЕСКД, СТО т.д.) по вине нормоконтролёров</option>
-                                        <option value="1.1.3.">-- 1.1.3. Несоответствие оформления выпускаемой документации
-                                            установленным нормам и правилам (ГОСТ, СПДС, ЕСКД, СТО т.д.) и правилам оформления,
-                                             оговоренным и принятым с заказчиком по вине исполнителей</option>
-                                    </optgroup>
-                                    <option value="1.2.1.">- 1.2. Некорректное использование исполнителями нормативных
-                                            документов (НД) или некорректная ссылка исполнителя на НД при подготовке документации
-                                    </option>
-                                    <optgroup label="- 1.3. Некорректное применение установленных требований со стороны
-                                        Рецензента (Заказчика, ГГЭ и др.)">
-                                        <option value="1.3.1.">-- 1.3.1. Некорректная ссылка на НД при подготовке замечания
-                                              со стороны Рецензента (Заказчика, ГГЭ и др.)</option>
-                                        <option value="1.3.2.">-- 1.3.2. Некорректная ссылка на невыполнение Исполнителем
-                                                НД со стороны Рецензента (Заказчика, ГГЭ и др.), в случае "невнимательного
-                                                (неполного) прочтения документации"</option>
-                                    </optgroup>
-                                </optgroup>
-                                <optgroup label="2. Оборудование">
-                                    <option value="2.1.1.">- 2.1. Использование при проведении инженерно-изыскательских,
-                                            научно-исследовательских работ и подготовки проектной документации оборудования
-                                            и программного обеспечения, несоответствующего требованиям ТЗ или состояние и
-                                            характеристики которых не позволяют производить качественные исследования и выпуск
-                                            проектной документации</option>
-                                    <option value="2.2.1.">- 2.2. Неправомерное требование со стороны Рецензента (Заказчика,
-                                            ГГЭ и др.) использовать программное обеспечение, приборы и сертифицированные
-                                            лаборатории, не указанные в ТЗ</option>
-                                </optgroup>
-                                <optgroup label="3. Персонал">
-                                    <optgroup label="- 3.1. Нарушение персоналом (исполнителями) требований Договора, ЗНП
-                                        (ТЗ) или других НД (использование устаревших НД)">
-                                        <option value="3.1.1.">-- 3.1.1. Не знание (не выполнение) требований Договора, ЗНП
-                                            (ТЗ, протоколов, решений, писем) и других НД, использование устаревших НД</option>
-                                        <option value="3.1.2.">-- 3.1.2. Не предоставление необходимых документов (разрешений,
-                                            сертификатов, договоров, протоколов, отчётов, актов, аттестатов, картографии,
-                                                справок, фото-видео материалов и др.)</option>
-                                        <option value="3.1.3.">-- 3.1.3. Отсутствие необходимых расчётов (измерений,
-                                                испытаний) или допущение ошибки при их выполнении (в случае их обязательного
-                                                выполнения)</option>
-                                        <option value="3.1.4.">-- 3.1.4. Технические ошибки из-за невнимательности</option>
-                                        <option value="3.1.5.">-- 3.1.5. Исполнителем, допустившим несоответствие, является субподрядчик</option>
-                                        <option value="3.1.6.">-- 3.1.6. Исполнитель, допустивший несоответствие, уволился из организации</option>
-                                    </optgroup>
-                                    <optgroup label="- 3.2. Недостаточное взаимодействие между подразделениями при проектировании,
-                                        в части предоставления (получения) необходимых и достаточных исходных данных в
-                                        установленный графиком срок">
-                                        <option value="3.2.1.">-- 3.2.1. Нарушение сроков выдачи задания (исходных данных)
-                                                смежным подразделениям (или получение от них)</option>
-                                        <option value="3.2.2.">-- 3.2.2. Нарушение сроков выполнения работ исполнителями,
-                                            влияющее на сроки работ смежных подразделений</option>
-                                        <option value="3.2.3.">-- 3.2.3. Предоставление недостаточных (некорректных) исходных
-                                                данных смежным подразделениям</option>
-                                    </optgroup>
-                                    <optgroup label="- 3.3. Недостаточное количество персонала (исполнителей) для выполнения работ">
-                                        <option value="3.3.1.">-- 3.3.1. Нарушение сроков выдачи задания (исходных данных)
-                                                смежным подразделениям (или получение от них) в следствии недостаточного
-                                                количества исполнителей</option>
-                                        <option value="3.3.2.">-- 3.3.2. Нарушение сроков выполнения работ исполнителями,
-                                                влияющее на сроки работ смежных подразделений в следствии недостаточного
-                                                количества исполнителей</option>
-                                        <option value="3.3.3.">-- 3.3.3. Нарушение сроков выполнения работ исполнителями,
-                                                влияющее на сроки выпуска проекта/документации в следствии недостаточного
-                                                количества исполнителей</option>
-                                    </optgroup>
-                                </optgroup>
-                                <optgroup label="4. Управление">
-                                    <optgroup label="- 4.1. Недостаточный уровень планирования работ по проекту со стороны
-                                        ГИП и руководителей подразделений, связанный с ошибками в планировании (в определении
-                                        приоритетности выполнения работ по Проекту; в распределении ресурсов внутри подразделения по Проектам)">
-                                        <option value="4.1.1.">-- 4.1.1. Нарушение сроков выпуска проектов, связанное с
-                                                ошибками планирования ГИП или Руководителей подразедений</option>
-                                        <option value="4.1.2.">-- 4.1.2. Нарушение сроков выпуска проектов, связанное с
-                                                ошибками планирования ГИП или Руководителей подразедений (при изменении приоритетов
-                                                в очерёдности проектирования со стороны Руководства Общества, Холдинга, Заказчика)</option>
-                                    </optgroup>
-                                    <optgroup label="- 4.2. Недостаточный уровень планирования выполнения договоров со стороны
-                                         планово-производственного отдела (ППО), связанный с ошибками в планировании (в
-                                         определении приоритетности выполнения Проектов; в распределении ресурсов производственного
-                                         блока по Проектам">
-                                         <option value="4.2.1.">-- 4.2.1. Нарушение сроков выпуска проектов, связанное с ошибками
-                                            планирования Руководства производственного блока или ППО</option>
-                                         <option value="4.2.2.">-- 4.2.2. Нарушение сроков выпуска проектов, связанное с ошибками
-                                             планирования Руководства производственного блока или ППО (при изменении приоритетов
-                                            в очерёдности проектирования со стороны Руководства Общества, Холдинга, Заказчика)</option>
-                                    </optgroup>
-                                    <option value="4.3.1.">- 4.3. Слабый контроль (проверка) выпускаемой документации на
-                                            предмет её соответствия требованиям Договора, ЗПН (ТЗ) или других НД со стороны
-                                            ГИП или руководителей подразделений</option>
-                                    <option value="4.4.1.">- 4.4. Изменение Заказчиком ЗНП (ТЗ) в процессе выполнения работ
-                                         (дополнительные требования Заказчика на различных стадиях проектирования)</option>
-                                    <optgroup label="- 4.5. Несвоевременное предоставление (не предоставление) Заказчиком
-                                        исходных данных (ИД), правоустанавливающих и учредительных документов (истечение их
-                                        срока действия">
-                                        <option value="4.5.1.">-- 4.5.1. Несвоевременное предоставление (не предоставление)
-                                            Заказчиком ИД (предоставление некорректных ИД)</option>
-                                        <option value="4.5.2.">-- 4.5.2. Непредставление правоустанавливающих документов со
-                                            стороны Заказчика (истечение их срока действия) для ведения работ по договору</option>
-                                    </optgroup>
-                                    <option value="4.6.1.">- 4.6. Изменение сроков выпуска проектов, связанные с изменением
-                                         приоиртетов Руководства холдинга (Заказчика) в очерёдности проектирования</option>
-                                </optgroup>
-                                <optgroup label="5. Методы/технология">
-                                    <option value="5.1.1.">- 5.1. Неиспользование исполнителями при проведении работ по договору
-                                         передовых современных технологий проектирования (3D-проектирования)</option>
-                                    <optgroup label="- 5.2. Неиспользование исполнителями вспомогательных инструментов и
-                                        программ для проверки актуальности НД">
-                                        <option value="5.2.1.">-- 5.2.1. Неиспользование исполнителями вспомогательных инструментов и
-                                        программ для проверки актуальности НД (в т.ч. информационно-справочной системы "Кодекс-Техэксперт")</option>
-                                    </optgroup>
-                                    <optgroup label="- 5.3. Нарушение методологии (процедур) нормоконтроля качества,
-                                        установленных в организации">
-                                        <option value="5.3.1.">-- 5.3.1. Формальное исполнение функций нормоконтроля со стороны
-                                             Руководства производственного блока или ГИПов</option>
-                                        <option value="5.3.2.">-- 5.3.2. Формальное исполнение функций нормоконтроля со стороны
-                                             Руководителей подразделений или исполнителей</option>
-                                    </optgroup>
-                                </optgroup>
-                                <option value="6.">6. Материал, сырьё, комплектующие</option>
-                                <option value="7.">7. Окружающая среда</option>
-                            </select>
+                            {% include "fragments/root_cause_element.html" %}
+                            <p id="root_cause_buf" hidden>{{ root_cause_buf }}</p>
                             {% if form.root_cause_list.errors %}
                                 {% for error in form.root_cause_list.errors %}
-                                    <li class="alert danger"> {{error}} </li>
-                                {% endfor %}
-                            {% endif %}
-                            <p id="root_cause_text" hidden>
-                                {% get_verbose_field_name "root_cause_text" %}<br />
-                            </p>
-                            {{ form.root_cause_text }}
-                            {% if form.root_cause_text.errors %}
-                                {% for error in form.root_cause_text.errors %}
                                     <li class="alert danger"> {{error}} </li>
                                 {% endfor %}
                             {% endif %}
@@ -831,37 +497,33 @@
                             let end_date = document.getElementById("end_date").innerHTML;
                             let start_date = document.getElementById("start_date").innerHTML;
                             for (let i = 0; i < calendars.length; i++) {
-                                calendars[i].max = end_date;
-                                calendars[i].min = start_date;
+                                if (calendars[i].name != "imp4_in_date_single" && calendars[i].name != "imp4_out_date_single" && calendars[i].name != "imp7_date") {
+                                    calendars[i].max = end_date;
+                                    calendars[i].min = start_date;
+                                } else {
+                                    calendars[i].min = new Date().toISOString().split("T")[0];
+                                }
                             }
                             function preventInput(event) {
                                 event.preventDefault();
                                 return false;
                             }
-                            let cause_input = document.getElementById("root_cause")
-                            cause_input.addEventListener('keydown', (e) => {
-                                const allowedKeys = ['Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'];
-                                if (!allowedKeys.includes(e.key) && !e.ctrlKey && !e.altKey && !e.metaKey) {
-                                    e.preventDefault();
+
+                            const root_cause_text_numbers = ['1.1.', '1.2.', '1.3.', '1.', '2.1.', '2.2.', '2.', '3.1.', '3.2.', '3.3.', '3.', '4.1.', '4.2.', '4.3.', '4.4.', '4.5.', '4.6.', '4.', '5.1.', '5.2.', '5.3.', '5.', '6.', '7.']
+                            let root_cause_buf = document.getElementById("root_cause_buf").innerHTML.split("\n");
+                            for (let i=0; i < root_cause_buf.length; i++) {
+                                let separated_str = root_cause_buf[i].split(" ");
+                                if (root_cause_text_numbers.includes(separated_str[0])) {
+                                    document.getElementById(separated_str[0]).value = separated_str.slice(1).join(' ');
                                 }
-                            });
-                            cause_input.addEventListener('paste', preventInput);
-                            cause_input.addEventListener('cut', preventInput);
-                            cause_input.addEventListener('drop', preventInput);
-                            cause_input.addEventListener('contextmenu', (e) => {
-                                e.preventDefault();
-                            });
-                            let dogovor = document.getElementById("id_project_dogovor").value;
-                            let reestr = document.getElementById("id_num_reestr").value;
-                            let s = "Реестр выявленных несоответствий № ";
-                            s = s.concat(dogovor.substring(4,9));
-                            s = s.concat(reestr);
-                            document.getElementById("reest_num").innerHTML = s;
-                            let imp1_critical = document.getElementById("imp1_critical").firstChild;
-                            let imp7_critical = document.getElementById("imp7_critical").firstChild;
-                            let importance = document.getElementById("total_imp").value;
-                            let causes1 = document.getElementById("causes1");
-                            causes1.addEventListener('change', selectCause);
+                            }
+                            let root_cause_numbers = document.getElementById("root_cause").value.split(", ");
+                            for (let i=0; i < root_cause_numbers.length; i++) {
+                                if (root_cause_numbers[i].length > 0 && '1234567'.includes(root_cause_numbers[i][0])) {
+                                    let checkbox_elem = document.getElementById("causes"+root_cause_numbers[i]);
+                                    checkbox_elem.checked = true;
+                                }
+                            }
                             let cause_file1 = document.getElementById("cause_file1");
                             let cause_file2 = document.getElementById("cause_file2");
                             let cause_file3 = document.getElementById("cause_file3");
@@ -869,511 +531,37 @@
                             let cause_name = document.getElementById("id_cause_file_name");
                             let cause_comment = document.getElementById("id_cause_file_comment");
                             let cause = document.getElementById("root_cause").value;
-                            let causes = [];
-                            let j = 0;
-                            for (i=0; i < cause.length; i++) {
-                                if (cause[i] == ',') {
-                                    causes.push(cause.slice(j, i));
-                                    j = i + 2;
-                                }
-                            }
-                            causes.push(cause.slice(j));
-                            console.log(causes);
-                            let txt = document.getElementById("id_root_cause_comment");
-                            if (cause) {
-                                document.getElementById("causes1").style.borderColor="#56C02B";
-                            } else {
-                                document.getElementById("root_cause_text").setAttribute("hidden", "");
-                                document.getElementById("root_cause0").removeAttribute("required");
-                                txt.removeAttribute("required");
-                                txt.setAttribute("hidden", "");
-                                cause_file1.setAttribute("hidden", "");
-                                cause_file2.setAttribute("hidden", "");
-                                cause_file3.setAttribute("hidden", "");
-                                cause_add.setAttribute("hidden", "");
-                                cause_name.setAttribute("hidden", "");
-                                cause_comment.setAttribute("hidden", "");
-                                cause_add.removeAttribute("required");
-                                cause_name.removeAttribute("required");
-                                cause_comment.removeAttribute("required");
-                            }
-                            if (cause.includes("0.")) {
-                                document.getElementById("root_cause_text").removeAttribute("hidden");
-                                document.getElementById("root_cause0").setAttribute("required", "");
-                                document.getElementById("root_cause0").removeAttribute("hidden");
-                                txt.setAttribute("hidden", "");
-                                txt.removeAttribute("required");
-                                cause_file1.setAttribute("hidden", "");
-                                cause_file2.setAttribute("hidden", "");
-                                cause_file3.setAttribute("hidden", "");
-                                cause_add.setAttribute("hidden", "");
-                                cause_name.setAttribute("hidden", "");
-                                cause_comment.setAttribute("hidden", "");
-                                cause_add.removeAttribute("required");
-                                cause_name.removeAttribute("required");
-                                cause_comment.removeAttribute("required");
-                            } else {
-                                document.getElementById("root_cause_text").setAttribute("hidden", "");
-                                document.getElementById("root_cause0").removeAttribute("required");
-                                let cause_file = document.getElementById("cause_file");
-                                let cause_add = document.getElementById("id_cause_add_files");
-                                let cause_name = document.getElementById("id_cause_file_name");
-                                let cause_comment = document.getElementById("id_cause_file_comment");
-                            }
-                            let lbls = [];
-                            let lbl = document.getElementById("cause_label");
-                            if (cause.includes("1.3.1.") || cause.includes("1.3.2.") || cause.includes("3.1.1.") || cause.includes("3.1.2.")) {
-                                    lbls.push("конкретные пункты НД");
-                                    txt.removeAttribute("hidden");
-                                    txt.setAttribute("required", "");
-                                    cause_file1.setAttribute("hidden", "");
-                                    cause_file2.setAttribute("hidden", "");
-                                    cause_file3.setAttribute("hidden", "");
-                                    cause_add.setAttribute("hidden", "");
-                                    cause_name.setAttribute("hidden", "");
-                                    cause_comment.setAttribute("hidden", "");
-                                    cause_add.removeAttribute("required");
-                                    cause_name.removeAttribute("required");
-                                    cause_comment.removeAttribute("required");
-                                }
-                            if (cause.includes("2.2.1.")) {
-                                lbls.push("конкретное ПО или оборудование");
-                                txt.setAttribute("required", "");
-                                txt.removeAttribute("hidden");
-                                cause_file1.setAttribute("hidden", "");
-                                cause_file2.setAttribute("hidden", "");
-                                cause_file3.setAttribute("hidden", "");
-                                cause_add.setAttribute("hidden", "");
-                                cause_name.setAttribute("hidden", "");
-                                cause_comment.setAttribute("hidden", "");
-                                cause_add.removeAttribute("required");
-                                cause_name.removeAttribute("required");
-                                cause_comment.removeAttribute("required");
-                            }
-                            if (cause.includes("3.1.5.")) {
-                                lbls.push("конкретного субподрядчика");
-                                txt.setAttribute("required", "");
-                                txt.removeAttribute("hidden");
-                                cause_file1.setAttribute("hidden", "");
-                                cause_file2.setAttribute("hidden", "");
-                                cause_file3.setAttribute("hidden", "");
-                                cause_add.setAttribute("hidden", "");
-                                cause_name.setAttribute("hidden", "");
-                                cause_comment.setAttribute("hidden", "");
-                                cause_add.removeAttribute("required");
-                                cause_name.removeAttribute("required");
-                                cause_comment.removeAttribute("required");
-                            }
-                            if (cause.includes("3.1.6.")) {
-                                lbls.push("конкретного исполнителя");
-                                txt.setAttribute("required", "");
-                                txt.removeAttribute("hidden");
-                                cause_file1.setAttribute("hidden", "");
-                                cause_file2.setAttribute("hidden", "");
-                                cause_file3.setAttribute("hidden", "");
-                                cause_add.setAttribute("hidden", "");
-                                cause_name.setAttribute("hidden", "");
-                                cause_comment.setAttribute("hidden", "");
-                                cause_add.removeAttribute("required");
-                                cause_name.removeAttribute("required");
-                                cause_comment.removeAttribute("required");
-                            }
-                            if (cause.includes("3.2.1.") || cause.includes("3.2.3.") || cause.includes("3.3.1.")) {
-                                lbls.push("конкретные подразделения");
-                                txt.setAttribute("required", "");
-                                txt.removeAttribute("hidden");
-                                cause_file1.setAttribute("hidden", "");
-                                cause_file2.setAttribute("hidden", "");
-                                cause_file3.setAttribute("hidden", "");
-                                cause_add.setAttribute("hidden", "");
-                                cause_name.setAttribute("hidden", "");
-                                cause_comment.setAttribute("hidden", "");
-                                cause_add.removeAttribute("required");
-                                cause_name.removeAttribute("required");
-                                cause_comment.removeAttribute("required");
-                            }
-                            if (cause.includes("4.1.1.") || cause.includes("4.2.1.")) {
-                                lbls.push("конкретные факты и Руководителей");
-                                txt.setAttribute("required", "");
-                                txt.removeAttribute("hidden");
-                                cause_file1.removeAttribute("hidden");
-                                cause_file2.removeAttribute("hidden");
-                                cause_file3.removeAttribute("hidden");
-                                cause_add.removeAttribute("hidden");
-                                cause_name.removeAttribute("hidden");
-                                cause_comment.removeAttribute("hidden");
-                            }
-                            if (cause.includes("4.1.2.") || cause.includes("4.2.2.")) {
-                                lbls.push("конкретные факты, Руководителей и конкретные распоряжения");
-                                txt.setAttribute("required", "");
-                                txt.removeAttribute("hidden");
-                                cause_file1.removeAttribute("hidden");
-                                cause_file2.removeAttribute("hidden");
-                                cause_file3.removeAttribute("hidden");
-                                cause_add.removeAttribute("hidden");
-                                cause_name.removeAttribute("hidden");
-                                cause_comment.removeAttribute("hidden");
-                            }
-                            if (cause.includes("4.3.1.")) {
-                                lbls.push("конкретных Руководителей");
-                                txt.setAttribute("required", "");
-                                txt.removeAttribute("hidden");
-                                cause_file1.setAttribute("hidden", "");
-                                cause_file2.setAttribute("hidden", "");
-                                cause_file3.setAttribute("hidden", "");
-                                cause_add.setAttribute("hidden", "");
-                                cause_name.setAttribute("hidden", "");
-                                cause_comment.setAttribute("hidden", "");
-                                cause_add.removeAttribute("required");
-                                cause_name.removeAttribute("required");
-                                cause_comment.removeAttribute("required");
-                            }
-                            if (cause.includes("4.4.1.") || cause.includes("4.5.1.") || cause.includes("4.5.2.")) {
-                                lbls.push("конкретные факты");
-                                txt.setAttribute("required", "");
-                                txt.removeAttribute("hidden");
-                                cause_file1.removeAttribute("hidden");
-                                cause_file2.removeAttribute("hidden");
-                                cause_file3.removeAttribute("hidden");
-                                cause_add.removeAttribute("hidden");
-                                cause_name.removeAttribute("hidden");
-                                cause_comment.removeAttribute("hidden");
-                            }
-                            if (cause.includes("4.6.1.")) {
-                                lbls.push("конкретные Распоряжения и документы");
-                                txt.setAttribute("required", "");
-                                txt.removeAttribute("hidden");
-                                cause_file1.removeAttribute("hidden");
-                                cause_file2.removeAttribute("hidden");
-                                cause_file3.removeAttribute("hidden");
-                                cause_add.removeAttribute("hidden");
-                                cause_name.removeAttribute("hidden");
-                                cause_comment.removeAttribute("hidden");
-                            }
-                            if (cause.includes("5.3.1.")) {
-                                lbls.push("конкретных Руководителей (нормоконтролёров)");
-                                txt.setAttribute("required", "");
-                                txt.removeAttribute("hidden");
-                                cause_file1.setAttribute("hidden", "");
-                                cause_file2.setAttribute("hidden", "");
-                                cause_file3.setAttribute("hidden", "");
-                                cause_add.setAttribute("hidden", "");
-                                cause_name.setAttribute("hidden", "");
-                                cause_comment.setAttribute("hidden", "");
-                                cause_add.removeAttribute("required");
-                                cause_name.removeAttribute("required");
-                                cause_comment.removeAttribute("required");
-                            }
-                            if (cause.includes("5.3.2.")) {
-                                lbls.push("конкретных Руководителей и исполнителей (нормоконтролёров)");
-                                txt.setAttribute("required", "");
-                                cause_file1.setAttribute("hidden", "");
-                                cause_file2.setAttribute("hidden", "");
-                                cause_file3.setAttribute("hidden", "");
-                                cause_add.setAttribute("hidden", "");
-                                cause_name.setAttribute("hidden", "");
-                                cause_comment.setAttribute("hidden", "");
-                                cause_add.removeAttribute("required");
-                                cause_name.removeAttribute("required");
-                                cause_comment.removeAttribute("required");
-                            }
-                            if (lbls.length > 0) {
-                                lbl.removeAttribute("hidden");
-                                lbl.innerHTML = "Укажите ";
-                                for (let i=0; i < lbls.length; i++) {
-                                    lbl.innerHTML += lbls[i];
-                                    if (i < lbls.length-1) {
-                                        lbl.innerHTML += ", ";
-                                    }
-                                }
-                            }
-                            if (document.getElementById("id_executor_fail_name").value == document.getElementById("emptyUserID").innerHTML) {
-                                document.getElementById("execFailText").removeAttribute("hidden");
-                                document.getElementById("executor_fail_text").removeAttribute("hidden");
-                            }
-
-                            let imp = [-1, -1, -1, -1, -1, -1, -1];
-                            let imp1 = document.getElementById("imp1");
-                            let imp2 = document.getElementById("imp2");
-                            let imp3 = document.getElementById("imp3");
-                            let imp4 = document.getElementById("imp4");
-                            let imp5 = document.getElementById("imp5");
-                            let imp6 = document.getElementById("imp6");
-                            let imp7 = document.getElementById("imp7");
-                            let imps1 = document.getElementsByClassName("imp1");
-                            let imps3 = document.getElementsByClassName("imp3");
-                            let imp3_dep = document.getElementsByClassName("imp3_dep");
-                            const depArray = ["ГТО", "ГО", "ОСО", "ОГиТ", "ОКиВД", "ОССС", "ОТВС", "ОЭиРБ", "ОЭА", "ПО", "СО", "ТХО", "ЭО", "ОГИП", "Гр. ИГДИ", "Гр. ИГИ", "Гр. ИГФИ", "Гр. ИГМИ", "Гр. ИЭИ", "ХГЛ", "АГ", "НИЛ-11", "НИО-28", "ХАЛ", "НИЛ-35", "НИЛ-5", "НИО-32", "Субподряд"];
-                            const re = /(?<=^|, )СО/;
-                            let imps4 = document.getElementsByClassName("imp4");
-                            let imp4_in = document.getElementsByClassName("imp4_in");
-                            let imp4_out = document.getElementsByClassName("imp4_out");
-                            let imps7 = document.getElementsByClassName("imp7");
-                            let imp3_dep_text = document.getElementById("id_imp3_dep");
-                            function imp3DepChanging(e) {
-                                let eInd = Array.from(imp3_dep).indexOf(e.target);
-                                if (this.checked) {
-                                    let bufS = imp3_dep_text.value;
-                                    if (bufS != "") {
-                                        bufS += ", ";
-                                    }
-                                    imp3_dep_text.value = bufS + depArray[eInd];
-                                } else {
-                                    let strInd = -1;
-                                    if (depArray[eInd] == "СО") {
-                                        strInd = imp3_dep_text.value.search(re);
-                                    } else {
-                                        strInd = imp3_dep_text.value.indexOf(depArray[eInd]);
-                                    }
-                                    let bufS = imp3_dep_text.value.slice(0, strInd) + imp3_dep_text.value.slice(strInd+depArray[eInd].length+2, imp3_dep_text.value.length);
-                                    if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
-                                        bufS = bufS.slice(0, bufS.length-2);
-                                    }
-                                    imp3_dep_text.value = bufS;
-                                }
-                                addToComment();
-                            }
-                            for (const chb of imp3_dep) {
-                                chb.addEventListener('change', imp3DepChanging);
-                                let eInd = Array.from(imp3_dep).indexOf(chb);
-                                if (eInd < depArray.length) {
-                                    let including = imp3_dep_text.value.indexOf(depArray[eInd])
-                                    if (including !== -1) {
-                                        if (depArray[eInd] == "СО" && including != 0 && imp3_dep_text.value.slice(including-1, including) == "О") {
-                                            chb.checked = false;
-                                        } else {
-                                            chb.checked = true;
+                            const root_cause_tree = document.querySelector('.root-cause-tree');
+                            root_cause_tree.addEventListener('change', (e) => {
+                                if (!e.target.classList.contains('root-cause-node-checkbox') && !e.target.classList.contains('form-textinput')) return;
+                                const checkbox = e.target;
+                                rootCauseForming();
+                            });
+                            let root_causes = document.getElementsByClassName('root-cause-node-checkbox');
+                            const root_cause_text = document.getElementsByName('root_cause_text');
+                            function rootCauseForming() {
+                                let root_cause_str = '';
+                                for (let i=0; i < root_cause_text.length; i++) {
+                                    if (root_cause_text[i].value != '') {
+                                        if (root_cause_str.length > 0) {
+                                            root_cause_str += ', ';
                                         }
-                                    } else {
-                                        chb.checked = false;
+                                        root_cause_str += root_cause_text[i].id;
                                     }
                                 }
-                            }
-                            let imp4_in_text = document.getElementById("id_imp4_comment_in");
-                            let imp4_out_text = document.getElementById("id_imp4_comment");
-                            function imp4InChanging(e) {
-                                let eInd = Array.from(imp4_in).indexOf(e.target);
-                                if (this.checked) {
-                                    let bufS = imp4_in_text.value;
-                                    if (bufS != "") {
-                                        bufS += ", ";
-                                    }
-                                    imp4_in_text.value = bufS + depArray[eInd];
-                                } else {
-                                    let strInd = -1;
-                                    if (depArray[eInd] == "СО") {
-                                        strInd = imp4_in_text.value.search(re);
-                                    } else {
-                                        strInd = imp4_in_text.value.indexOf(depArray[eInd]);
-                                    }
-                                    let bufS = imp4_in_text.value.slice(0, strInd) + imp4_in_text.value.slice(strInd+depArray[eInd].length+2, imp4_in_text.value.length);
-                                    if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
-                                        bufS = bufS.slice(0, bufS.length-2);
-                                    }
-                                    imp4_in_text.value = bufS;
-                                }
-                                addToComment();
-                            }
-                            for (const chb of imp4_in) {
-                                chb.addEventListener('change', imp4InChanging);
-                                let eInd = Array.from(imp4_in).indexOf(chb);
-                                if (eInd < depArray.length) {
-                                    let including = imp4_in_text.value.indexOf(depArray[eInd])
-                                    if (including !== -1) {
-                                        if (depArray[eInd] == "СО" && including != 0 && imp4_in_text.value.slice(including-1, including) == "О") {
-                                            chb.checked = false;
-                                        } else {
-                                            chb.checked = true;
+                                for (let i=0; i < root_causes.length; i++) {
+                                    if (root_causes[i].checked && root_causes[i].value != 'on') {
+                                        if (root_cause_str.length > 0) {
+                                            root_cause_str += ', ';
                                         }
-                                    } else {
-                                        chb.checked = false;
+                                        root_cause_str += root_causes[i].value;
                                     }
                                 }
-                            }
-                            function imp4OutChanging(e) {
-                                let eInd = Array.from(imp4_out).indexOf(e.target);
-                                if (this.checked) {
-                                    let bufS = imp4_out_text.value;
-                                    if (bufS != "") {
-                                        bufS += ", ";
-                                    }
-                                    imp4_out_text.value = bufS + depArray[eInd];
-                                } else {
-                                    let strInd = -1;
-                                    if (depArray[eInd] == "СО") {
-                                        strInd = imp4_out_text.value.search(re);
-                                    } else {
-                                        strInd = imp4_out_text.value.indexOf(depArray[eInd]);
-                                    }
-                                    let bufS = imp4_out_text.value.slice(0, strInd) + imp4_out_text.value.slice(strInd+depArray[eInd].length+2, imp4_out_text.value.length);
-                                    if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
-                                        bufS = bufS.slice(0, bufS.length-2);
-                                    }
-                                    imp4_out_text.value = bufS;
-                                }
-                                addToComment();
-                            }
-                            for (const chb of imp4_out) {
-                                chb.addEventListener('change', imp4OutChanging);
-                                let eInd = Array.from(imp4_out).indexOf(chb);
-                                if (eInd < depArray.length) {
-                                    let including = imp4_out_text.value.indexOf(depArray[eInd])
-                                    if (including !== -1) {
-                                        if (depArray[eInd] == "СО" && including != 0 && imp4_out_text.value.slice(including-1, including) == "О") {
-                                            chb.checked = false;
-                                        } else {
-                                            chb.checked = true;
-                                        }
-                                    } else {
-                                        chb.checked = false;
-                                    }
-                                }
-                            }
-                            const radioButtons1 = document.querySelectorAll('input[name="importance1"]');
-                            const radioButtons2 = document.querySelectorAll('input[name="importance2"]');
-                            const radioButtons3 = document.querySelectorAll('input[name="importance3"]');
-                            const radioButtons4 = document.querySelectorAll('input[name="importance4"]');
-                            const radioButtons5 = document.querySelectorAll('input[name="importance5"]');
-                            const radioButtons6 = document.querySelectorAll('input[name="importance6"]');
-                            const radioButtons7 = document.querySelectorAll('input[name="importance7"]');
-                            for(const radioButton of radioButtons1){
-                                radioButton.addEventListener('change', select1);
-                                if (radioButton.checked && radioButton.value=="True") {
-                                    imp[0] = 1;
-                                }
-                                if (radioButton.checked && radioButton.value=="False") {
-                                    imp[0] = 0;
-                                }
-                            }
-                            for(const radioButton of radioButtons2){
-                                radioButton.addEventListener('change', select2);
-                                if (radioButton.checked && radioButton.value=="True") {
-                                    imp[1] = 1;
-                                }
-                                if (radioButton.checked && radioButton.value=="False") {
-                                    imp[1] = 0;
-                                }
-                            }
-                            for(const radioButton of radioButtons3){
-                                radioButton.addEventListener('change', select3);
-                                if (radioButton.checked && radioButton.value=="True") {
-                                    imp[2] = 1;
-                                }
-                                if (radioButton.checked && radioButton.value == "False") {
-                                    imp[2] = 0;
-                                }
-                            }
-                            for(const radioButton of radioButtons4){
-                                radioButton.addEventListener('change', select4);
-                                if (radioButton.checked && radioButton.value=="True") {
-                                    imp[3] = 1;
-                                }
-                                if (radioButton.checked && radioButton.value == "False") {
-                                    imp[3] = 0;
-                                }
-                            }
-                            for(const radioButton of radioButtons5){
-                                radioButton.addEventListener('change', select5);
-                                if (radioButton.checked && radioButton.value=="True") {
-                                    document.getElementById("imp6").removeAttribute("hidden");
-                                    imp[4] = 1;
-                                }
-                                if (radioButton.checked && radioButton.value == "False") {
-                                    imp[4] = 0;
-                                }
-                            }
-                            for(const radioButton of radioButtons6){
-                                radioButton.addEventListener('change', select6);
-                                if (radioButton.checked && radioButton.value=="True") {
-                                    imp[5] = 1;
-                                }
-                                if (radioButton.checked && radioButton.value=="False") {
-                                    imp[5] = 0;
-                                }
-                            }
-                            for(const radioButton of radioButtons7){
-                                radioButton.addEventListener('change', select7);
-                                if (radioButton.checked && radioButton.value=="True") {
-                                    imp[6] = 1;
-                                }
-                                if (radioButton.checked && radioButton.value=="False") {
-                                    imp[6] = 0;
-                                }
-                            }
-                            answer();
-
-                            if (document.getElementById("total_imp").value != "") {
-                                document.getElementById("total_imp").style.borderColor="#56C02B";
-								document.getElementById("total_imp").style.background = "#FFFFFF";
-							}
-<!--                            } else {-->
-<!--                                cause_file1.setAttribute("hidden", "");-->
-<!--                                cause_file2.setAttribute("hidden", "");-->
-<!--                                cause_file3.setAttribute("hidden", "");-->
-<!--                                cause_add.setAttribute("hidden", "");-->
-<!--                                cause_name.setAttribute("hidden", "");-->
-<!--                                cause_comment.setAttribute("hidden", "");-->
-<!--                                cause_add.removeAttribute("required");-->
-<!--                                cause_name.removeAttribute("required");-->
-<!--                                cause_comment.removeAttribute("required");-->
-<!--                            }-->
-                            function selectCause(e) {
-                                let lbl = document.getElementById("cause_label");
-                                let txt = document.getElementById("id_root_cause_comment");
-                                let cause_file1 = document.getElementById("cause_file1");
-                                let cause_file2 = document.getElementById("cause_file2");
-                                let cause_file3 = document.getElementById("cause_file3");
-                                let cause_add = document.getElementById("id_cause_add_files");
-                                let cause_name = document.getElementById("id_cause_file_name");
-                                let cause_comment = document.getElementById("id_cause_file_comment");
-                                if (this.selectedOptions != "") {
-                                    document.getElementById("rootCause").removeAttribute("hidden");
-                                    let selectedCause = this.selectedOptions;
-                                    document.getElementById("root_cause").value = "";
-                                    for (let i=0; i < selectedCause.length; i++) {
-                                        document.getElementById("root_cause").value += selectedCause[i].value;
-                                        if (i < selectedCause.length - 1) {
-                                            document.getElementById("root_cause").value += ", ";
-                                        }
-                                    }
-                                }
+                                document.getElementById("root_cause").value = root_cause_str;
                                 let cause = document.getElementById("root_cause").value;
                                 let lbls = [];
-                                if (cause.includes("0.")) {
-                                    document.getElementById("root_cause_text").removeAttribute("hidden");
-                                    document.getElementById("root_cause0").setAttribute("required", "");
-                                    document.getElementById("root_cause0").removeAttribute("hidden");
-                                    txt.setAttribute("hidden", "");
-                                    txt.removeAttribute("required");
-                                    lbl.setAttribute("hidden", "");
-                                    cause_file1.setAttribute("hidden", "");
-                                    cause_file2.setAttribute("hidden", "");
-                                    cause_file3.setAttribute("hidden", "");
-                                    cause_add.setAttribute("hidden", "");
-                                    cause_name.setAttribute("hidden", "");
-                                    cause_comment.setAttribute("hidden", "");
-                                    cause_add.removeAttribute("required");
-                                    cause_name.removeAttribute("required");
-                                    cause_comment.removeAttribute("required");
-                                } else {
-                                    document.getElementById("root_cause_text").setAttribute("hidden", "");
-                                    document.getElementById("root_cause0").removeAttribute("required");
-                                    document.getElementById("root_cause0").setAttribute("hidden", "");
-
-                                    txt.setAttribute("hidden", "");
-                                    txt.removeAttribute("required");
-                                    cause_file1.setAttribute("hidden", "");
-                                    cause_file2.setAttribute("hidden", "");
-                                    cause_file3.setAttribute("hidden", "");
-                                    cause_add.setAttribute("hidden", "");
-                                    cause_name.setAttribute("hidden", "");
-                                    cause_comment.setAttribute("hidden", "");
-                                    cause_add.removeAttribute("required");
-                                    cause_name.removeAttribute("required");
-                                    cause_comment.removeAttribute("required");
-                                    lbl.setAttribute("hidden", "");
-                                }
-
+                                let txt = document.getElementById("id_root_cause_comment");
+                                let lbl = document.getElementById("cause_label");
                                 if (cause.includes("1.3.1.") || cause.includes("1.3.2.") || cause.includes("3.1.1.") || cause.includes("3.1.2.")) {
                                     txt.removeAttribute("hidden");
                                     lbl.removeAttribute("hidden");
@@ -1542,19 +730,336 @@
                                     cause_name.removeAttribute("required");
                                     cause_comment.removeAttribute("required");
                                 }
-                                lbl.innerHTML = "Укажите ";
-                                for (let i=0; i < lbls.length; i++) {
-                                    lbl.innerHTML += lbls[i];
-                                    if (i < lbls.length-1) {
-                                        lbl.innerHTML += ", ";
+                                if (lbls.length > 0) {
+                                    lbl.innerHTML = "Укажите ";
+                                    for (let i=0; i < lbls.length; i++) {
+                                        lbl.innerHTML += lbls[i];
+                                        if (i < lbls.length-1) {
+                                            lbl.innerHTML += ", ";
+                                        }
+                                    }
+                                } else {
+                                    txt.setAttribute("hidden", "");
+                                    lbl.setAttribute("hidden", "");
+                                    lbls.push("конкретных Руководителей и исполнителей (нормоконтролёров)");
+                                    txt.removeAttribute("required");
+                                    cause_file1.setAttribute("hidden", "");
+                                    cause_file2.setAttribute("hidden", "");
+                                    cause_file3.setAttribute("hidden", "");
+                                    cause_add.setAttribute("hidden", "");
+                                    cause_name.setAttribute("hidden", "");
+                                    cause_comment.setAttribute("hidden", "");
+                                    cause_add.removeAttribute("required");
+                                    cause_name.removeAttribute("required");
+                                    cause_comment.removeAttribute("required");
+                                }
+                            }
+                            rootCauseForming();
+
+                            let cause_input = document.getElementById("root_cause")
+                            cause_input.addEventListener('keydown', (e) => {
+                                const allowedKeys = ['Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'PageUp', 'PageDown'];
+                                if (!allowedKeys.includes(e.key) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                                    e.preventDefault();
+                                }
+                            });
+                            cause_input.addEventListener('paste', preventInput);
+                            cause_input.addEventListener('cut', preventInput);
+                            cause_input.addEventListener('drop', preventInput);
+                            cause_input.addEventListener('contextmenu', (e) => {
+                                e.preventDefault();
+                            });
+                            let dogovor = document.getElementById("id_project_dogovor").value;
+                            let reestr = document.getElementById("id_num_reestr").value;
+                            let s = "Реестр выявленных несоответствий № ";
+                            s = s.concat(dogovor.substring(4,9));
+                            s = s.concat(reestr);
+                            document.getElementById("reest_num").innerHTML = s;
+                            let imp1_critical = document.getElementById("imp1_critical").firstChild;
+                            let imp7_critical = document.getElementById("imp7_critical").firstChild;
+                            let imp5_critical = document.getElementById("imp5_critical").firstChild;
+                            let importance = document.getElementById("total_imp").value;
+
+                            if (document.getElementById("id_executor_fail_name").value == document.getElementById("emptyUserID").innerHTML) {
+                                document.getElementById("execFailText").removeAttribute("hidden");
+                                document.getElementById("executor_fail_text").removeAttribute("hidden");
+                            }
+
+                            let imp = [-1, -1, -1, -1, -1, -1, -1];
+                            let imp1 = document.getElementById("imp1");
+                            let imp2 = document.getElementById("imp2");
+                            let imp3 = document.getElementById("imp3");
+                            let imp4 = document.getElementById("imp4");
+                            let imp5 = document.getElementById("imp5");
+                            let imp6 = document.getElementById("imp6");
+                            let imp7 = document.getElementById("imp7");
+                            let imps1 = document.getElementsByClassName("imp1");
+                            let imps3 = document.getElementsByClassName("imp3");
+                            let imp3_dep = document.getElementsByClassName("imp3_dep");
+                            const depArray = ["ГТО", "ГО", "ОСО", "ОГиТ", "ОКиВД", "ОССС", "ОТВС", "ОЭиРБ", "ОЭА", "ПО", "СО", "ТХО", "ЭО", "ОГИП", "Гр. ИГДИ", "Гр. ИГИ", "Гр. ИГФИ", "Гр. ИГМИ", "Гр. ИЭИ", "ХГЛ", "АГ", "НИЛ-11", "НИО-28", "ХАЛ", "НИЛ-35", "НИЛ-5", "НИО-32", "Субподряд"];
+                            const re = /(?<=^|, )СО/;
+                            let imps4 = document.getElementsByClassName("imp4");
+                            let imp4_in = document.getElementsByClassName("imp4_in");
+                            let imp4_out = document.getElementsByClassName("imp4_out");
+                            let imps7 = document.getElementsByClassName("imp7");
+                            let imp3_dep_text = document.getElementById("id_imp3_dep");
+                            function imp3DepChanging(e) {
+                                let eInd = Array.from(imp3_dep).indexOf(e.target);
+                                if (this.checked) {
+                                    let bufS = imp3_dep_text.value;
+                                    if (bufS != "") {
+                                        bufS += ", ";
+                                    }
+                                    imp3_dep_text.value = bufS + depArray[eInd];
+                                } else {
+                                    let strInd = -1;
+                                    if (depArray[eInd] == "СО") {
+                                        strInd = imp3_dep_text.value.search(re);
+                                    } else {
+                                        strInd = imp3_dep_text.value.indexOf(depArray[eInd]);
+                                    }
+                                    let bufS = imp3_dep_text.value.slice(0, strInd) + imp3_dep_text.value.slice(strInd+depArray[eInd].length+2, imp3_dep_text.value.length);
+                                    if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
+                                        bufS = bufS.slice(0, bufS.length-2);
+                                    }
+                                    imp3_dep_text.value = bufS;
+                                }
+                                addToComment();
+                            }
+                            for (const chb of imp3_dep) {
+                                chb.addEventListener('change', imp3DepChanging);
+                                let eInd = Array.from(imp3_dep).indexOf(chb);
+                                if (eInd < depArray.length) {
+                                    let including = imp3_dep_text.value.indexOf(depArray[eInd])
+                                    if (including !== -1) {
+                                        if (depArray[eInd] == "СО" && including != 0 && imp3_dep_text.value.slice(including-1, including) == "О") {
+                                            chb.checked = false;
+                                        } else {
+                                            chb.checked = true;
+                                        }
+                                    } else {
+                                        chb.checked = false;
                                     }
                                 }
                             }
+                            let imp4_in_text = document.getElementById("id_imp4_comment_in");
+                            let imp4_out_text = document.getElementById("id_imp4_comment");
+                            let imp4_in_date = JSON.parse(document.getElementById("id_imp4_in_date").value);
+                            let imp4_out_date = JSON.parse(document.getElementById("id_imp4_out_date").value);
+                            function imp4InChanging(e) {
+                                let eInd = Array.from(imp4_in).indexOf(e.target);
+                                let check_date = this.parentNode.nextElementSibling.firstChild;
+                                if (this.checked) {
+                                    let bufS = imp4_in_text.value;
+                                    if (bufS != "") {
+                                        bufS += ", ";
+                                    }
+                                    imp4_in_text.value = bufS + depArray[eInd];
+                                    check_date.removeAttribute("hidden");
+                                    check_date.setAttribute("required", "");
+                                } else {
+                                    let strInd = -1;
+                                    if (depArray[eInd] == "СО") {
+                                        strInd = imp4_in_text.value.search(re);
+                                    } else {
+                                        strInd = imp4_in_text.value.indexOf(depArray[eInd]);
+                                    }
+                                    let bufS = imp4_in_text.value.slice(0, strInd) + imp4_in_text.value.slice(strInd+depArray[eInd].length+2, imp4_in_text.value.length);
+                                    if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
+                                        bufS = bufS.slice(0, bufS.length-2);
+                                    }
+                                    imp4_in_text.value = bufS;
+                                    check_date.setAttribute("hidden", "");
+                                    check_date.removeAttribute("required");
+                                }
+                                addToComment();
+                            }
+                            for (const chb of imp4_in) {
+                                chb.addEventListener('change', imp4InChanging);
+                                let eInd = Array.from(imp4_in).indexOf(chb);
+                                let check_date = chb.parentNode.nextElementSibling.firstChild;
+                                if (eInd < depArray.length) {
+                                    let including = imp4_in_text.value.indexOf(depArray[eInd])
+                                    if (including !== -1) {
+                                        if (depArray[eInd] == "СО" && including != 0 && imp4_in_text.value.slice(including-1, including) == "О") {
+                                            chb.checked = false;
+                                            check_date.setAttribute("hidden", "");
+                                            check_date.removeAttribute("required");
+                                        } else {
+                                            chb.checked = true;
+                                            check_date.removeAttribute("hidden");
+                                            check_date.setAttribute("required", "");
+                                            if (imp4_in_date) {
+                                                check_date.value = imp4_in_date[depArray[eInd]];
+                                            }
+                                        }
+                                    } else {
+                                        chb.checked = false;
+                                        check_date.setAttribute("hidden", "");
+                                        check_date.removeAttribute("required");
+                                    }
+                                }
+                            }
+                            function imp4OutChanging(e) {
+                                let eInd = Array.from(imp4_out).indexOf(e.target);
+                                let check_date = this.parentNode.nextElementSibling.firstChild;
+                                if (this.checked) {
+                                    let bufS = imp4_out_text.value;
+                                    if (bufS != "") {
+                                        bufS += ", ";
+                                    }
+                                    imp4_out_text.value = bufS + depArray[eInd];
+                                    check_date.removeAttribute("hidden");
+                                    check_date.setAttribute("required", "");
+                                } else {
+                                    let strInd = -1;
+                                    if (depArray[eInd] == "СО") {
+                                        strInd = imp4_out_text.value.search(re);
+                                    } else {
+                                        strInd = imp4_out_text.value.indexOf(depArray[eInd]);
+                                    }
+                                    let bufS = imp4_out_text.value.slice(0, strInd) + imp4_out_text.value.slice(strInd+depArray[eInd].length+2, imp4_out_text.value.length);
+                                    if (bufS.slice(bufS.length-2, bufS.length) == ", ") {
+                                        bufS = bufS.slice(0, bufS.length-2);
+                                    }
+                                    imp4_out_text.value = bufS;
+                                    check_date.setAttribute("hidden", "");
+                                    check_date.removeAttribute("required");
+                                }
+                                addToComment();
+                            }
+                            for (const chb of imp4_out) {
+                                chb.addEventListener('change', imp4OutChanging);
+                                let check_date = chb.parentNode.nextElementSibling.firstChild;
+                                let eInd = Array.from(imp4_out).indexOf(chb);
+                                if (eInd < depArray.length) {
+                                    let including = imp4_out_text.value.indexOf(depArray[eInd])
+                                    if (including !== -1) {
+                                        if (depArray[eInd] == "СО" && including != 0 && imp4_out_text.value.slice(including-1, including) == "О") {
+                                            chb.checked = false;
+                                            check_date.setAttribute("hidden", "");
+                                            check_date.removeAttribute("required");
+                                        } else {
+                                            chb.checked = true;
+                                            check_date.removeAttribute("hidden");
+                                            check_date.setAttribute("required", "");
+                                            if (imp4_out_date) {
+                                                check_date.value = imp4_out_date[depArray[eInd]];
+                                            }
+                                        }
+                                    } else {
+                                        chb.checked = false;
+                                        check_date.setAttribute("hidden", "");
+                                        check_date.removeAttribute("required");
+                                    }
+                                }
+                            }
+                            document.getElementById("newID").addEventListener('click', addID);
+                            function delID(e) {
+                                let parentNode = this.parentElement.parentElement;
+                                parentNode.children[0].firstChild.value = '';
+                                parentNode.children[1].firstChild.value = '';
+                                addToComment();
+                                parentNode.remove();
+                            }
+                            function addID(e) {
+                                const currentRow = this.parentElement.parentElement;
+                                const newRow = currentRow.cloneNode(true);
+                                newRow.querySelectorAll('input').forEach(input => {
+                                    input.value = '';
+                                });
+                                currentRow.after(newRow);
+                                newRow.children[0].firstChild.addEventListener('change', addToComment);
+                                newRow.children[1].firstChild.addEventListener('change', addToComment);
+                                let delButton = newRow.children[2].firstChild;
+                                delButton.addEventListener('click', delID);
+                                delButton.setAttribute("class", "red-button");
+                                delButton.innerHTML = "Удалить ИД";
+                            }
+
+                            const radioButtons1 = document.querySelectorAll('input[name="importance1"]');
+                            const radioButtons2 = document.querySelectorAll('input[name="importance2"]');
+                            const radioButtons3 = document.querySelectorAll('input[name="importance3"]');
+                            const radioButtons4 = document.querySelectorAll('input[name="importance4"]');
+                            const radioButtons5 = document.querySelectorAll('input[name="importance5"]');
+                            const radioButtons6 = document.querySelectorAll('input[name="importance6"]');
+                            const radioButtons7 = document.querySelectorAll('input[name="importance7"]');
+                            for(const radioButton of radioButtons1){
+                                radioButton.addEventListener('change', select1);
+                                if (radioButton.checked && radioButton.value=="True") {
+                                    imp[0] = 1;
+                                }
+                                if (radioButton.checked && radioButton.value=="False") {
+                                    imp[0] = 0;
+                                }
+                            }
+                            for(const radioButton of radioButtons2){
+                                radioButton.addEventListener('change', select2);
+                                if (radioButton.checked && radioButton.value=="True") {
+                                    imp[1] = 1;
+                                }
+                                if (radioButton.checked && radioButton.value=="False") {
+                                    imp[1] = 0;
+                                }
+                            }
+                            for(const radioButton of radioButtons3){
+                                radioButton.addEventListener('change', select3);
+                                if (radioButton.checked && radioButton.value=="True") {
+                                    imp[2] = 1;
+                                }
+                                if (radioButton.checked && radioButton.value == "False") {
+                                    imp[2] = 0;
+                                }
+                            }
+                            for(const radioButton of radioButtons4){
+                                radioButton.addEventListener('change', select4);
+                                if (radioButton.checked && radioButton.value=="True") {
+                                    imp[3] = 1;
+                                }
+                                if (radioButton.checked && radioButton.value == "False") {
+                                    imp[3] = 0;
+                                }
+                            }
+                            for(const radioButton of radioButtons5){
+                                radioButton.addEventListener('change', select5);
+                                if (radioButton.checked && radioButton.value=="True") {
+                                    document.getElementById("imp6").removeAttribute("hidden");
+                                    imp[4] = 1;
+                                }
+                                if (radioButton.checked && radioButton.value == "False") {
+                                    imp[4] = 0;
+                                }
+                            }
+                            for(const radioButton of radioButtons6){
+                                radioButton.addEventListener('change', select6);
+                                if (radioButton.checked && radioButton.value=="True") {
+                                    imp[5] = 1;
+                                }
+                                if (radioButton.checked && radioButton.value=="False") {
+                                    imp[5] = 0;
+                                }
+                            }
+                            for(const radioButton of radioButtons7){
+                                radioButton.addEventListener('change', select7);
+                                if (radioButton.checked && radioButton.value=="True") {
+                                    imp[6] = 1;
+                                }
+                                if (radioButton.checked && radioButton.value=="False") {
+                                    imp[6] = 0;
+                                }
+                            }
+                            answer();
+
+                            if (document.getElementById("total_imp").value != "") {
+                                document.getElementById("total_imp").style.borderColor="#56C02B";
+								document.getElementById("total_imp").style.background = "#FFFFFF";
+							}
 
                             let imp_comment1_znp = document.getElementById("id_imp1_comment_znp");
                             let imp_comment1_nd = document.getElementById("id_imp1_comment_nd");
                             let imp_comm3 = document.getElementById("id_imp3_comment");
-                            let imp_comm7 = document.getElementById("id_imp7_comment");
+                            let imp_comm7 = document.getElementsByName("imp7_comment");
+                            let imp_date7 = document.getElementsByName("imp7_date");
                             function addToComment(e) {
                                 let comment_content = document.getElementById("comment_buf").innerHTML;
                                 if (comment_content != '') {
@@ -1595,17 +1100,26 @@
                                     comment_content = comment_content.concat(imp4_in_text.value);
                                     comment_content = comment_content.concat("\n");
                                 }
-                                if (imp_comm7.value != '') {
-                                    comment_content = comment_content.concat('Требуется получение дополнительных исходных данных от Заказчика: ');
-                                    comment_content = comment_content.concat(imp_comm7.value);
-                                    comment_content = comment_content.concat("\n");
+                                for (let i=0; i<imp_comm7.length; i++) {
+                                    if (imp_comm7[i].value != '') {
+                                        comment_content = comment_content.concat('Требуется получение дополнительных исходных данных от Заказчика: ');
+                                        comment_content = comment_content.concat(imp_comm7[i].value);
+                                        if (imp_date7[i].value != '') {
+                                            comment_content = comment_content.concat('. В срок до ');
+                                            comment_content = comment_content.concat(imp_date7[i].value.slice(-2)+'.'+imp_date7[i].value.slice(5, 7)+'.'+imp_date7[i].value.slice(0, 4));
+                                        }
+                                        comment_content = comment_content.concat("\n");
+                                    }
                                 }
                                 document.getElementById("id_comment").value = comment_content;
                             }
                             imp_comment1_znp.addEventListener('change', addToComment);
                             imp_comment1_nd.addEventListener('change', addToComment);
                             imp_comm3.addEventListener('change', addToComment);
-                            imp_comm7.addEventListener('change', addToComment);
+                            for (let i=0; i<imp_comm7.length; i++) {
+                                imp_comm7[i].addEventListener('change', addToComment);
+                                imp_date7[i].addEventListener('change', addToComment);
+                            }
 
                             function select1(e) {
                                 if (this.checked) {
@@ -1728,15 +1242,30 @@
                                     if (imp[3] != -1) {
                                         imp7.removeAttribute("hidden");
                                         if (imp[6] == 1) {
+                                            imp7_critical.innerHTML = '!';
                                             imps7[0].removeAttribute("hidden");
-                                            imps7[1].removeAttribute("hidden");
-                                            imps7[1].children[0].firstChild.setAttribute("required", "");
+                                            for (let i=1; i < imps7.length; i++) {
+                                                imps7[i].removeAttribute("hidden");
+                                                imps7[i].children[0].firstChild.setAttribute("required", "");
+                                                imps7[i].children[1].firstChild.setAttribute("required", "");
+                                            }
+                                        } else {
+                                            imp7_critical.innerHTML = '';
+                                            imps7[0].setAttribute("hidden", "");
+                                            for (let i=1; i < imps7.length; i++) {
+                                                imps7[i].setAttribute("hidden", "");
+                                                imps7[i].children[0].firstChild.removeAttribute("required");
+                                                imps7[i].children[1].firstChild.removeAttribute("required");
+                                            }
                                         }
                                     } else {
                                         imp7.setAttribute("hidden","");
                                         imps7[0].setAttribute("hidden", "");
-                                        imps7[1].setAttribute("hidden", "");
-                                        imps7[1].children[0].firstChild.removeAttribute("required");
+                                        for (let i=1; i < imps7.length; i++) {
+                                            imps7[i].setAttribute("hidden", "");
+                                            imps7[i].children[0].firstChild.removeAttribute("required");
+                                            imps7[i].children[1].firstChild.removeAttribute("required");
+                                        }
                                     }
                                     if (imp[3] == 1) {
                                         imps4[0].removeAttribute("hidden");
@@ -1773,8 +1302,11 @@
                                     imps4[1].setAttribute("hidden", "");
                                     imps4[2].setAttribute("hidden", "");
                                     imps7[0].setAttribute("hidden", "");
-                                    imps7[1].setAttribute("hidden", "");
-                                    imps7[1].children[0].firstChild.removeAttribute("required");
+                                    for (let i=1; i < imps7.length; i++) {
+                                        imps7[i].setAttribute("hidden", "");
+                                        imps7[i].children[0].firstChild.removeAttribute("required");
+                                        imps7[i].children[1].firstChild.removeAttribute("required");
+                                    }
                                     if (imp[1] == 0) {
                                         document.getElementById("total_imp").value = 'Несущественное';
                                         document.getElementById("total_imp").style.borderColor="#56C02B";
@@ -1794,8 +1326,11 @@
                                         imps4[1].setAttribute("hidden", "");
                                         imps4[2].setAttribute("hidden", "");
                                         imps7[0].setAttribute("hidden", "");
-                                        imps7[1].setAttribute("hidden", "");
-                                        imps7[1].children[0].firstChild.removeAttribute("required");
+                                        for (let i=1; i < imps7.length; i++) {
+                                            imps7[i].setAttribute("hidden", "");
+                                            imps7[i].children[0].firstChild.removeAttribute("required");
+                                            imps7[i].children[1].firstChild.removeAttribute("required");
+                                        }
                                     } else if (imp[1] == 1) {
                                         imp3.removeAttribute("hidden");
                                         if (imp[2] != -1) {
@@ -1817,27 +1352,56 @@
                                                 imp5.removeAttribute("hidden");
                                                 if (imp[4] == 1) {
                                                     imp6.removeAttribute("hidden");
+                                                    imp5_critical.innerHTML = '!';
                                                     if (imp[5] != -1) {
                                                         imp7.removeAttribute("hidden");
                                                         if (imp[6] == 1) {
                                                             imps7[0].removeAttribute("hidden");
-                                                            imps7[1].removeAttribute("hidden");
-                                                            imps7[1].children[0].firstChild.setAttribute("required", "");
+                                                            imp7_critical.innerHTML = '!';
+                                                            for (let i=1; i < imps7.length; i++) {
+                                                                imps7[i].removeAttribute("hidden");
+                                                                imps7[i].children[0].firstChild.setAttribute("required", "");
+                                                                imps7[i].children[1].firstChild.setAttribute("required", "");
+                                                            }
+                                                        } else {
+                                                            imp7_critical.innerHTML = '';
+                                                            imps7[0].setAttribute("hidden", "");
+                                                            for (let i=1; i < imps7.length; i++) {
+                                                                imps7[i].setAttribute("hidden", "");
+                                                                imps7[i].children[0].firstChild.removeAttribute("required");
+                                                                imps7[i].children[1].firstChild.removeAttribute("required");
+                                                            }
                                                         }
                                                     }
                                                 } else if (imp[4] == 0) {
                                                     imp7.removeAttribute("hidden");
+                                                    imp5_critical.innerHTML = '';
                                                     if (imp[6] == 1) {
+                                                        imp7_critical.innerHTML = '!';
                                                         imps7[0].removeAttribute("hidden");
-                                                        imps7[1].removeAttribute("hidden");
-                                                        imps7[1].children[0].firstChild.setAttribute("required", "");
+                                                        for (let i=1; i < imps7.length; i++) {
+                                                            imps7[i].removeAttribute("hidden");
+                                                            imps7[i].children[0].firstChild.setAttribute("required", "");
+                                                            imps7[i].children[1].firstChild.setAttribute("required", "");
+                                                        }
+                                                    } else {
+                                                        imp7_critical.innerHTML = '';
+                                                        imps7[0].setAttribute("hidden", "");
+                                                        for (let i=1; i < imps7.length; i++) {
+                                                            imps7[i].setAttribute("hidden", "");
+                                                            imps7[i].children[0].firstChild.removeAttribute("required");
+                                                            imps7[i].children[1].firstChild.removeAttribute("required");
+                                                        }
                                                     }
+                                                } else {
+                                                    imp5_critical.innerHTML = '';
                                                 }
                                             }
                                         }
 
                                         if (imp[1] == 1) {
                                             if (imp[4] == 1) {
+                                                imp5_critical.innerHTML = '!';
                                                 if (imp[5] == 1) {
                                                     document.getElementById("total_imp").value = 'В компетенции Заказчика';
                                                     document.getElementById("total_imp").style.borderColor="#56C02B";
@@ -1852,6 +1416,7 @@
 													document.getElementById("total_imp").style.background = img_background;
                                                 }
                                             } else if (imp[4] == 0) {
+                                                imp5_critical.innerHTML = '';
                                                 if (imp[6] == 1) {
                                                     imp7_critical.innerHTML = '!';
                                                     document.getElementById("total_imp").value = 'В компетенции Заказчика';
@@ -1869,6 +1434,7 @@
 													document.getElementById("total_imp").style.background = img_background;
                                                 }
                                             } else {
+                                                imp5_critical.innerHTML = '';
                                                 document.getElementById("total_imp").value = '';
                                                 document.getElementById("total_imp").style.borderColor="#FF0000";
 												document.getElementById("total_imp").style.background = img_background;
