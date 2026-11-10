@@ -4302,7 +4302,11 @@ def gip_tasks(request, id):
         tasks_work = gipTask.objects.filter((Q(task_remark__in=remarks_id) & Q(task_status="В работе"))).order_by("-actuality", "id")
         tasks_done = gipTask.objects.filter((Q(task_remark__in=remarks_id) & Q(task_status="Выполнено"))).order_by("-actuality", "id")
         tasks_archive = gipTask.objects.filter((Q(task_remark__in=remarks_id) & Q(task_status="В архиве"))).order_by("-actuality", "id")
-        departments = np.unique(np.array(gipTask.objects.filter(task_remark__in=remarks_id).values_list('task_departments', flat=True)))
+        departments = np.array(gipTask.objects.filter(task_remark__in=remarks_id).values_list('task_departments', flat=True))
+        for i in range(len(departments)):
+            if departments[i] is None:
+                departments[i] = ''
+        departments = np.unique(departments)
         if request.method == 'POST':
             if request.POST.get('table_export'):
                 name = xlsxTasks(reestInfo.objects.filter(id=id))
